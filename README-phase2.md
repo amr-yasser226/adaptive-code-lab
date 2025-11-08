@@ -47,7 +47,7 @@ The document follows the **exact outline** (10–15 pages, cover page, 1.5 line 
 | **Admin Use-Case** | Manage users, backups, server config, logs (`<<extend>>` emergency) | [admin_use_case.png](./docs/figures/admin_use_case.png) |
 | **Automation Use-Case** | Auto-save, code analysis, difficulty adjustment, notifications | [automation_use_case.png](./docs/figures/automation_use_case.png) |
 | **Conceptual Class #1** | `User`, `CodeSession`, `LearningPath`, `Exercise`, `Progress` – associations & multiplicity | [class_diagram_1.png](./docs/figures/class_diagram_1.png) |
-| **Conceptual Class #2** | `RealtimeEditor`, `ChangeLog`, `ConflictResolver`, `WebSocketConnection` – aggregation/composition | [class_diagram_2.png](./docs/figures/class_diagram_2.png) |
+| **Conceptual Class #2** | same as 1 | [class_diagram_2.png](./docs/figures/class_diagram_2.png) |
 
 ---
 
