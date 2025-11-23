@@ -2,44 +2,100 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Adaptive Code Lab - Design Docs</title>
+    <title>Adaptive Code Lab - Design Documentation</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1, h2 { color: #2c3e50; }
+        section { margin-bottom: 40px; }
+        img { max-width: 90%; margin-bottom: 20px; border: 1px solid #ccc; }
+        ul { list-style: none; padding-left: 0; }
+        li { margin-bottom: 20px; }
+    </style>
 </head>
 <body>
-    <h1>Adaptive Code Lab - Design Documentation</h1>
-    
-    <h2>ER Diagram</h2>
-    <img src="design/er/er_diagram.svg" alt="ER Diagram" width="800">
+    <h1>Adaptive Code Lab - Software Design Documentation</h1>
 
-    <h2>System Architecture</h2>
-    <img src="design/architecture/system_architecture.svg" alt="System Architecture" width="800">
+    <!-- ER Diagram -->
+    <section>
+        <h2>ER Diagram</h2>
+        <img src="design/er/er_diagram.svg" alt="ER Diagram">
+    </section>
 
-    <h2>UML Class Diagram</h2>
-    <img src="design/class_diagram/uml_class_diagram.svg" alt="UML Class Diagram" width="800">
+    <!-- System Architecture -->
+    <section>
+        <h2>System Architecture</h2>
+        <img src="design/architecture/system_architecture.svg" alt="System Architecture">
+    </section>
 
-    <h2>Sequence Diagrams</h2>
-    <ul>
-        <li><img src="design/sequence/sequence_submit_assignment.svg" alt="Submit Assignment"></li>
-        <li><img src="design/sequence/sequence_manual_regrade.svg" alt="Manual Regrade"></li>
-        <li><img src="design/sequence/sequence_batch_plagiarism_detection.svg" alt="Batch Plagiarism"></li>
-        <li><img src="design/sequence/sequence_ai_hint_request.svg" alt="AI Hint Request"></li>
-        <li><img src="design/sequence/sequence_peer_review_submission.svg" alt="Peer Review"></li>
-        <li><img src="design/sequence/sequence_student_course_enrollment.svg" alt="Student Enrollment"></li>
-        <li><img src="design/sequence/sequence_mvc_interaction.svg" alt="MVC Interaction"></li>
-    </ul>
+    <!-- UML Class Diagram -->
+    <section>
+        <h2>UML Class Diagram</h2>
+        <img src="design/class_diagram/uml_class_diagram.svg" alt="UML Class Diagram">
+    </section>
 
-    <h2>UI/UX Wireframes</h2>
-    <ul>
-        <li><img src="design/ui_ux/wireframe_assignment_dashboard_desktop.svg" alt="Assignment Dashboard Desktop"></li>
-        <li><img src="design/ui_ux/wireframe_assignment_dashboard_mobile.svg" alt="Assignment Dashboard Mobile"></li>
-        <li><img src="design/ui_ux/wireframe_code_editor_desktop.svg" alt="Code Editor Desktop"></li>
-        <li><img src="design/ui_ux/wireframe_code_editor_mobile.svg" alt="Code Editor Mobile"></li>
-        <li><img src="design/ui_ux/wireframe_progress_feedback_desktop.svg" alt="Progress Feedback Desktop"></li>
-        <li><img src="design/ui_ux/wireframe_progress_feedback_mobile.svg" alt="Progress Feedback Mobile"></li>
-        <li><img src="design/ui_ux/wireframe_similarity_dashboard_desktop.svg" alt="Similarity Dashboard Desktop"></li>
-        <li><img src="design/ui_ux/wireframe_similarity_dashboard_mobile.svg" alt="Similarity Dashboard Mobile"></li>
-        <li><img src="design/ui_ux/wireframe_submission_history_desktop.svg" alt="Submission History Desktop"></li>
-        <li><img src="design/ui_ux/wireframe_submission_history_mobile.svg" alt="Submission History Mobile"></li>
-    </ul>
+    <!-- Sequence Diagrams -->
+    <section>
+        <h2>Sequence Diagrams</h2>
+        <ul>
+            <li><img src="design/sequence/sequence_submit_assignment.svg" alt="Submit Assignment"></li>
+            <li><img src="design/sequence/sequence_manual_regrade.svg" alt="Manual Regrade"></li>
+            <li><img src="design/sequence/sequence_batch_plagiarism_detection.svg" alt="Batch Plagiarism"></li>
+            <li><img src="design/sequence/sequence_ai_hint_request.svg" alt="AI Hint Request"></li>
+            <li><img src="design/sequence/sequence_peer_review_submission.svg" alt="Peer Review Submission"></li>
+            <li><img src="design/sequence/sequence_student_course_enrollment.svg" alt="Student Enrollment"></li>
+            <li><img src="design/sequence/sequence_mvc_interaction.svg" alt="MVC Interaction"></li>
+        </ul>
+    </section>
+
+    <!-- UI/UX Wireframes -->
+    <section>
+        <h2>UI/UX Wireframes</h2>
+        <h3>Assignment Dashboard</h3>
+        <ul>
+            <li><img src="design/ui_ux/wireframe_assignment_dashboard_desktop.svg" alt="Desktop v1"></li>
+            <li><img src="design/ui_ux/wireframe_assignment_dashboard_desktop_v2.svg" alt="Desktop v2"></li>
+            <li><img src="design/ui_ux/wireframe_assignment_dashboard_mobile.svg" alt="Mobile v1"></li>
+            <li><img src="design/ui_ux/wireframe_assignment_dashboard_mobile_v2.svg" alt="Mobile v2"></li>
+        </ul>
+
+        <h3>Code Editor</h3>
+        <ul>
+            <li><img src="design/ui_ux/wireframe_code_editor_desktop.svg" alt="Desktop v1"></li>
+            <li><img src="design/ui_ux/wireframe_code_editor_desktop_v2.svg" alt="Desktop v2"></li>
+            <li><img src="design/ui_ux/wireframe_code_editor_desktop_v3.svg" alt="Desktop v3"></li>
+            <li><img src="design/ui_ux/wireframe_code_editor_desktop_v4.svg" alt="Desktop v4"></li>
+            <li><img src="design/ui_ux/wireframe_code_editor_mobile.svg" alt="Mobile v1"></li>
+            <li><img src="design/ui_ux/wireframe_code_editor_mobile_v2.svg" alt="Mobile v2"></li>
+            <li><img src="design/ui_ux/wireframe_code_editor_merged.svg" alt="Merged v1"></li>
+            <li><img src="design/ui_ux/wireframe_code_editor_merged_v2.svg" alt="Merged v2"></li>
+            <li><img src="design/ui_ux/wireframe_code_editor_merged_v3.svg" alt="Merged v3"></li>
+            <li><img src="design/ui_ux/wireframe_code_editor_merged_v4.svg" alt="Merged v4"></li>
+        </ul>
+
+        <h3>Progress Feedback</h3>
+        <ul>
+            <li><img src="design/ui_ux/wireframe_progress_feedback_desktop.svg" alt="Desktop v1"></li>
+            <li><img src="design/ui_ux/wireframe_progress_feedback_desktop_v2.svg" alt="Desktop v2"></li>
+            <li><img src="design/ui_ux/wireframe_progress_feedback_mobile.svg" alt="Mobile v1"></li>
+            <li><img src="design/ui_ux/wireframe_progress_feedback_mobile_v2.svg" alt="Mobile v2"></li>
+        </ul>
+
+        <h3>Similarity Dashboard</h3>
+        <ul>
+            <li><img src="design/ui_ux/wireframe_similarity_dashboard_desktop.svg" alt="Desktop v1"></li>
+            <li><img src="design/ui_ux/wireframe_similarity_dashboard_desktop_v2.svg" alt="Desktop v2"></li>
+            <li><img src="design/ui_ux/wireframe_similarity_dashboard_mobile.svg" alt="Mobile v1"></li>
+            <li><img src="design/ui_ux/wireframe_similarity_dashboard_mobile_v2.svg" alt="Mobile v2"></li>
+        </ul>
+
+        <h3>Submission History</h3>
+        <ul>
+            <li><img src="design/ui_ux/wireframe_submission_history_desktop.svg" alt="Desktop v1"></li>
+            <li><img src="design/ui_ux/wireframe_submission_history_desktop_v2.svg" alt="Desktop v2"></li>
+            <li><img src="design/ui_ux/wireframe_submission_history_mobile.svg" alt="Mobile v1"></li>
+            <li><img src="design/ui_ux/wireframe_submission_history_mobile_v2.svg" alt="Mobile v2"></li>
+        </ul>
+    </section>
 
 </body>
 </html>
