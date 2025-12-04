@@ -70,3 +70,63 @@ class Instrucotr_repo :
             office_hours=row.office_hours,
             is_Active=row.is_active
         )
+    def save(self, instructor: Instructor) :
+        try:
+            self.db.begin_transaction()
+
+            update_user = """
+                UPDATE users
+                SET name = :name,
+                    email = :email,
+                    password_hash = :password_hash,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = :id
+            """
+            self.db.execute(update_user, {
+                "id": instructor.get_id(),
+                "name": instructor.name,
+                "email": instructor.email,
+                "password_hash": instructor.get_password_hash(),
+            })
+
+
+            exists_query = "SELECT id FROM instructors WHERE id = :id"
+            row = self.db.execute(exists_query, {"id": instructor.get_id()}).fetchone()
+
+            if row:
+
+                update_instructor = """
+                    UPDATE instructors
+                    SET instructor_code = :code,
+                        bio = :bio,
+                        office_hours = :hours
+                    WHERE id = :id
+                """
+                self.db.execute(update_instructor, {
+                    "id": instructor.get_id(),
+                    "code": instructor.instructor_code,
+                    "bio": instructor.bio,
+                    "hours": instructor.office_hours
+                })
+            else:
+
+                insert_instructor = """
+                    INSERT INTO instructors (id, instructor_code, bio, office_hours)
+                    VALUES (:id, :code, :bio, :hours)
+                """
+                self.db.execute(insert_instructor, {
+                    "id": instructor.get_id(),
+                    "code": instructor.instructor_code,
+                    "bio": instructor.bio,
+                    "hours": instructor.office_hours
+                })
+
+            self.db.commit()
+
+
+            return self.getById(instructor.get_id())
+
+        except Exception as e:
+            self.db.rollback()
+            print("Error saving instructor:", e)
+            return None
