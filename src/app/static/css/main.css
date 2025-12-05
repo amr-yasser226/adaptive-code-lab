@@ -2029,6 +2029,91 @@ select:focus-visible {
 }
 
 /* ==============================================
+   Depth & Shadow System
+   ============================================== */
+
+/* Shadow Elevation Levels */
+.shadow-1 {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-2 {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-3 {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.shadow-4 {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.shadow-5 {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+}
+
+/* Header Shadow */
+.navbar {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Card Elevation on Hover */
+.card,
+.analytics-card,
+.detail-card,
+.assignment-card,
+.filter-card {
+    transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Elevated State */
+.card:hover,
+.analytics-card:hover,
+.detail-card:hover,
+.assignment-card:hover,
+.filter-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Dashboard Header Shadow */
+.dashboard-header,
+.analytics-header,
+.submit-header {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Modals Shadow */
+.modal-content {
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Depth Layers for Visual Hierarchy */
+.surface-0 {
+    background-color: white;
+}
+
+.surface-1 {
+    background-color: #f8f9fa;
+}
+
+.surface-2 {
+    background-color: #f0f2f5;
+}
+
+/* Floating Elements */
+.floating-button {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.floating-button:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-4px);
+}
+
+/* ==============================================
    Error Pages (404, 500)
    ============================================== */
 
