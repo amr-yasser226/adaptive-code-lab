@@ -3,50 +3,84 @@
 {% block title %}Dashboard - ACCL{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-md-12">
-        <h1>
-            <i class="fas fa-tachometer-alt"></i> Dashboard
-        </h1>
-        <p class="text-muted">Welcome, {{ current_user.name }}!</p>
+<!-- Orange Gradient Header -->
+<div class="dashboard-header mb-5">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="dashboard-title">
+                    <i class="fas fa-chart-pie"></i> Assignment Dashboard
+                </h1>
+                <p class="dashboard-subtitle">Track your progress and manage submissions</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <i class="fas fa-thumbs-up dashboard-icon-large"></i>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- Stats Row -->
-<div class="row mb-4">
-    {% if current_user.role == 'student' %}
-        <!-- Student Stats -->
-        <div class="col-md-3 mb-3">
-            <div class="stat-card">
-                <i class="fas fa-tasks"></i>
-                <h3>{{ stats.active_assignments }}</h3>
-                <p>Active Assignments</p>
-            </div>
-        </div>
+<!-- Tab Navigation -->
+<div class="assignment-tabs mb-4">
+    <a href="#" class="tab-link active">All Assignments</a>
+    <a href="#" class="tab-link">In Progress</a>
+    <a href="#" class="tab-link">Completed</a>
+    <a href="#" class="tab-link">Overdue</a>
+    <div class="ms-auto">
+        <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-filter"></i> Filter</button>
+        <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-sort"></i> Sort</button>
+    </div>
+</div>
 
-        <div class="col-md-3 mb-3">
-            <div class="stat-card">
-                <i class="fas fa-upload"></i>
-                <h3>{{ stats.total_submissions }}</h3>
-                <p>Submissions</p>
+<!-- Stats Row with Colored Cards -->
+<div class="row mb-5">
+    <!-- Yellow Card: Total Assignments -->
+    <div class="col-md-3 mb-3">
+        <div class="stat-card stat-card-yellow">
+            <div class="stat-icon">
+                <i class="fas fa-chart-bar"></i>
             </div>
+            <h3>{{ stats.total_assignments }}</h3>
+            <p>Total Assignments</p>
+            <small>Across 6 courses</small>
         </div>
+    </div>
 
-        <div class="col-md-3 mb-3">
-            <div class="stat-card">
-                <i class="fas fa-star"></i>
-                <h3>{{ "%.1f"|format(stats.average_score) }}%</h3>
-                <p>Average Score</p>
+    <!-- Blue Card: In Progress -->
+    <div class="col-md-3 mb-3">
+        <div class="stat-card stat-card-blue">
+            <div class="stat-icon">
+                <i class="fas fa-hourglass-half"></i>
             </div>
+            <h3>{{ stats.active_assignments }}</h3>
+            <p>In Progress</p>
+            <small>Due this week: 3</small>
         </div>
+    </div>
 
-        <div class="col-md-3 mb-3">
-            <div class="stat-card">
+    <!-- Green Card: Completed -->
+    <div class="col-md-3 mb-3">
+        <div class="stat-card stat-card-green">
+            <div class="stat-icon">
                 <i class="fas fa-check-circle"></i>
-                <h3>{{ stats.passed_tests }}</h3>
-                <p>Tests Passed</p>
             </div>
+            <h3>{{ stats.passed_tests }}</h3>
+            <p>Completed</p>
+            <small>Avg score: 92%</small>
         </div>
+    </div>
+
+    <!-- Pink Card: Overdue -->
+    <div class="col-md-3 mb-3">
+        <div class="stat-card stat-card-pink">
+            <div class="stat-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3>2</h3>
+            <p>Overdue</p>
+            <small>Requires attention</small>
+        </div>
+    </div>
     {% elif current_user.role == 'instructor' %}
         <!-- Instructor Stats -->
         <div class="col-md-3 mb-3">
