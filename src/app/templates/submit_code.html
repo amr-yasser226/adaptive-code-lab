@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Code - {{ assignment.title }} - ACCL{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('assignment.list') }}">Assignments</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('assignment.view', assignment_id=assignment.id) }}">{{ assignment.title }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Submit</li>
+    </ol>
+</nav>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1>
+            <i class="fas fa-code"></i> Submit Code
+        </h1>
+        <p class="text-muted">{{ assignment.title }}</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Code Editor Area -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h5 class="mb-0">Code Editor</h5>
+                    </div>
+                    <div class="col-auto">
+                        <small>Version: {{ submission.version_number if submission else 1 }}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <form method="POST" action="{{ url_for('submission.submit', assignment_id=assignment.id) }}" novalidate>
+                    {{ form.csrf_token }}
+
+                    <!-- Language Selection -->
+                    <div class="p-3 border-bottom">
+                        <label for="language" class="form-label"><strong>Programming Language</strong></label>
+                        {{ form.language(class="form-select" + (" is-invalid" if form.language.errors else ""), 
+                                        id="language") }}
+                        {% if form.language.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.language.errors[0] }}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            Allowed languages: {{ assignment.languages|join(', ') }}
+                        </small>
+                    </div>
+
+                    <!-- Code Input (Textarea) -->
+                    <div class="p-3">
+                        <label for="code" class="form-label"><strong>Your Code</strong></label>
+                        {{ form.code(class="form-control font-monospace" + (" is-invalid" if form.code.errors else ""), 
+                                    id="code", rows="20", placeholder="Paste or write your code here...") }}
+                        {% if form.code.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.code.errors[0] }}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted d-block mt-2">
+                            Character count: <span id="charCount">0</span> / 100000
+                        </small>
+                    </div>
+
+                    <!-- File Upload Alternative -->
+                    <div class="p-3 border-top">
+                        <label for="file_upload" class="form-label">Or upload a file</label>
+                        <input type="file" class="form-control" id="file_upload" accept=".py,.java,.cpp,.c,.js,.go,.rb">
+                        <small class="form-text text-muted">
+                            Supported: .py, .java, .cpp, .c, .js, .go, .rb (Max: 2MB)
+                        </small>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="p-3 border-top bg-light">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-paper-plane"></i> Submit Code
+                        </button>
+                        <a href="{{ url_for('assignment.view', assignment_id=assignment.id) }}" 
+                           class="btn btn-outline-secondary btn-lg">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Info -->
+    <div class="col-lg-4">
+        <!-- Assignment Info -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Assignment Info</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Due Date</strong>
+                    <p class="mb-0">{{ assignment.due_date.strftime('%B %d, %Y') }}</p>
+                </div>
+                <div class="mb-3">
+                    <strong>Points</strong>
+                    <p class="mb-0">{{ assignment.points }} pts</p>
+                </div>
+                <div>
+                    <strong>Languages</strong>
+                    <p>
+                        {% for lang in assignment.languages %}
+                            <span class="badge bg-secondary">{{ lang }}</span>
+                        {% endfor %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Tips -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-lightbulb"></i> Tips</h5>
+            </div>
+            <div class="card-body">
+                <ul class="small mb-0">
+                    <li>Make sure your code is correct before submitting</li>
+                    <li>You can submit multiple times - only the latest will be graded</li>
+                    <li>Check the test cases before submitting</li>
+                    <li>Your code will be executed in a secure sandbox</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Previous Submissions -->
+        {% if previous_submissions %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Previous Submissions</h5>
+                </div>
+                <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                    <div class="list-group list-group-flush">
+                        {% for prev in previous_submissions %}
+                            <a href="{{ url_for('submission.view', submission_id=prev.id) }}" 
+                               class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <strong>Version {{ prev.version_number }}</strong>
+                                    <small>{{ prev.submitted_at.strftime('%m/%d %H:%M') }}</small>
+                                </div>
+                                <small class="text-muted">{{ prev.language }}</small>
+                                {% if prev.score %}
+                                    <div class="small">
+                                        Score: <strong>{{ prev.score }}/100</strong>
+                                    </div>
+                                {% endif %}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Character counter
+    const codeInput = document.getElementById('code');
+    const charCount = document.getElementById('charCount');
+    
+    if (codeInput) {
+        codeInput.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+        });
+    }
+
+    // File upload handling
+    const fileInput = document.getElementById('file_upload');
+    if (fileInput && codeInput) {
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    codeInput.value = event.target.result;
+                    charCount.textContent = codeInput.value.length;
+                };
+                reader.readAsText(file);
+            }
+        });
+    }
+</script>
+{% endblock %}
