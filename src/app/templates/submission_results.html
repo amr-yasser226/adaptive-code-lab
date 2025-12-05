@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Submission Results - {{ submission.assignment.title }} - ACCL{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('assignment.list') }}">Assignments</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('assignment.view', assignment_id=submission.assignment.id) }}">{{ submission.assignment.title }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Submission Results</li>
+    </ol>
+</nav>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1><i class="fas fa-check-circle"></i> Submission Results</h1>
+        <p class="text-muted">{{ submission.assignment.title }} - Version {{ submission.version_number }}</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <small class="text-muted d-block">Submitted: {{ submission.submitted_at.strftime('%B %d, %Y at %I:%M %p') }}</small>
+        <small class="text-muted">Language: <strong>{{ submission.language }}</strong></small>
+    </div>
+</div>
+
+<!-- Overall Score Card -->
+{% if submission.score %}
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card border-success">
+                <div class="card-body text-center py-5">
+                    <h6 class="card-title text-muted">Overall Score</h6>
+                    <h1 class="text-success mb-3">{{ submission.score }}/100</h1>
+                    <div>
+                        <span class="badge bg-success">Graded</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Progress Summary -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Total Tests</h6>
+                <h3>{{ test_results|length }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Passed</h6>
+                <h3 class="text-success">{{ passed_count }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Failed</h6>
+                <h3 class="text-danger">{{ failed_count }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Pass Rate</h6>
+                <h3 class="text-info">{{ "%.1f"|format((passed_count / test_results|length * 100) if test_results else 0) }}%</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Test Results Detailed -->
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-flask"></i> Test Results</h5>
+    </div>
+    <div class="card-body">
+        {% if test_results %}
+            <div class="accordion" id="testAccordion">
+                {% for result in test_results %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button {% if result.passed %}bg-light{% else %}bg-danger bg-opacity-10{% endif %}" 
+                                    type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#test{{ loop.index }}">
+                                <strong>
+                                    {% if result.passed %}
+                                        <i class="fas fa-check-circle text-success"></i>
+                                    {% else %}
+                                        <i class="fas fa-times-circle text-danger"></i>
+                                    {% endif %}
+                                    Test {{ loop.index }}
+                                </strong>
+                                <span class="ms-2">
+                                    {% if result.passed %}
+                                        <span class="badge bg-success">PASSED</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">FAILED</span>
+                                    {% endif %}
+                                </span>
+                                <span class="ms-auto text-muted small">({{ result.runtime_ms }}ms)</span>
+                            </button>
+                        </h2>
+                        <div id="test{{ loop.index }}" class="accordion-collapse collapse" 
+                             data-bs-parent="#testAccordion">
+                            <div class="accordion-body">
+                                <!-- Input -->
+                                <div class="mb-3">
+                                    <h6>Input</h6>
+                                    <div class="bg-light p-2 rounded border" style="font-family: monospace; font-size: 0.9em; white-space: pre-wrap; word-break: break-all;">
+                                        {{ result.test_case.input[:200] }}{% if result.test_case.input|length > 200 %}...{% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Expected Output -->
+                                <div class="mb-3">
+                                    <h6>Expected Output</h6>
+                                    <div class="bg-light p-2 rounded border" style="font-family: monospace; font-size: 0.9em; white-space: pre-wrap; word-break: break-all;">
+                                        {{ result.test_case.expected_output[:200] }}{% if result.test_case.expected_output|length > 200 %}...{% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Actual Output -->
+                                <div class="mb-3">
+                                    <h6>Your Output</h6>
+                                    <div class="bg-light p-2 rounded border {% if result.passed %}border-success{% else %}border-danger{% endif %}" 
+                                         style="font-family: monospace; font-size: 0.9em; white-space: pre-wrap; word-break: break-all;">
+                                        {{ result.stdout[:200] }}{% if result.stdout|length > 200 %}...{% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Error Output (if any) -->
+                                {% if result.stderr %}
+                                    <div class="mb-3">
+                                        <h6 class="text-danger">Error Output</h6>
+                                        <div class="bg-danger bg-opacity-10 p-2 rounded border border-danger" 
+                                             style="font-family: monospace; font-size: 0.85em; white-space: pre-wrap; word-break: break-all;">
+                                            {{ result.stderr[:300] }}
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                                <!-- Runtime -->
+                                <div class="mb-0">
+                                    <small class="text-muted">Runtime: <strong>{{ result.runtime_ms }}ms</strong></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">No test results available yet. Submission is being processed.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- AI Hints Section -->
+{% if submission.hints %}
+    <div class="card mt-4">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0"><i class="fas fa-lightbulb"></i> AI Hints</h5>
+        </div>
+        <div class="card-body">
+            {% for hint in submission.hints %}
+                <div class="alert alert-info mb-3">
+                    <h6>Hint Level {{ hint.level }}</h6>
+                    <p class="mb-0">{{ hint.content }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+<!-- Action Buttons -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="d-flex gap-2">
+            {% if submission.status != 'graded' and current_user.role == 'instructor' %}
+                <form method="POST" action="{{ url_for('submission.regrade', submission_id=submission.id) }}" style="display: inline;">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sync"></i> Re-grade
+                    </button>
+                </form>
+            {% endif %}
+            
+            <a href="{{ url_for('submission.view_code', submission_id=submission.id) }}" class="btn btn-outline-primary">
+                <i class="fas fa-code"></i> View Code
+            </a>
+            
+            {% if current_user.role == 'student' %}
+                <a href="{{ url_for('submission.create', assignment_id=submission.assignment.id) }}" class="btn btn-success">
+                    <i class="fas fa-arrow-up"></i> Submit New Version
+                </a>
+            {% endif %}
+
+            <a href="{{ url_for('assignment.view', assignment_id=submission.assignment.id) }}" class="btn btn-outline-secondary">
+                Back to Assignment
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

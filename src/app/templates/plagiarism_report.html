@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Similarity Detection - ACCL{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1>
+            <i class="fas fa-exclamation-triangle"></i> Plagiarism Detection
+        </h1>
+        <p class="text-muted">Compare submissions for similarity</p>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('plagiarism.report') }}" class="row g-3">
+            <div class="col-md-4">
+                <label for="assignment" class="form-label">Assignment</label>
+                <select name="assignment" class="form-select" id="assignment">
+                    <option value="">All Assignments</option>
+                    {% for assignment in assignments %}
+                        <option value="{{ assignment.id }}" {% if request.args.get('assignment') == assignment.id|string %}selected{% endif %}>
+                            {{ assignment.title }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="threshold" class="form-label">Similarity Threshold (%)</label>
+                <input type="number" name="threshold" class="form-control" value="{{ request.args.get('threshold', 50) }}" 
+                       min="0" max="100" id="threshold">
+            </div>
+            <div class="col-md-3">
+                <label for="sort" class="form-label">Sort By</label>
+                <select name="sort" class="form-select" id="sort">
+                    <option value="similarity" {% if request.args.get('sort') == 'similarity' %}selected{% endif %}>Highest Similarity</option>
+                    <option value="recent" {% if request.args.get('sort') == 'recent' %}selected{% endif %}>Most Recent</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Similarity Pairs List -->
+{% if similarities %}
+    <div class="row">
+        {% for pair in similarities %}
+            <div class="col-md-12 mb-4">
+                <div class="card {% if pair.similarity_score > 75 %}border-danger{% elif pair.similarity_score > 50 %}border-warning{% else %}border-success{% endif %}">
+                    <div class="card-header {% if pair.similarity_score > 75 %}bg-danger{% elif pair.similarity_score > 50 %}bg-warning{% else %}bg-success{% endif %} text-white">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-users"></i> 
+                                    {{ pair.submission1.student.name }} 
+                                    <i class="fas fa-exchange-alt"></i>
+                                    {{ pair.submission2.student.name }}
+                                </h5>
+                            </div>
+                            <div class="col-auto">
+                                <h4 class="mb-0">{{ "%.1f"|format(pair.similarity_score) }}%</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <strong>Submission 1</strong>
+                                <p class="small text-muted">
+                                    {{ pair.submission1.student.name }}<br>
+                                    Submitted: {{ pair.submission1.submitted_at.strftime('%b %d, %Y') }}
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Submission 2</strong>
+                                <p class="small text-muted">
+                                    {{ pair.submission2.student.name }}<br>
+                                    Submitted: {{ pair.submission2.submitted_at.strftime('%b %d, %Y') }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Matching Snippets -->
+                        {% if pair.matching_blocks %}
+                            <h6 class="mb-3">Matching Code Snippets</h6>
+                            {% for block in pair.matching_blocks[:3] %}
+                                <div class="mb-3">
+                                    <small class="text-muted">Match {{ loop.index }}: {{ "%.1f"|format(block.similarity * 100) }}% similar</small>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="bg-light p-2 rounded border" style="font-family: monospace; font-size: 0.85em; max-height: 100px; overflow: hidden;">
+                                                {{ block.code1[:150] }}...
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="bg-light p-2 rounded border" style="font-family: monospace; font-size: 0.85em; max-height: 100px; overflow: hidden;">
+                                                {{ block.code2[:150] }}...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ url_for('plagiarism.compare', pair_id=pair.id) }}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-eye"></i> Detailed Comparison
+                        </a>
+                        <button class="btn btn-sm btn-outline-danger" onclick="markAsFalsePositive('{{ pair.id }}')">
+                            <i class="fas fa-check"></i> Mark as False Positive
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-info" role="alert">
+        <i class="fas fa-info-circle"></i> No suspicious similarities found above the threshold.
+    </div>
+{% endif %}
+
+<!-- Legend -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h6>Similarity Score Legend</h6>
+                <div class="row">
+                    <div class="col-md-4">
+                        <span class="badge bg-danger">75%+</span>
+                        <span class="ms-2">Very High - Requires Investigation</span>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="badge bg-warning">50-74%</span>
+                        <span class="ms-2">High - Review Recommended</span>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="badge bg-success">< 50%</span>
+                        <span class="ms-2">Low - Likely Independent Work</span>
+                    </div>
+                </div>
+                <p class="small text-muted mt-2 mb-0">
+                    <strong>Note:</strong> This tool is for advisory purposes only. Similar code does not necessarily indicate plagiarism 
+                    as students may legitimately arrive at similar solutions.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<script>
+function markAsFalsePositive(pairId) {
+    if (confirm('Mark this pair as a false positive?')) {
+        fetch('{{ url_for("plagiarism.mark_false_positive") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ pair_id: pairId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+</script>
