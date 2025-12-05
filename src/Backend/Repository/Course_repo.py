@@ -86,7 +86,7 @@ class Course_repo:
                 WHERE id = :id
             """
             self.db.execute(query, {
-                "id": course.get_if(),
+                "id": course.get_id(),
                 "instructor_id": course.get_instructor_id(),
                 "code": course.code,
                 "title": course.title,

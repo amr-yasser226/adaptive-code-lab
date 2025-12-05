@@ -13,7 +13,7 @@ class Course:
         self.status = status
         self.updated_at = updated_at
         self.credits = credits 
-    def get_if(self):
+    def get_id(self):
         return self.__id
     def get_instructor_id(self):
             return self.__instructor_id
