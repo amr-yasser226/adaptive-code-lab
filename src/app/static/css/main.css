@@ -662,6 +662,194 @@ footer a:hover {
     border-color: #EB6B9D;
 }
 
+/* Results/History Page Styles */
+.results-header {
+    background: linear-gradient(135deg, #1E88E5 0%, #1565C0 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 0;
+    margin-left: -15px;
+    margin-right: -15px;
+    margin-top: -15px;
+}
+
+.results-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* Search and Filter Bar */
+.search-filter-bar {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.search-filter-bar .input-group {
+    margin-bottom: 1rem;
+}
+
+.search-filter-bar .input-group-text {
+    color: #999;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* Submission Cards */
+.submission-card {
+    background: white;
+    border-left: 5px solid #ddd;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.submission-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.submission-card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.submission-status-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+.submission-card-passed .submission-status-icon {
+    background: #52C41A;
+}
+
+.submission-card-warning .submission-status-icon {
+    background: #FFA940;
+}
+
+.submission-card-failed .submission-status-icon {
+    background: #F5222D;
+}
+
+.submission-info h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.submission-info .submission-date {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.9rem;
+    color: #999;
+}
+
+.submission-score {
+    margin-left: auto;
+}
+
+.score-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.score-badge-green {
+    background: #F6FFED;
+    color: #2F7C0F;
+}
+
+.score-badge-warning {
+    background: #FFF7E6;
+    color: #AD6800;
+}
+
+.score-badge-danger {
+    background: #FFF1F0;
+    color: #820014;
+}
+
+.submission-card-body {
+    margin: 1rem 0;
+    padding: 1rem 0;
+    border-top: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.submission-stats {
+    display: flex;
+    gap: 2rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.stat-item i {
+    color: #1E88E5;
+}
+
+.submission-card-footer {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.submission-card-passed {
+    border-left-color: #52C41A;
+}
+
+.submission-card-warning {
+    border-left-color: #FFA940;
+}
+
+.submission-card-failed {
+    border-left-color: #F5222D;
+}
+
+/* Statistics Box */
+.stat-box {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #f0f0f0;
+}
+
+.stat-box h6 {
+    font-size: 0.85rem;
+    color: #999;
+    margin-bottom: 0.5rem;
+}
+
+.stat-box h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    color: #333;
+}
+
 /* Print Styles */
 @media print {
     .navbar,

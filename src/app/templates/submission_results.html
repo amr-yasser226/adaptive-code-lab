@@ -1,63 +1,192 @@
 {% extends "base.html" %}
 
-{% block title %}Submission Results - {{ submission.assignment.title }} - ACCL{% endblock %}
+{% block title %}Submission History - ACCL{% endblock %}
 
 {% block content %}
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
-        <li class="breadcrumb-item"><a href="{{ url_for('assignments') }}">Assignments</a></li>
-        <li class="breadcrumb-item"><a href="{{ url_for('assignment_detail', assignment_id=submission.assignment.id) }}">{{ submission.assignment.title }}</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Submission Results</li>
-    </ol>
-</nav>
-
-<div class="row mb-4">
-    <div class="col-md-8">
-        <h1><i class="fas fa-check-circle"></i> Submission Results</h1>
-        <p class="text-muted">{{ submission.assignment.title }} - Version {{ submission.version_number }}</p>
-    </div>
-    <div class="col-md-4 text-end">
-        <small class="text-muted d-block">Submitted: {{ submission.submitted_at.strftime('%B %d, %Y at %I:%M %p') }}</small>
-        <small class="text-muted">Language: <strong>{{ submission.language }}</strong></small>
+<!-- Blue Gradient Header -->
+<div class="results-header mb-5">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="results-title">
+                    <i class="fas fa-history"></i> Submission History
+                </h1>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-outline-light me-2"><i class="fas fa-home"></i> Home</button>
+                <button class="btn btn-outline-light me-2"><i class="fas fa-list"></i> Assignments</button>
+                <button class="btn btn-outline-light me-2"><i class="fas fa-history"></i> History</button>
+                <button class="btn btn-outline-light"><i class="fas fa-download"></i> Export</button>
+                <button class="btn btn-light ms-3"><i class="fas fa-user"></i></button>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- Overall Score Card -->
-{% if submission.score %}
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card border-success">
-                <div class="card-body text-center py-5">
-                    <h6 class="card-title text-muted">Overall Score</h6>
-                    <h1 class="text-success mb-3">{{ submission.score }}/100</h1>
-                    <div>
-                        <span class="badge bg-success">Graded</span>
+<!-- Search and Filter Bar -->
+<div class="search-filter-bar mb-4">
+    <div class="input-group mb-3">
+        <span class="input-group-text bg-light border-0"><i class="fas fa-search"></i></span>
+        <input type="text" class="form-control border-0" placeholder="Search assignments by name, date, or status...">
+    </div>
+    
+    <div class="filter-buttons">
+        <button class="btn btn-primary">All (47)</button>
+        <button class="btn btn-outline-secondary">Recent</button>
+        <button class="btn btn-outline-secondary"><i class="fas fa-check"></i> Passed (32)</button>
+        <button class="btn btn-outline-secondary"><i class="fas fa-times"></i> Failed (15)</button>
+        <div class="ms-auto">
+            <button class="btn btn-outline-secondary"><i class="fas fa-sort"></i> Sort: Newest First</button>
+        </div>
+    </div>
+</div>
+
+<!-- Submission Cards -->
+<div class="row">
+    <div class="col-md-12">
+        <!-- Passed Submission (Green Border) -->
+        <div class="submission-card submission-card-passed mb-3">
+            <div class="submission-card-header">
+                <div class="submission-status-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="submission-info">
+                    <h3>Assignment #3: Data Structures - Binary Trees</h3>
+                    <p class="submission-date"><i class="far fa-calendar"></i> Submitted: November 15, 2025 at 2:34 PM</p>
+                </div>
+                <div class="submission-score">
+                    <span class="score-badge score-badge-green">Score: 95/100</span>
+                </div>
+            </div>
+            <div class="submission-card-body">
+                <div class="submission-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-clock"></i> Time: 45 minutes
                     </div>
+                    <div class="stat-item">
+                        <i class="fas fa-redo"></i> Attempts: 2
+                    </div>
+                </div>
+            </div>
+            <div class="submission-card-footer">
+                <button class="btn btn-sm btn-outline-success"><i class="fas fa-eye"></i> View Details</button>
+                <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-download"></i> Download Code</button>
+            </div>
+        </div>
+
+        <!-- In Progress Submission (Orange Border) -->
+        <div class="submission-card submission-card-warning mb-3">
+            <div class="submission-card-header">
+                <div class="submission-status-icon">
+                    <i class="fas fa-exclamation"></i>
+                </div>
+                <div class="submission-info">
+                    <h3>Assignment #2: Algorithms - Sorting & Searching</h3>
+                    <p class="submission-date"><i class="far fa-calendar"></i> Submitted: November 12, 2025 at 4:18 PM</p>
+                </div>
+                <div class="submission-score">
+                    <span class="score-badge score-badge-warning">Score: 68/100</span>
+                </div>
+            </div>
+            <div class="submission-card-body">
+                <div class="submission-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-clock"></i> Time: 62 minutes
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-redo"></i> Attempts: 3
+                    </div>
+                </div>
+            </div>
+            <div class="submission-card-footer">
+                <button class="btn btn-sm btn-outline-warning"><i class="fas fa-eye"></i> View Details</button>
+                <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-download"></i> Download Code</button>
+            </div>
+        </div>
+
+        <!-- Failed Submission (Red Border) -->
+        <div class="submission-card submission-card-failed mb-3">
+            <div class="submission-card-header">
+                <div class="submission-status-icon">
+                    <i class="fas fa-times"></i>
+                </div>
+                <div class="submission-info">
+                    <h3>Assignment #1: Python Basics - Control Flow</h3>
+                    <p class="submission-date"><i class="far fa-calendar"></i> Submitted: November 8, 2025 at 11:05 AM</p>
+                </div>
+                <div class="submission-score">
+                    <span class="score-badge score-badge-danger">Score: 42/100</span>
+                </div>
+            </div>
+            <div class="submission-card-body">
+                <div class="submission-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-clock"></i> Time: 38 minutes
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-redo"></i> Attempts: 1
+                    </div>
+                </div>
+            </div>
+            <div class="submission-card-footer">
+                <button class="btn btn-sm btn-outline-danger"><i class="fas fa-eye"></i> View Details</button>
+                <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-download"></i> Download Code</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Load More Button -->
+<div class="text-center mb-4">
+    <button class="btn btn-light border"><i class="fas fa-folder-open"></i> Load 12 More Submissions...</button>
+</div>
+
+<!-- Overall Statistics Section -->
+<div class="card border-0 bg-light">
+    <div class="card-body p-4">
+        <h3><i class="fas fa-chart-bar"></i> Overall Statistics & Analytics</h3>
+        <div class="row mt-4">
+            <div class="col-md-2">
+                <div class="stat-box">
+                    <h6>Total Submissions</h6>
+                    <h3>47</h3>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="stat-box">
+                    <h6><i class="fas fa-check"></i> Passed</h6>
+                    <h3 class="text-success">32 (68%)</h3>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="stat-box">
+                    <h6><i class="fas fa-times"></i> Failed</h6>
+                    <h3 class="text-danger">15 (32%)</h3>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="stat-box">
+                    <h6>Average Score</h6>
+                    <h3>78.5%</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-box">
+                    <h6>Total Time Invested</h6>
+                    <h3>24.5 hrs</h3>
                 </div>
             </div>
         </div>
     </div>
-{% endif %}
+</div>
 
-<!-- Progress Summary -->
-<div class="row mb-4">
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <h6 class="card-title text-muted">Total Tests</h6>
-                <h3>{{ test_results|length }}</h3>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <h6 class="card-title text-muted">Passed</h6>
-                <h3 class="text-success">{{ passed_count }}</h3>
-            </div>
-        </div>
-    </div>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('assignments') }}">Assignments</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Submission Results</li>
+    </ol>
+</nav>
     <div class="col-md-3">
         <div class="card text-center">
             <div class="card-body">
