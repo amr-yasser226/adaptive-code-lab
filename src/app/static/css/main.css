@@ -1208,6 +1208,23 @@ footer a:hover {
     animation: bounce 1s infinite;
 }
 
+/* Code Editor Styles */
+.editor-card {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.editor-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+
+.editor-header h5 {
+    margin: 0;
+}
+
 /* Responsive Design - Tablet Adjustments */
 @media (max-width: 768px) {
     .dashboard-header {
