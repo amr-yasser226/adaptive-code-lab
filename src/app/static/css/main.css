@@ -850,6 +850,232 @@ footer a:hover {
     color: #333;
 }
 
+/* Plagiarism Detection Page Styles */
+.plagiarism-header {
+    background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 0;
+    margin-left: -15px;
+    margin-right: -15px;
+    margin-top: -15px;
+}
+
+.plagiarism-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.plagiarism-subtitle {
+    margin: 0.5rem 0 0 0;
+    font-size: 0.95rem;
+    opacity: 0.95;
+}
+
+.plagiarism-icon-large {
+    font-size: 3rem;
+    opacity: 0.3;
+}
+
+/* Overview Cards */
+.overview-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.overview-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.overview-card i {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.overview-card h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0.5rem 0;
+}
+
+.overview-card p {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0;
+}
+
+.overview-card-blue i,
+.overview-card-blue h3 {
+    color: #1E88E5;
+}
+
+.overview-card-red i,
+.overview-card-red h3 {
+    color: #E53935;
+}
+
+.overview-card-yellow i,
+.overview-card-yellow h3 {
+    color: #FFA000;
+}
+
+.overview-card-green i,
+.overview-card-green h3 {
+    color: #43A047;
+}
+
+/* Filter Controls */
+.filter-controls {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Similarity Detection Cards */
+.similarity-card {
+    background: white;
+    border-left: 5px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.similarity-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.similarity-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    background: #f8f9fa;
+}
+
+.similarity-badge {
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+}
+
+.similarity-card-high .similarity-badge {
+    background: #FFEBEE;
+    color: #C62828;
+}
+
+.similarity-card-medium .similarity-badge {
+    background: #FFF3E0;
+    color: #E65100;
+}
+
+.similarity-score {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #666;
+}
+
+.similarity-card-high {
+    border-left-color: #E53935;
+}
+
+.similarity-card-high .similarity-score {
+    color: #E53935;
+}
+
+.similarity-card-medium {
+    border-left-color: #FFA000;
+}
+
+.similarity-card-medium .similarity-score {
+    color: #FFA000;
+}
+
+.similarity-card-body {
+    padding: 1.5rem;
+}
+
+.comparison-pair {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 1rem;
+}
+
+.submission-compared {
+    flex: 1;
+}
+
+.submission-compared h6 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.submission-compared p {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0.25rem 0;
+}
+
+.vs-badge {
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #666;
+    flex-shrink: 0;
+}
+
+.comparison-details {
+    font-size: 0.9rem;
+    color: #999;
+    margin: 0;
+}
+
+.similarity-card-footer {
+    padding: 1rem 1.5rem;
+    background: #f8f9fa;
+    text-align: right;
+}
+
+/* Insights Grid */
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.insight-item {
+    display: flex;
+    gap: 1rem;
+}
+
+.insight-item i {
+    font-size: 1.5rem;
+    color: #9C27B0;
+    flex-shrink: 0;
+}
+
+.insight-item p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
 /* Print Styles */
 @media print {
     .navbar,
