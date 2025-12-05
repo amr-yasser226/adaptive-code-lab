@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - ACCL{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1>
+            <i class="fas fa-chart-bar"></i> Analytics Dashboard
+        </h1>
+        <p class="text-muted">View class performance and assignment statistics</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{{ url_for('analytics.export_csv') }}" class="btn btn-success">
+            <i class="fas fa-download"></i> Export CSV
+        </a>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-4">
+                <label for="assignment" class="form-label">Assignment</label>
+                <select name="assignment" class="form-select" id="assignment">
+                    <option value="">All Assignments</option>
+                    {% for assignment in assignments %}
+                        <option value="{{ assignment.id }}" {% if request.args.get('assignment') == assignment.id|string %}selected{% endif %}>
+                            {{ assignment.title }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="date_range" class="form-label">Date Range</label>
+                <select name="date_range" class="form-select" id="date_range">
+                    <option value="all" {% if request.args.get('date_range') == 'all' %}selected{% endif %}>All Time</option>
+                    <option value="week" {% if request.args.get('date_range') == 'week' %}selected{% endif %}>Last Week</option>
+                    <option value="month" {% if request.args.get('date_range') == 'month' %}selected{% endif %}>Last Month</option>
+                    <option value="semester" {% if request.args.get('date_range') == 'semester' %}selected{% endif %}>This Semester</option>
+                </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-filter"></i> Apply Filters
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Overall Statistics -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Class Average</h6>
+                <h2 class="text-primary">{{ "%.1f"|format(stats.class_average) }}%</h2>
+                <small class="text-muted">All students, all assignments</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Total Students</h6>
+                <h2 class="text-success">{{ stats.total_students }}</h2>
+                <small class="text-muted">Enrolled</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Submissions</h6>
+                <h2 class="text-info">{{ stats.total_submissions }}</h2>
+                <small class="text-muted">Received</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Submission Rate</h6>
+                <h2 class="text-warning">{{ "%.1f"|format(stats.submission_rate) }}%</h2>
+                <small class="text-muted">On-time submissions</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assignment Performance Table -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Performance by Assignment</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Assignment</th>
+                        <th>Submissions</th>
+                        <th>Average Score</th>
+                        <th>Pass Rate</th>
+                        <th>Median Time</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for assignment in assignment_stats %}
+                        <tr>
+                            <td>
+                                <strong>{{ assignment.title }}</strong>
+                                <br>
+                                <small class="text-muted">{{ assignment.due_date.strftime('%b %d') }}</small>
+                            </td>
+                            <td>{{ assignment.submission_count }}/{{ assignment.student_count }}</td>
+                            <td>
+                                <strong>{{ "%.1f"|format(assignment.average_score) }}%</strong>
+                            </td>
+                            <td>
+                                {% if assignment.pass_rate >= 80 %}
+                                    <span class="badge bg-success">{{ "%.0f"|format(assignment.pass_rate) }}%</span>
+                                {% elif assignment.pass_rate >= 60 %}
+                                    <span class="badge bg-warning">{{ "%.0f"|format(assignment.pass_rate) }}%</span>
+                                {% else %}
+                                    <span class="badge bg-danger">{{ "%.0f"|format(assignment.pass_rate) }}%</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ assignment.median_submission_time }}</td>
+                            <td>
+                                <a href="{{ url_for('analytics.assignment_detail', assignment_id=assignment.id) }}" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    Details
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Student Performance -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Score Distribution</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted text-center py-5">
+                    <i class="fas fa-chart" style="font-size: 3rem;"></i><br>
+                    Chart visualization would display here
+                </p>
+                <p class="small text-muted text-center">
+                    (In production, this would show a histogram or bell curve of score distribution)
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Performance Tiers</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Excellent (90-100%)</small>
+                    <p class="mb-2">
+                        <strong>{{ performance_tiers.excellent }}</strong> students
+                        <span class="float-end text-success">{{ "%.1f"|format((performance_tiers.excellent / stats.total_students * 100) if stats.total_students > 0 else 0) }}%</span>
+                    </p>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Good (80-89%)</small>
+                    <p class="mb-2">
+                        <strong>{{ performance_tiers.good }}</strong> students
+                        <span class="float-end text-info">{{ "%.1f"|format((performance_tiers.good / stats.total_students * 100) if stats.total_students > 0 else 0) }}%</span>
+                    </p>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Average (70-79%)</small>
+                    <p class="mb-2">
+                        <strong>{{ performance_tiers.average }}</strong> students
+                        <span class="float-end text-warning">{{ "%.1f"|format((performance_tiers.average / stats.total_students * 100) if stats.total_students > 0 else 0) }}%</span>
+                    </p>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Needs Improvement (Below 70%)</small>
+                    <p class="mb-0">
+                        <strong>{{ performance_tiers.needs_improvement }}</strong> students
+                        <span class="float-end text-danger">{{ "%.1f"|format((performance_tiers.needs_improvement / stats.total_students * 100) if stats.total_students > 0 else 0) }}%</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
