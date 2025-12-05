@@ -1,5 +1,5 @@
 class Enrollment : 
-    Enrollement_status =('enrolled','dropped','completed')
+    VALID_STATUS =('enrolled','dropped','completed')
     def __init__(self, student_id , course_id , status , enrolled_at , dropped_at , final_grade):
         if status not in Enrollment.VALID_STATUS:
             raise ValueError(
