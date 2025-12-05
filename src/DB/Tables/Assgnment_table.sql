@@ -1,7 +1,4 @@
-from DB.connection import connect_db
-conn=connect_db()
-c=conn.cursor()
-c.execute('''CREATE TABLE assignments (
+CREATE TABLE IF NOT EXISTS assignments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     course_id INTEGER NOT NULL,
     title TEXT NOT NULL,
@@ -16,8 +13,3 @@ c.execute('''CREATE TABLE assignments (
     updated_at TIMESTAMP,
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
-
-''')
-
-conn.commit()
-conn.close()
