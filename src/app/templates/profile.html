@@ -3,47 +3,60 @@
 {% block title %}Profile - ACCL{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-md-8">
-        <h1>
-            <i class="fas fa-user"></i> Profile
-        </h1>
-        <p class="text-muted">Your account information</p>
+<!-- Profile Header -->
+<div class="profile-header mb-5">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="mb-0">
+                <i class="fas fa-user-circle"></i> My Profile
+            </h1>
+            <p class="text-muted mb-0 mt-2">Manage your account settings and preferences</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="badge bg-primary" style="font-size: 1rem; padding: 0.5rem 1rem;">
+                {% if current_user.role == 'instructor' %}
+                    <i class="fas fa-chalkboard-user"></i> Instructor
+                {% elif current_user.role == 'admin' %}
+                    <i class="fas fa-crown"></i> Administrator
+                {% else %}
+                    <i class="fas fa-graduation-cap"></i> Student
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 
 <div class="row">
     <div class="col-md-8">
         <!-- Profile Information -->
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Account Information</h5>
+        <div class="card mb-4 profile-card">
+            <div class="card-header bg-gradient">
+                <h5 class="mb-0"><i class="fas fa-id-card"></i> Account Information</h5>
             </div>
             <div class="card-body">
                 <form method="POST" action="{{ url_for('profile.update') }}" novalidate>
-                    {{ form.csrf_token }}
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="name" class="form-label">Full Name</label>
-                            {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), 
-                                        id="name", readonly=True) }}
-                            <small class="form-text text-muted">Contact admin to change name</small>
+                            <input type="text" class="form-control" id="name" 
+                                   value="{{ current_user.name }}" readonly style="background-color: #f8f9fa;">
+                            <small class="form-text text-muted"><i class="fas fa-lock"></i> Contact admin to change</small>
                         </div>
 
                         <div class="col-md-6 mb-3">
                             <label for="role" class="form-label">Account Type</label>
                             <input type="text" class="form-control" id="role" 
                                    value="{% if current_user.role == 'instructor' %}Instructor{% elif current_user.role == 'admin' %}Administrator{% else %}Student{% endif %}" 
-                                   readonly>
+                                   readonly style="background-color: #f8f9fa;">
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label for="email" class="form-label">Email Address</label>
-                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), 
-                                     id="email", readonly=True) }}
-                        <small class="form-text text-muted">Contact admin to change email</small>
+                        <input type="email" class="form-control" id="email" 
+                               value="{{ current_user.email }}" readonly style="background-color: #f8f9fa;">
+                        <small class="form-text text-muted"><i class="fas fa-lock"></i> Contact admin to change email</small>
                     </div>
 
                     <hr>
