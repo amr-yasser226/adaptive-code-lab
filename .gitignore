@@ -35,3 +35,5 @@ model_cache/
 
 # Ignore SQLite database
 src/DB/Accl_DB.db
+
+.pytest_cache/
