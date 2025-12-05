@@ -1,9 +1,14 @@
 import sqlite3
 import os
-import pytest
+from dotenv import load_dotenv
 
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../src"))
-DB_PATH = os.path.join(PROJECT_ROOT, "DB", "Accl_DB.db")
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
+
+DB_PATH = os.getenv("ACCL_DB_PATH", os.path.join(PROJECT_ROOT, "DB", "Accl_DB.db"))
+if not os.path.isabs(DB_PATH):
+    DB_PATH = os.path.join(PROJECT_ROOT, DB_PATH)
+
 TABLES_DIR = os.path.join(PROJECT_ROOT, "DB", "Tables")
 
 def run_migrations(db_path=DB_PATH, tables_dir=TABLES_DIR):
@@ -29,14 +34,12 @@ def run_migrations(db_path=DB_PATH, tables_dir=TABLES_DIR):
 
     conn.commit()
 
-    # Return a proper list of table names
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
     tables = [t[0] for t in cursor.fetchall()]
 
     conn.close()
     print("\n✅ All migrations finished!")
     return tables
-
 
 if __name__ == "__main__":
     run_migrations()

@@ -1,7 +1,15 @@
-import sqlite3
 import os
+import sqlite3
+from dotenv import load_dotenv
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "Accl_DB.db")
+# Load .env
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
+
+# Use DB path from .env
+DB_PATH = os.getenv("ACCL_DB_PATH", os.path.join(PROJECT_ROOT, "DB", "Accl_DB.db"))
+if not os.path.isabs(DB_PATH):
+    DB_PATH = os.path.join(PROJECT_ROOT, DB_PATH)
 
 def create_database():
     conn = sqlite3.connect(DB_PATH)
