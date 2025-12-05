@@ -1,11 +1,19 @@
 from sqlalchemy import create_engine ,text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
-
+from dotenv import load_dotenv
+import os
 
 class Database : 
-    def __init__(self,db_url:str): 
-        self.db_url = db_url
+    def __init__(self): 
+        load_dotenv()
+
+        self.db_url = os.getenv("ACCL_DB_PATH")
+
+        if not self.db_url:
+            raise ValueError("ACCL_DB_PATH not found in .env")
+
+
         self.session_local=None
         self.engine = None
         self.session = None
