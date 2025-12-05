@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ACCL - Adaptive Collaborative Code Lab. Online coding platform for assignments, testing, and plagiarism detection.">
+    <meta name="author" content="ACCL Team">
+    <meta name="theme-color" content="#FF9500">
     <title>{% block title %}ACCL - Adaptive Collaborative Code Lab{% endblock %}</title>
     
     <!-- Bootstrap CSS -->
@@ -17,13 +20,18 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <!-- Skip to Main Content Link (Accessibility) -->
+    <a href="#main-content" class="btn btn-primary position-fixed" style="top: -40px; left: 0; z-index: 100;" onFocus="this.style.top='0';" onBlur="this.style.top='-40px';">
+        Skip to Main Content
+    </a>
+
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top" aria-label="Main Navigation">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('index') }}">
-                <i class="fas fa-code"></i> ACCL
+            <a class="navbar-brand" href="{{ url_for('index') }}" aria-label="ACCL Home">
+                <i class="fas fa-code" aria-hidden="true"></i> ACCL
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
