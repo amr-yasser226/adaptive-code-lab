@@ -2373,6 +2373,149 @@ section + section {
 }
 
 /* ==============================================
+   Footer & Bottom Section Styling
+   ============================================== */
+
+footer {
+    background: linear-gradient(135deg, #343a40 0%, #23282d 100%);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 3rem 0 1rem;
+    margin-top: 4rem;
+    border-top: 2px solid #FF9500;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.1);
+}
+
+footer h5 {
+    color: #FF9500;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 0.75rem;
+}
+
+footer h5::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 30px;
+    height: 2px;
+    background: linear-gradient(90deg, #FF9500, transparent);
+}
+
+footer p {
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+footer a,
+.text-light-link {
+    color: rgba(255, 255, 255, 0.8) !important;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+footer a::before,
+.text-light-link::before {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: #FF9500;
+    transition: width 0.3s ease;
+}
+
+footer a:hover,
+.text-light-link:hover {
+    color: #FF9500 !important;
+}
+
+footer a:hover::before,
+.text-light-link:hover::before {
+    width: 100%;
+}
+
+footer ul {
+    list-style: none;
+    padding: 0;
+}
+
+footer ul li {
+    margin-bottom: 0.5rem;
+}
+
+footer hr {
+    border-color: rgba(255, 255, 255, 0.1);
+    margin: 2rem 0;
+}
+
+footer .small {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+/* Back to Top Button */
+.back-to-top {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #FF9500 0%, #FF6B00 100%);
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 99;
+    box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.back-to-top.show {
+    display: flex;
+}
+
+.back-to-top:hover {
+    background: linear-gradient(135deg, #FF6B00 0%, #FF5500 100%);
+    box-shadow: 0 8px 20px rgba(255, 149, 0, 0.4);
+    transform: translateY(-4px);
+}
+
+.back-to-top i {
+    color: white;
+    font-size: 1.25rem;
+}
+
+/* Responsive Footer */
+@media (max-width: 768px) {
+    footer {
+        padding: 2rem 0 1rem;
+        margin-top: 2rem;
+    }
+
+    footer h5 {
+        margin-bottom: 1rem;
+        font-size: 1rem;
+    }
+
+    footer .text-center {
+        text-align: center;
+    }
+
+    .back-to-top {
+        width: 45px;
+        height: 45px;
+        bottom: 1.5rem;
+        right: 1.5rem;
+    }
+}
+
+/* ==============================================
    Error Pages (404, 500)
    ============================================== */
 
