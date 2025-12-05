@@ -1,7 +1,4 @@
-from DB.connection import connect_db
-conn=connect_db()
-c=conn.cursor()
-c.execute('''CREATE TABLE files (
+CREATE TABLE IF NOT EXISTS files (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     submission_id INTEGER NOT NULL,
     path TEXT NOT NULL,
@@ -15,9 +12,3 @@ c.execute('''CREATE TABLE files (
     FOREIGN KEY (submission_id) REFERENCES submissions(id) ON DELETE CASCADE,
     FOREIGN KEY (uploader_id) REFERENCES users(id) ON DELETE SET NULL
 );
-
-
-
-''')
-conn.commit()
-conn.close()

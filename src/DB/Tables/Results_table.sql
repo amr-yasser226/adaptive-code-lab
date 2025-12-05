@@ -1,7 +1,4 @@
-from DB.connection import connect_db
-conn=connect_db()
-c=conn.cursor()
-c.execute('''CREATE TABLE results (
+CREATE TABLE IF NOT EXISTS results (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     submission_id INTEGER NOT NULL,
     test_case_id INTEGER NOT NULL,
@@ -16,9 +13,3 @@ c.execute('''CREATE TABLE results (
     FOREIGN KEY (submission_id) REFERENCES submissions(id) ON DELETE CASCADE,
     FOREIGN KEY (test_case_id) REFERENCES test_cases(id) ON DELETE CASCADE
 );
-
-    
-
-''')
-conn.commit()
-conn.close()
