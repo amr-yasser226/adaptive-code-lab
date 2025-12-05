@@ -26,7 +26,7 @@ def main():
         print(f"ERROR: app.py not found at {app_path}")
         sys.exit(1)
     
-    print("Γ£ô Found Flask application")
+    print("[OK] Found Flask application")
     print(f"  Location: {app_path}")
     print()
     
@@ -34,7 +34,7 @@ def main():
     templates_path = project_root / 'src' / 'app' / 'templates'
     if templates_path.exists():
         template_files = list(templates_path.glob('*.html')) + list(templates_path.glob('auth/*.html'))
-        print(f"Γ£ô Found {len(template_files)} template files")
+        print(f"[OK] Found {len(template_files)} template files")
     print()
     
     # Check static files
@@ -42,15 +42,15 @@ def main():
     if static_path.exists():
         css_files = list((static_path / 'css').glob('*.css'))
         js_files = list((static_path / 'js').glob('*.js'))
-        print(f"Γ£ô Found {len(css_files)} CSS and {len(js_files)} JS files")
+        print(f"[OK] Found {len(css_files)} CSS and {len(js_files)} JS files")
     print()
     
     # Check database
     db_path = project_root / 'src' / 'DB' / 'Accl_DB.db'
     if db_path.exists():
-        print(f"Γ£ô Database found: {db_path}")
+        print(f"[OK] Database found: {db_path}")
     else:
-        print(f"ΓÜá Database not found at {db_path}")
+        print(f"[WARN] Database not found at {db_path}")
         print("  Run: python src/DB/Creating_DB.py")
     print()
     
