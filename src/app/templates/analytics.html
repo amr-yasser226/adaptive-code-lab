@@ -3,26 +3,22 @@
 {% block title %}Analytics - ACCL{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-md-8">
-        <h1>
-            <i class="fas fa-chart-bar"></i> Analytics Dashboard
-        </h1>
-        <p class="text-muted">View class performance and assignment statistics</p>
-    </div>
-    <div class="col-md-4 text-end">
-        <a href="{{ url_for('analytics.export_csv') }}" class="btn btn-success">
-            <i class="fas fa-download"></i> Export CSV
-        </a>
+<!-- Analytics Header -->
+<div class="analytics-header">
+    <div class="container-fluid">
+        <h1><i class="fas fa-chart-bar"></i> Analytics Dashboard</h1>
+        <p class="subtitle">Real-time performance insights and class statistics</p>
     </div>
 </div>
 
 <!-- Filters -->
-<div class="card mb-4">
-    <div class="card-body">
+<div class="container-fluid my-4">
+    <div class="filter-card">
         <form method="GET" class="row g-3">
-            <div class="col-md-4">
-                <label for="assignment" class="form-label">Assignment</label>
+            <div class="col-md-3">
+                <label for="assignment" class="form-label">
+                    <i class="fas fa-tasks"></i> Assignment
+                </label>
                 <select name="assignment" class="form-select" id="assignment">
                     <option value="">All Assignments</option>
                     {% for assignment in assignments %}
@@ -32,8 +28,10 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-4">
-                <label for="date_range" class="form-label">Date Range</label>
+            <div class="col-md-3">
+                <label for="date_range" class="form-label">
+                    <i class="fas fa-calendar"></i> Date Range
+                </label>
                 <select name="date_range" class="form-select" id="date_range">
                     <option value="all" {% if request.args.get('date_range') == 'all' %}selected{% endif %}>All Time</option>
                     <option value="week" {% if request.args.get('date_range') == 'week' %}selected{% endif %}>Last Week</option>
@@ -45,157 +43,194 @@
                 <button type="submit" class="btn btn-primary w-100">
                     <i class="fas fa-filter"></i> Apply Filters
                 </button>
+                <a href="{{ url_for('analytics.export_csv') }}" class="btn btn-success ms-2">
+                    <i class="fas fa-download"></i>
+                </a>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Overall Statistics -->
-<div class="row mb-4">
-    <div class="col-md-3 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <h6 class="card-title text-muted">Class Average</h6>
-                <h2 class="text-primary">{{ "%.1f"|format(stats.class_average) }}%</h2>
-                <small class="text-muted">All students, all assignments</small>
+<!-- Overall Statistics Cards -->
+<div class="container-fluid mb-4">
+    <div class="row">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="analytics-card stat-card-blue">
+                <div class="stat-icon">
+                    <i class="fas fa-percentage"></i>
+                </div>
+                <div class="stat-content">
+                    <h6>Class Average</h6>
+                    <h2>{{ "%.1f"|format(stats.class_average) }}%</h2>
+                    <small>Overall performance</small>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <h6 class="card-title text-muted">Total Students</h6>
-                <h2 class="text-success">{{ stats.total_students }}</h2>
-                <small class="text-muted">Enrolled</small>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="analytics-card stat-card-green">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-content">
+                    <h6>Total Students</h6>
+                    <h2>{{ stats.total_students }}</h2>
+                    <small>Active enrollments</small>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <h6 class="card-title text-muted">Submissions</h6>
-                <h2 class="text-info">{{ stats.total_submissions }}</h2>
-                <small class="text-muted">Received</small>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="analytics-card stat-card-yellow">
+                <div class="stat-icon">
+                    <i class="fas fa-paper-plane"></i>
+                </div>
+                <div class="stat-content">
+                    <h6>Submissions</h6>
+                    <h2>{{ stats.total_submissions }}</h2>
+                    <small>Total received</small>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <h6 class="card-title text-muted">Submission Rate</h6>
-                <h2 class="text-warning">{{ "%.1f"|format(stats.submission_rate) }}%</h2>
-                <small class="text-muted">On-time submissions</small>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="analytics-card stat-card-pink">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <div class="stat-content">
+                    <h6>Submission Rate</h6>
+                    <h2>{{ "%.1f"|format(stats.submission_rate) }}%</h2>
+                    <small>On-time submissions</small>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Assignment Performance Table -->
-<div class="card mb-4">
-    <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">Performance by Assignment</h5>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th>Assignment</th>
-                        <th>Submissions</th>
-                        <th>Average Score</th>
-                        <th>Pass Rate</th>
-                        <th>Median Time</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for assignment in assignment_stats %}
+<div class="container-fluid mb-4">
+    <div class="analytics-card">
+        <div class="analytics-card-header">
+            <h5>Performance by Assignment</h5>
+            <span class="badge bg-secondary">{{ assignment_stats|length }} assignments</span>
+        </div>
+        <div class="analytics-card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
                         <tr>
-                            <td>
-                                <strong>{{ assignment.title }}</strong>
-                                <br>
-                                <small class="text-muted">{{ assignment.due_date.strftime('%b %d') }}</small>
-                            </td>
-                            <td>{{ assignment.submission_count }}/{{ assignment.student_count }}</td>
-                            <td>
-                                <strong>{{ "%.1f"|format(assignment.average_score) }}%</strong>
-                            </td>
-                            <td>
-                                {% if assignment.pass_rate >= 80 %}
-                                    <span class="badge bg-success">{{ "%.0f"|format(assignment.pass_rate) }}%</span>
-                                {% elif assignment.pass_rate >= 60 %}
-                                    <span class="badge bg-warning">{{ "%.0f"|format(assignment.pass_rate) }}%</span>
-                                {% else %}
-                                    <span class="badge bg-danger">{{ "%.0f"|format(assignment.pass_rate) }}%</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ assignment.median_submission_time }}</td>
-                            <td>
-                                <a href="{{ url_for('analytics.assignment_detail', assignment_id=assignment.id) }}" 
-                                   class="btn btn-sm btn-outline-primary">
-                                    Details
-                                </a>
-                            </td>
+                            <th>Assignment</th>
+                            <th>Submissions</th>
+                            <th>Average Score</th>
+                            <th>Pass Rate</th>
+                            <th>Median Time</th>
+                            <th>Action</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {% for assignment in assignment_stats %}
+                            <tr>
+                                <td>
+                                    <strong>{{ assignment.title }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ assignment.due_date.strftime('%b %d') }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark">{{ assignment.submission_count }}/{{ assignment.student_count }}</span>
+                                </td>
+                                <td>
+                                    <strong>{{ "%.1f"|format(assignment.average_score) }}%</strong>
+                                </td>
+                                <td>
+                                    {% if assignment.pass_rate >= 80 %}
+                                        <span class="badge bg-success"><i class="fas fa-check-circle"></i> {{ "%.0f"|format(assignment.pass_rate) }}%</span>
+                                    {% elif assignment.pass_rate >= 60 %}
+                                        <span class="badge bg-warning"><i class="fas fa-exclamation-circle"></i> {{ "%.0f"|format(assignment.pass_rate) }}%</span>
+                                    {% else %}
+                                        <span class="badge bg-danger"><i class="fas fa-times-circle"></i> {{ "%.0f"|format(assignment.pass_rate) }}%</span>
+                                    {% endif %}
+                                </td>
+                                <td><code class="text-muted">{{ assignment.median_submission_time }}</code></td>
+                                <td>
+                                    <a href="{{ url_for('analytics.assignment_detail', assignment_id=assignment.id) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Student Performance -->
-<div class="row">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header bg-secondary text-white">
-                <h5 class="mb-0">Score Distribution</h5>
-            </div>
-            <div class="card-body">
-                <p class="text-muted text-center py-5">
-                    <i class="fas fa-chart" style="font-size: 3rem;"></i><br>
-                    Chart visualization would display here
-                </p>
-                <p class="small text-muted text-center">
-                    (In production, this would show a histogram or bell curve of score distribution)
-                </p>
+<!-- Performance Analysis -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="analytics-card">
+                <div class="analytics-card-header">
+                    <h5><i class="fas fa-chart-line"></i> Score Distribution</h5>
+                </div>
+                <div class="analytics-card-body text-center py-5">
+                    <div style="font-size: 4rem; color: #667eea; margin-bottom: 1rem;">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <p class="text-muted">Visualization would display here</p>
+                    <small class="text-muted">(In production: histogram of score distribution)</small>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Performance Tiers</h5>
-            </div>
-            <div class="card-body">
-                <div class="mb-3">
-                    <small class="text-muted">Excellent (90-100%)</small>
-                    <p class="mb-2">
-                        <strong>{{ performance_tiers.excellent }}</strong> students
-                        <span class="float-end text-success">{{ "%.1f"|format((performance_tiers.excellent / stats.total_students * 100) if stats.total_students > 0 else 0) }}%</span>
-                    </p>
+        <div class="col-lg-4 mb-4">
+            <div class="analytics-card">
+                <div class="analytics-card-header">
+                    <h5><i class="fas fa-layer-group"></i> Performance Tiers</h5>
                 </div>
-                <div class="mb-3">
-                    <small class="text-muted">Good (80-89%)</small>
-                    <p class="mb-2">
-                        <strong>{{ performance_tiers.good }}</strong> students
-                        <span class="float-end text-info">{{ "%.1f"|format((performance_tiers.good / stats.total_students * 100) if stats.total_students > 0 else 0) }}%</span>
-                    </p>
-                </div>
-                <div class="mb-3">
-                    <small class="text-muted">Average (70-79%)</small>
-                    <p class="mb-2">
-                        <strong>{{ performance_tiers.average }}</strong> students
-                        <span class="float-end text-warning">{{ "%.1f"|format((performance_tiers.average / stats.total_students * 100) if stats.total_students > 0 else 0) }}%</span>
-                    </p>
-                </div>
-                <div class="mb-3">
-                    <small class="text-muted">Needs Improvement (Below 70%)</small>
-                    <p class="mb-0">
-                        <strong>{{ performance_tiers.needs_improvement }}</strong> students
-                        <span class="float-end text-danger">{{ "%.1f"|format((performance_tiers.needs_improvement / stats.total_students * 100) if stats.total_students > 0 else 0) }}%</span>
-                    </p>
+                <div class="analytics-card-body">
+                    <div class="performance-tier mb-3">
+                        <div class="tier-header">
+                            <small class="tier-label">Excellent (90-100%)</small>
+                            <small class="tier-percent text-success">{{ "%.1f"|format((performance_tiers.excellent / stats.total_students * 100) if stats.total_students > 0 else 0) }}%</small>
+                        </div>
+                        <div class="tier-bar">
+                            <div class="tier-progress" style="width: {{ (performance_tiers.excellent / stats.total_students * 100) if stats.total_students > 0 else 0 }}%; background: linear-gradient(90deg, #28a745, #20c997);"></div>
+                        </div>
+                        <small class="text-muted">{{ performance_tiers.excellent }} students</small>
+                    </div>
+
+                    <div class="performance-tier mb-3">
+                        <div class="tier-header">
+                            <small class="tier-label">Good (80-89%)</small>
+                            <small class="tier-percent text-info">{{ "%.1f"|format((performance_tiers.good / stats.total_students * 100) if stats.total_students > 0 else 0) }}%</small>
+                        </div>
+                        <div class="tier-bar">
+                            <div class="tier-progress" style="width: {{ (performance_tiers.good / stats.total_students * 100) if stats.total_students > 0 else 0 }}%; background: linear-gradient(90deg, #17a2b8, #00d4ff);"></div>
+                        </div>
+                        <small class="text-muted">{{ performance_tiers.good }} students</small>
+                    </div>
+
+                    <div class="performance-tier mb-3">
+                        <div class="tier-header">
+                            <small class="tier-label">Average (70-79%)</small>
+                            <small class="tier-percent text-warning">{{ "%.1f"|format((performance_tiers.average / stats.total_students * 100) if stats.total_students > 0 else 0) }}%</small>
+                        </div>
+                        <div class="tier-bar">
+                            <div class="tier-progress" style="width: {{ (performance_tiers.average / stats.total_students * 100) if stats.total_students > 0 else 0 }}%; background: linear-gradient(90deg, #ffc107, #ff9800);"></div>
+                        </div>
+                        <small class="text-muted">{{ performance_tiers.average }} students</small>
+                    </div>
+
+                    <div class="performance-tier">
+                        <div class="tier-header">
+                            <small class="tier-label">Needs Improvement (&lt;70%)</small>
+                            <small class="tier-percent text-danger">{{ "%.1f"|format((performance_tiers.needs_improvement / stats.total_students * 100) if stats.total_students > 0 else 0) }}%</small>
+                        </div>
+                        <div class="tier-bar">
+                            <div class="tier-progress" style="width: {{ (performance_tiers.needs_improvement / stats.total_students * 100) if stats.total_students > 0 else 0 }}%; background: linear-gradient(90deg, #dc3545, #c82333);"></div>
+                        </div>
+                        <small class="text-muted">{{ performance_tiers.needs_improvement }} students</small>
+                    </div>
                 </div>
             </div>
         </div>

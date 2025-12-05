@@ -1475,6 +1475,174 @@ footer a:hover {
 }
 
 /* ==============================================
+   Analytics Dashboard
+   ============================================== */
+
+.analytics-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2.5rem 0;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    animation: slideInDown 0.6s ease-out;
+}
+
+.analytics-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.analytics-header .subtitle {
+    font-size: 1.1rem;
+    opacity: 0.95;
+    margin: 0;
+}
+
+.filter-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #667eea;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.analytics-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.analytics-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+.analytics-card-header {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.analytics-card-header h5 {
+    margin: 0;
+    font-weight: 600;
+    color: #343a40;
+}
+
+.analytics-card-body {
+    padding: 1.5rem;
+}
+
+.analytics-card.stat-card-yellow,
+.analytics-card.stat-card-blue,
+.analytics-card.stat-card-green,
+.analytics-card.stat-card-pink {
+    border: none;
+}
+
+.analytics-card .stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.analytics-card .stat-content h6 {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.analytics-card .stat-content h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.analytics-card .stat-content small {
+    color: #999;
+    display: block;
+}
+
+/* Performance Tiers */
+.performance-tier {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.performance-tier:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.tier-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.tier-label {
+    font-weight: 600;
+    color: #333;
+}
+
+.tier-percent {
+    font-weight: 700;
+}
+
+.tier-bar {
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.tier-progress {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+/* Responsive Analytics */
+@media (max-width: 768px) {
+    .analytics-header h1 {
+        font-size: 2rem;
+    }
+
+    .analytics-header .subtitle {
+        font-size: 1rem;
+    }
+
+    .analytics-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .analytics-card-header .badge {
+        align-self: flex-start;
+    }
+
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+
+    .table th,
+    .table td {
+        padding: 0.75rem 0.5rem;
+    }
+}
+
+/* ==============================================
    Error Pages (404, 500)
    ============================================== */
 
