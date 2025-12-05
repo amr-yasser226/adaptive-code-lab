@@ -152,7 +152,7 @@
                                                 {% endif %}
                                             </td>
                                             <td>
-                                                <a href="{{ url_for('assignment.view', assignment_id=assignment.id) }}" 
+                                                <a href="{{ url_for('assignment_detail', assignment_id=assignment.id) }}" 
                                                    class="btn btn-sm btn-primary">
                                                     View
                                                 </a>
@@ -265,13 +265,13 @@
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-                        <a href="{{ url_for('assignment.create') }}" class="btn btn-primary">
+                        <a href="{{ url_for('assignment_create') }}" class="btn btn-primary">
                             <i class="fas fa-plus"></i> New Assignment
                         </a>
-                        <a href="{{ url_for('assignment.list') }}" class="btn btn-outline-primary">
+                        <a href="{{ url_for('assignments') }}" class="btn btn-outline-primary">
                             <i class="fas fa-list"></i> View All Assignments
                         </a>
-                        <a href="{{ url_for('analytics.dashboard') }}" class="btn btn-outline-primary">
+                        <a href="{{ url_for('analytics') }}" class="btn btn-outline-primary">
                             <i class="fas fa-chart-bar"></i> View Analytics
                         </a>
                         <a href="{{ url_for('plagiarism.report') }}" class="btn btn-outline-danger">

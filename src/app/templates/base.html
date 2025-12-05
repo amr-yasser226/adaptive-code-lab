@@ -28,7 +28,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    {% if current_user.is_authenticated %}
+                    {% if current_user %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('dashboard') }}">
                                 <i class="fas fa-tachometer-alt"></i> Dashboard
@@ -37,16 +37,16 @@
                         
                         {% if current_user.role == 'instructor' or current_user.role == 'admin' %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('assignments') }}">
-                                    <i class="fas fa-list"></i> Assignments
+                                <a class="nav-link" href="{{ url_for('analytics') }}">
+                                    <i class="fas fa-chart-bar"></i> Analytics
                                 </a>
                             </li>
                         {% endif %}
                         
                         {% if current_user.role == 'student' %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('my_submissions') }}">
-                                    <i class="fas fa-file-upload"></i> My Submissions
+                                <a class="nav-link" href="{{ url_for('assignments') }}">
+                                    <i class="fas fa-file-upload"></i> Assignments
                                 </a>
                             </li>
                         {% endif %}
@@ -57,7 +57,6 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li><a class="dropdown-item" href="{{ url_for('profile') }}">Profile</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('settings') }}">Settings</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
                             </ul>

@@ -1,4 +1,4 @@
-﻿"""
+"""
 Adaptive Code Lab - Integrated Flask Application
 Full frontend-backend integration with code execution and testing
 """
@@ -643,4 +643,3 @@ if __name__ == '__main__':
     
     # Run Flask app (use_reloader=False for Windows compatibility)
     app.run(debug=True, host='127.0.0.1', port=5000, use_reloader=False)
-

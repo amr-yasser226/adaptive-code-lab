@@ -4,7 +4,7 @@
 
 {% block content %}
 <!-- Hero Section -->
-{% if not current_user.is_authenticated %}
+{% if not current_user %}
     <div class="bg-primary text-white py-5 rounded-lg mb-5">
         <div class="container">
             <div class="row align-items-center">
@@ -15,10 +15,10 @@
                     <p class="lead">Adaptive Collaborative Code Learning Lab</p>
                     <p>Learn programming with automated grading, AI-powered hints, and instructor feedback.</p>
                     <div class="mt-4">
-                        <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg me-2">
+                        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg me-2">
                             <i class="fas fa-user-plus"></i> Get Started
                         </a>
-                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg">
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
                             <i class="fas fa-sign-in-alt"></i> Login
                         </a>
                     </div>
@@ -68,7 +68,7 @@
         <div class="col-md-12 text-center py-5">
             <h3>Ready to start learning?</h3>
             <p class="lead text-muted mb-4">Join now and access programming assignments with instant feedback.</p>
-            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
                 <i class="fas fa-user-plus"></i> Register Now
             </a>
         </div>
@@ -107,7 +107,7 @@
                         <i class="fas fa-file-upload text-success" style="font-size: 2rem;"></i>
                         <h6 class="card-title mt-3">My Submissions</h6>
                         <h3 class="mb-3">{{ quick_stats.total_submissions }}</h3>
-                        <a href="{{ url_for('my_submissions') }}" class="btn btn-sm btn-success">View</a>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-sm btn-success">View</a>
                     </div>
                 </div>
             </div>
@@ -127,7 +127,7 @@
                         <i class="fas fa-history text-info" style="font-size: 2rem;"></i>
                         <h6 class="card-title mt-3">Pending Feedback</h6>
                         <h3 class="mb-3">{{ quick_stats.pending_feedback }}</h3>
-                        <a href="{{ url_for('my_submissions') }}?status=pending" class="btn btn-sm btn-info">Check</a>
+                        <a href="{{ url_for('dashboard') }}?status=pending" class="btn btn-sm btn-info">Check</a>
                     </div>
                 </div>
             </div>

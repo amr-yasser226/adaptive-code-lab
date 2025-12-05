@@ -6,7 +6,7 @@
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
-        <li class="breadcrumb-item"><a href="{{ url_for('assignment.list') }}">Assignments</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('assignments') }}">Assignments</a></li>
         <li class="breadcrumb-item active" aria-current="page">{{ assignment.title }}</li>
     </ol>
 </nav>
@@ -124,12 +124,12 @@
                             <strong>Submitted:</strong>
                             <p class="small">{{ latest_submission.submitted_at.strftime('%b %d, %Y at %I:%M %p') }}</p>
                         </div>
-                        <a href="{{ url_for('submission.view', submission_id=latest_submission.id) }}" 
+                        <a href="{{ url_for('submission_results', submission_id=latest_submission.id) }}" 
                            class="btn btn-info w-100 mb-2">
                             <i class="fas fa-eye"></i> View Submission
                         </a>
                     {% endif %}
-                    <a href="{{ url_for('submission.create', assignment_id=assignment.id) }}" 
+                    <a href="{{ url_for('submit_code', assignment_id=assignment.id) }}" 
                        class="btn btn-primary w-100">
                         <i class="fas fa-upload"></i> {% if latest_submission %}Re-submit{% else %}Submit Code{% endif %}
                     </a>
