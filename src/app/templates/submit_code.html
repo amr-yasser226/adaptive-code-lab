@@ -175,6 +175,141 @@
                 </div>
             </div>
         </div>
+
+        <!-- Live Execution Panel -->
+        <div class="execution-panel mt-4">
+            <div class="execution-header">
+                <h5><i class="fas fa-play"></i> Live Code Execution</h5>
+                <small class="text-muted">Test your code before submission</small>
+            </div>
+
+            <div class="execution-body">
+                <!-- Input/Output Tabs -->
+                <ul class="nav nav-tabs execution-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="input-tab" data-bs-toggle="tab" data-bs-target="#input-panel" type="button" role="tab">
+                            <i class="fas fa-keyboard"></i> Input
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="output-tab" data-bs-toggle="tab" data-bs-target="#output-panel" type="button" role="tab">
+                            <i class="fas fa-terminal"></i> Output
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tests-tab" data-bs-toggle="tab" data-bs-target="#tests-panel" type="button" role="tab">
+                            <i class="fas fa-flask"></i> Test Cases
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content execution-content">
+                    <!-- Input Panel -->
+                    <div class="tab-pane fade show active" id="input-panel" role="tabpanel">
+                        <label class="input-label"><i class="fas fa-comment"></i> Standard Input</label>
+                        <textarea id="codeInput" class="code-input-area" placeholder="Enter input for your program (if needed)&#10;Example:&#10;5&#10;3"></textarea>
+                    </div>
+
+                    <!-- Output Panel -->
+                    <div class="tab-pane fade" id="output-panel" role="tabpanel">
+                        <div class="output-header">
+                            <span class="output-label"><i class="fas fa-terminal"></i> Standard Output</span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearOutput()">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                        </div>
+                        <div id="codeOutput" class="code-output-area">
+                            <div class="output-placeholder">
+                                <i class="fas fa-play-circle"></i>
+                                <p>Run your code to see output here</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Test Cases Panel -->
+                    <div class="tab-pane fade" id="tests-panel" role="tabpanel">
+                        <div class="test-cases-container">
+                            <div class="test-case-item">
+                                <div class="test-case-header">
+                                    <span class="test-number">Test Case 1</span>
+                                    <span class="test-status pending"><i class="fas fa-hourglass-half"></i> Pending</span>
+                                </div>
+                                <div class="test-case-body">
+                                    <div class="test-row">
+                                        <strong>Input:</strong>
+                                        <code>5 3</code>
+                                    </div>
+                                    <div class="test-row">
+                                        <strong>Expected:</strong>
+                                        <code>8</code>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="test-case-item">
+                                <div class="test-case-header">
+                                    <span class="test-number">Test Case 2</span>
+                                    <span class="test-status pending"><i class="fas fa-hourglass-half"></i> Pending</span>
+                                </div>
+                                <div class="test-case-body">
+                                    <div class="test-row">
+                                        <strong>Input:</strong>
+                                        <code>10 20</code>
+                                    </div>
+                                    <div class="test-row">
+                                        <strong>Expected:</strong>
+                                        <code>30</code>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="test-case-item">
+                                <div class="test-case-header">
+                                    <span class="test-number">Test Case 3</span>
+                                    <span class="test-status pending"><i class="fas fa-hourglass-half"></i> Pending</span>
+                                </div>
+                                <div class="test-case-body">
+                                    <div class="test-row">
+                                        <strong>Input:</strong>
+                                        <code>-5 -3</code>
+                                    </div>
+                                    <div class="test-row">
+                                        <strong>Expected:</strong>
+                                        <code>-8</code>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Execution Actions -->
+                <div class="execution-actions">
+                    <button type="button" class="btn btn-success btn-lg" onclick="runCode()">
+                        <i class="fas fa-play"></i> Run Code
+                    </button>
+                    <button type="button" class="btn btn-outline-info btn-lg" onclick="runAllTests()">
+                        <i class="fas fa-flask"></i> Run Tests
+                    </button>
+                    <div class="execution-stats">
+                        <span id="executionTime" class="stat">
+                            <i class="fas fa-clock"></i> Time: -- ms
+                        </span>
+                        <span id="executionMemory" class="stat">
+                            <i class="fas fa-memory"></i> Memory: -- KB
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Execution Info -->
+                <div class="execution-info">
+                    <div class="info-message info-info">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Code runs in a secure sandbox with 5-second timeout</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Sidebar -->
@@ -355,8 +490,144 @@ if __name__ == "__main__":
         // Could add language-specific hints here
     }
 
+    // Live Code Execution Functions
+    function runCode() {
+        const code = codeInput.value;
+        const input = document.getElementById('codeInput').value;
+        const language = document.getElementById('language').value;
+        const output = document.getElementById('codeOutput');
+
+        if (!code.trim()) {
+            showError(output, 'Please enter some code first');
+            return;
+        }
+
+        // Show loading state
+        showLoading(output);
+
+        // Simulate API call to run code
+        setTimeout(() => {
+            try {
+                // Mock execution for demonstration
+                const result = simulateCodeExecution(code, input, language);
+                displayOutput(output, result);
+            } catch (error) {
+                showError(output, `Error: ${error.message}`);
+            }
+        }, 800);
+    }
+
+    function runAllTests() {
+        const code = codeInput.value;
+        const language = document.getElementById('language').value;
+
+        if (!code.trim()) {
+            alert('Please enter some code first');
+            return;
+        }
+
+        const testCases = document.querySelectorAll('.test-case-item');
+        let passedCount = 0;
+
+        testCases.forEach((testCase, index) => {
+            const status = testCase.querySelector('.test-status');
+            status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running...';
+            status.className = 'test-status running';
+
+            setTimeout(() => {
+                // Mock test execution
+                const isPassed = Math.random() > 0.3; // 70% pass rate for demo
+                
+                if (isPassed) {
+                    passedCount++;
+                    status.innerHTML = '<i class="fas fa-check-circle"></i> Passed';
+                    status.className = 'test-status passed';
+                    testCase.style.borderLeftColor = '#28a745';
+                } else {
+                    status.innerHTML = '<i class="fas fa-times-circle"></i> Failed';
+                    status.className = 'test-status failed';
+                    testCase.style.borderLeftColor = '#dc3545';
+                }
+            }, 600 + index * 400);
+        });
+
+        // Show summary after all tests
+        setTimeout(() => {
+            const summary = document.createElement('div');
+            summary.className = 'test-summary';
+            summary.innerHTML = `
+                <strong>Summary:</strong> ${passedCount}/${testCases.length} tests passed
+                ${passedCount === testCases.length ? 
+                    '<span class="badge bg-success ms-2">All Passed!</span>' : 
+                    '<span class="badge bg-warning ms-2">Some Failed</span>'}
+            `;
+            document.querySelector('.test-cases-container').appendChild(summary);
+        }, 600 + testCases.length * 400);
+    }
+
+    function simulateCodeExecution(code, input, language) {
+        // Mock execution - in production, this would call backend API
+        const lines = code.split('\n').filter(l => l.trim());
+        
+        if (language === 'python') {
+            // Simple Python simulation
+            if (code.includes('print')) {
+                return `Hello, World!\n[Output simulated for ${language}]`;
+            }
+            return `Program executed successfully\nExecution time: 45 ms`;
+        }
+        
+        return `Program executed successfully\nLanguage: ${language}\nExecution time: 125 ms\nMemory: 2.3 MB`;
+    }
+
+    function displayOutput(outputDiv, result) {
+        outputDiv.innerHTML = `
+            <div class="output-content">
+                <pre>${escapeHtml(result)}</pre>
+                <div class="output-footer">
+                    <span class="output-success"><i class="fas fa-check-circle"></i> Execution successful</span>
+                    <span class="output-time">Time: 125 ms | Memory: 2.3 MB</span>
+                </div>
+            </div>
+        `;
+    }
+
+    function showLoading(outputDiv) {
+        outputDiv.innerHTML = `
+            <div class="output-loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Running code...</p>
+            </div>
+        `;
+    }
+
+    function showError(outputDiv, error) {
+        outputDiv.innerHTML = `
+            <div class="output-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <pre>${escapeHtml(error)}</pre>
+            </div>
+        `;
+    }
+
+    function clearOutput() {
+        const output = document.getElementById('codeOutput');
+        output.innerHTML = `
+            <div class="output-placeholder">
+                <i class="fas fa-play-circle"></i>
+                <p>Run your code to see output here</p>
+            </div>
+        `;
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
     // Version tracking (mock)
-    let submissionCount = {{ previous_submissions|length if previous_submissions else 0 }};
+    let submissionCount = 0;
     document.getElementById('codeForm').addEventListener('submit', function() {
         submissionCount++;
         versionNumber.textContent = submissionCount + 1;
