@@ -29,3 +29,9 @@ Thumbs.db
 *.bin
 *.cache/
 model_cache/
+
+# Ignore pip editable/build info
+*.egg-info/
+
+# Ignore SQLite database
+src/DB/Accl_DB.db
