@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Register - ACCL{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg">
+            <div class="card-body p-5">
+                <h2 class="text-center mb-4">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </h2>
+
+                <!-- Display Errors -->
+                {% if form.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for field, errors in form.errors.items() %}
+                            {% for error in errors %}
+                                <strong>{{ field }}:</strong> {{ error }}<br>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form method="POST" action="{{ url_for('auth.register') }}" novalidate>
+                    {{ form.csrf_token }}
+
+                    <!-- Name Field -->
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Full Name</label>
+                        {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), 
+                                    placeholder="Enter your full name", id="name") }}
+                        {% if form.name.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.name.errors[0] }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Email Field -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), 
+                                     placeholder="Enter your email", id="email") }}
+                        {% if form.email.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.email.errors[0] }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Role Selection -->
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Account Type</label>
+                        {{ form.role(class="form-select" + (" is-invalid" if form.role.errors else ""), id="role") }}
+                        <small class="form-text text-muted">
+                            Choose your role. Instructor accounts require approval.
+                        </small>
+                        {% if form.role.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.role.errors[0] }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), 
+                                        placeholder="Enter a strong password", id="password") }}
+                        {% if form.password.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.password.errors[0] }}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            Minimum 8 characters, including uppercase, lowercase, and numbers.
+                        </small>
+                    </div>
+
+                    <!-- Confirm Password Field -->
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Confirm Password</label>
+                        {{ form.confirm_password(class="form-control" + (" is-invalid" if form.confirm_password.errors else ""), 
+                                               placeholder="Re-enter your password", id="confirm_password") }}
+                        {% if form.confirm_password.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.confirm_password.errors[0] }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Terms Agreement -->
+                    <div class="mb-3 form-check">
+                        {{ form.agree_terms(class="form-check-input", id="agree_terms") }}
+                        <label class="form-check-label" for="agree_terms">
+                            I agree to the <a href="#" target="_blank">Terms and Conditions</a>
+                        </label>
+                        {% if form.agree_terms.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.agree_terms.errors[0] }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary w-100 mb-3">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
+                </form>
+
+                <!-- Divider -->
+                <div class="text-center my-3">
+                    <small class="text-muted">or</small>
+                </div>
+
+                <!-- Login Link -->
+                <div class="text-center">
+                    <p class="mb-0">
+                        Already have an account? 
+                        <a href="{{ url_for('auth.login') }}">Login here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Form validation
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.querySelectorAll('form[novalidate]');
+            Array.prototype.slice.call(forms).forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+
+    // Password strength indicator
+    document.getElementById('password').addEventListener('input', function() {
+        var password = this.value;
+        var strength = 0;
+        
+        if (password.length >= 8) strength++;
+        if (/[a-z]/.test(password)) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[^a-zA-Z0-9]/.test(password)) strength++;
+        
+        // Visual feedback can be added here
+    });
+</script>
+{% endblock %}
