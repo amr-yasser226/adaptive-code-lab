@@ -2225,6 +2225,154 @@ section + section {
 }
 
 /* ==============================================
+   Navigation Bar Enhancements
+   ============================================== */
+
+.navbar {
+    background: linear-gradient(135deg, #343a40 0%, #23282d 100%) !important;
+    padding: 0.75rem 0 !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.navbar.navbar-dark {
+    background-color: #343a40 !important;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.navbar-brand i {
+    margin-right: 0.5rem;
+    color: #FF9500;
+    transition: all 0.3s ease;
+}
+
+.navbar-brand:hover {
+    transform: scale(1.05);
+    color: #ffffff;
+}
+
+.navbar-brand:hover i {
+    transform: rotate(10deg);
+    color: #ffb84d;
+}
+
+/* Navbar Links Styling */
+.nav-link {
+    margin: 0 0.5rem;
+    padding: 0.75rem 1rem !important;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 1rem;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #FF9500, #FF6B00);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #ffffff !important;
+    transform: translateY(-2px);
+}
+
+.nav-link:hover::after {
+    width: calc(100% - 2rem);
+}
+
+.nav-link i {
+    margin-right: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover i {
+    transform: scale(1.2) rotate(5deg);
+}
+
+/* Active Link State */
+.nav-link.active {
+    color: #FF9500 !important;
+    background: rgba(255, 149, 0, 0.1);
+    border-radius: 6px;
+}
+
+.nav-link.active::after {
+    width: calc(100% - 2rem);
+    background: #FF9500;
+}
+
+/* Navbar Toggler */
+.navbar-toggler {
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 0.25rem rgba(255, 149, 0, 0.25);
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255,255,255,0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* Dropdown Menu Styling */
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 0.5rem 0;
+}
+
+.dropdown-item {
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(255, 149, 0, 0.1);
+    color: #FF9500;
+    transform: translateX(4px);
+}
+
+.dropdown-item.active {
+    background-color: #FF9500;
+    color: white;
+}
+
+/* Navbar Responsive */
+@media (max-width: 991px) {
+    .nav-link {
+        margin: 0;
+        padding: 0.5rem 1rem !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-link::after {
+        display: none;
+    }
+
+    .navbar-collapse {
+        background: rgba(0, 0, 0, 0.95);
+        border-radius: 0 0 8px 8px;
+        margin-top: 0.5rem;
+    }
+}
+
+/* ==============================================
    Error Pages (404, 500)
    ============================================== */
 
