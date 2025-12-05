@@ -1096,6 +1096,61 @@ footer a:hover {
     }
 }
 
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #1E88E5 0%, #1565C0 50%, #FF9500 100%);
+    color: white;
+    padding: 4rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.hero-title {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    opacity: 0.95;
+}
+
+.hero-description {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    opacity: 0.9;
+}
+
+.hero-icon {
+    font-size: 12rem;
+    opacity: 0.15;
+    display: block;
+}
+
+/* Feature Cards */
+.feature-card {
+    background: white;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    color: #FF9500;
+    margin-bottom: 1rem;
+    display: block;
+}
+
 /* Responsive Design - Tablet Adjustments */
 @media (max-width: 768px) {
     .dashboard-header {

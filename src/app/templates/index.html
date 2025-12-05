@@ -5,26 +5,26 @@
 {% block content %}
 <!-- Hero Section -->
 {% if not current_user %}
-    <div class="bg-primary text-white py-5 rounded-lg mb-5">
+    <div class="hero-section mb-5">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h1 class="display-4 fw-bold">
-                        <i class="fas fa-code"></i> Welcome to ACCL
+                    <h1 class="hero-title fw-bold">
+                        <i class="fas fa-graduation-cap"></i> Welcome to ACCL
                     </h1>
-                    <p class="lead">Adaptive Collaborative Code Learning Lab</p>
-                    <p>Learn programming with automated grading, AI-powered hints, and instructor feedback.</p>
-                    <div class="mt-4">
-                        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg me-2">
-                            <i class="fas fa-user-plus"></i> Get Started
+                    <p class="hero-subtitle">Adaptive Collaborative Code Learning Lab</p>
+                    <p class="hero-description">Master programming with automated grading, AI-powered hints, plagiarism detection, and real-time instructor feedback.</p>
+                    <div class="mt-4 d-flex gap-2">
+                        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg" title="Create a new account">
+                            <i class="fas fa-user-plus"></i> Get Started Free
                         </a>
-                        <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
-                            <i class="fas fa-sign-in-alt"></i> Login
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg" title="Sign in to your account">
+                            <i class="fas fa-sign-in-alt"></i> Sign In
                         </a>
                     </div>
                 </div>
-                <div class="col-md-4 text-center">
-                    <i class="fas fa-laptop-code" style="font-size: 10rem; opacity: 0.3;"></i>
+                <div class="col-md-4 text-center d-none d-md-block">
+                    <i class="fas fa-laptop-code hero-icon"></i>
                 </div>
             </div>
         </div>
@@ -33,9 +33,9 @@
     <!-- Features Section -->
     <div class="row mb-5">
         <div class="col-md-4 mb-4">
-            <div class="card h-100 text-center">
+            <div class="card h-100 text-center feature-card">
                 <div class="card-body">
-                    <i class="fas fa-flask text-primary" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <i class="fas fa-flask feature-icon"></i>
                     <h5 class="card-title">Automated Testing</h5>
                     <p class="card-text">Automatic grading with comprehensive test execution in secure sandboxes.</p>
                 </div>
