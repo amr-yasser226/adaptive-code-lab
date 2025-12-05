@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (passwordInput) {
         passwordInput.addEventListener('input', function() {
             checkPasswordStrength(this.value);
+            checkPasswordMatch();
         });
     }
 
@@ -54,6 +55,68 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Password Strength Checker
+function checkPasswordStrength(password) {
+    const strengthBar = document.getElementById('passwordStrength');
+    const matchMessage = document.getElementById('passwordMatch');
+    
+    if (!strengthBar) return;
+    
+    const progressBar = strengthBar.querySelector('.progress-bar');
+    let strength = 0;
+    
+    // Check length
+    if (password.length >= 8) strength += 25;
+    if (password.length >= 12) strength += 10;
+    
+    // Check for lowercase
+    if (/[a-z]/.test(password)) strength += 15;
+    
+    // Check for uppercase
+    if (/[A-Z]/.test(password)) strength += 15;
+    
+    // Check for numbers
+    if (/[0-9]/.test(password)) strength += 15;
+    
+    // Check for special characters
+    if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) strength += 10;
+    
+    // Cap at 100
+    strength = Math.min(strength, 100);
+    
+    if (strength === 0) {
+        strengthBar.style.display = 'none';
+    } else {
+        strengthBar.style.display = 'block';
+        progressBar.style.width = strength + '%';
+        
+        if (strength < 40) {
+            progressBar.className = 'progress-bar bg-danger';
+        } else if (strength < 70) {
+            progressBar.className = 'progress-bar bg-warning';
+        } else {
+            progressBar.className = 'progress-bar bg-success';
+        }
+    }
+}
+
+// Password Match Checker
+function checkPasswordMatch() {
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirm_password');
+    const matchMessage = document.getElementById('passwordMatch');
+    
+    if (!password || !confirmPassword || !matchMessage) return;
+    
+    if (password.value !== confirmPassword.value && confirmPassword.value !== '') {
+        matchMessage.style.display = 'block';
+        confirmPassword.classList.add('is-invalid');
+    } else {
+        matchMessage.style.display = 'none';
+        confirmPassword.classList.remove('is-invalid');
+    }
+}
 
 // Simple AJAX helper for form submissions
 function submitFormViaAjax(formId, successCallback) {
