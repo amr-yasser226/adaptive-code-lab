@@ -18,17 +18,19 @@
                     </div>
                 {% endif %}
 
-                <form method="POST" action="{{ url_for('login') }}" novalidate>
+                <form method="POST" action="{{ url_for('login') }}" id="loginForm" novalidate>
                     <!-- Email Field -->
                     <div class="mb-3">
                         <label for="email" class="form-label">Email Address</label>
-                        <input type="email" name="email" class="form-control" placeholder="Enter your email" id="email" required>
+                        <input type="email" name="email" class="form-control" placeholder="Enter your email (e.g., user@example.com)" id="email" required pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$" autocomplete="email">
+                        <small class="form-text text-muted">Please enter a valid email address</small>
                     </div>
 
                     <!-- Password Field -->
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" placeholder="Enter your password" id="password" required>
+                        <input type="password" name="password" class="form-control" placeholder="Enter your password (min. 6 characters)" id="password" required minlength="6" autocomplete="current-password">
+                        <small class="form-text text-muted">Password must be at least 6 characters</small>
                     </div>
 
                     <!-- Remember Me -->
