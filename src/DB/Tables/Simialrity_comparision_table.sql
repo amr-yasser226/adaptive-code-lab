@@ -1,7 +1,4 @@
-from DB.connection import connect_db
-conn=connect_db()
-c=conn.cursor()
-c.execute('''CREATE TABLE similarity_comparisons (
+CREATE TABLE IF NOT EXISTS similarity_comparisons (
     similarity_id INTEGER NOT NULL,
     compared_submission_id INTEGER NOT NULL,
     match_score REAL NOT NULL CHECK(match_score >= 0.0 AND match_score <= 1.0),
@@ -11,11 +8,3 @@ c.execute('''CREATE TABLE similarity_comparisons (
     FOREIGN KEY (similarity_id) REFERENCES similarity_flags(id) ON DELETE CASCADE,
     FOREIGN KEY (compared_submission_id) REFERENCES submissions(id) ON DELETE CASCADE
 );
-
-
-
-    
-
-''')
-conn.commit()
-conn.close()
