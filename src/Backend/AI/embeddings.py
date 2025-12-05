@@ -162,24 +162,26 @@ def check_similarity_with_submissions(submission_id, assignment_id, threshold=No
     conn.close()
     return similar_submissions
 
+# Will be removed later and added a better test in
+# tests/backend/test_embeddings.py using pytest.
 
-if __name__ == "__main__":
-    example_submission_id = 1
-    example_code = """
-def add(a, b):
-    return a + b
+# if __name__ == "__main__":
+#     example_submission_id = 1
+#     example_code = """
+# def add(a, b):
+#     return a + b
 
-def multiply(a, b):
-    return a * b
-"""
+# def multiply(a, b):
+#     return a * b
+# """
     
-    print("Processing example submission...")
-    embedding = process_submission_embedding(example_submission_id, example_code, is_file=False)
+#     print("Processing example submission...")
+#     embedding = process_submission_embedding(example_submission_id, example_code, is_file=False)
     
-    if embedding:
-        print(f"Success! Generated {len(embedding)}-dimensional embedding")
+#     if embedding:
+#         print(f"Success! Generated {len(embedding)}-dimensional embedding")
     
-    retrieved = get_embedding(example_submission_id)
-    if retrieved:
-        print(f"Retrieved embedding has {len(retrieved)} dimensions")
-        print(f"Embeddings match: {np.allclose(embedding, retrieved)}")
+#     retrieved = get_embedding(example_submission_id)
+#     if retrieved:
+#         print(f"Retrieved embedding has {len(retrieved)} dimensions")
+#         print(f"Embeddings match: {np.allclose(embedding, retrieved)}")
