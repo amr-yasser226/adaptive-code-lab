@@ -2516,6 +2516,157 @@ footer .small {
 }
 
 /* ==============================================
+   Color Palette & Utility Classes
+   ============================================== */
+
+/* Extended Color Palette */
+:root {
+    --primary-gradient: linear-gradient(135deg, #FF9500 0%, #FF6B00 100%);
+    --secondary-gradient: linear-gradient(135deg, #1E88E5 0%, #1565C0 100%);
+    --tertiary-gradient: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+    --success-gradient: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    --danger-gradient: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    --info-gradient: linear-gradient(135deg, #17a2b8 0%, #0f7fb5 100%);
+    --warning-gradient: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+}
+
+/* Gradient Utility Classes */
+.gradient-primary {
+    background: var(--primary-gradient);
+    color: white;
+}
+
+.gradient-secondary {
+    background: var(--secondary-gradient);
+    color: white;
+}
+
+.gradient-tertiary {
+    background: var(--tertiary-gradient);
+    color: white;
+}
+
+.gradient-success {
+    background: var(--success-gradient);
+    color: white;
+}
+
+.gradient-danger {
+    background: var(--danger-gradient);
+    color: white;
+}
+
+.gradient-info {
+    background: var(--info-gradient);
+    color: white;
+}
+
+.gradient-warning {
+    background: var(--warning-gradient);
+    color: white;
+}
+
+/* Text Color Utilities */
+.text-primary-light {
+    color: #FFE0B2;
+}
+
+.text-secondary-light {
+    color: #BBDEFB;
+}
+
+.text-danger-light {
+    color: #EF9A9A;
+}
+
+.text-success-light {
+    color: #A5D6A7;
+}
+
+/* Background Color Utilities */
+.bg-primary-light {
+    background-color: #FFE0B2;
+}
+
+.bg-secondary-light {
+    background-color: #BBDEFB;
+}
+
+.bg-danger-light {
+    background-color: #EF9A9A;
+}
+
+.bg-success-light {
+    background-color: #A5D6A7;
+}
+
+/* Border Color Utilities */
+.border-primary-gradient {
+    border-image: var(--primary-gradient) 1;
+}
+
+.border-secondary-gradient {
+    border-image: var(--secondary-gradient) 1;
+}
+
+/* Opacity Utilities */
+.opacity-10 { opacity: 0.1; }
+.opacity-20 { opacity: 0.2; }
+.opacity-30 { opacity: 0.3; }
+.opacity-40 { opacity: 0.4; }
+.opacity-50 { opacity: 0.5; }
+.opacity-60 { opacity: 0.6; }
+.opacity-70 { opacity: 0.7; }
+.opacity-80 { opacity: 0.8; }
+.opacity-90 { opacity: 0.9; }
+
+/* Display Utilities */
+.display-1-sm { font-size: 2rem; font-weight: 700; }
+.display-2-sm { font-size: 1.75rem; font-weight: 700; }
+.display-3-sm { font-size: 1.5rem; font-weight: 700; }
+
+/* Rounded Utilities */
+.rounded-1 { border-radius: 4px; }
+.rounded-2 { border-radius: 8px; }
+.rounded-3 { border-radius: 12px; }
+.rounded-4 { border-radius: 16px; }
+
+/* Transform Utilities */
+.scale-hover:hover { transform: scale(1.05); }
+.scale-sm-hover:hover { transform: scale(1.02); }
+.translate-up-hover:hover { transform: translateY(-4px); }
+.rotate-hover:hover { transform: rotate(5deg); }
+
+/* Transition Utilities */
+.transition-all { transition: all 0.3s ease; }
+.transition-color { transition: color 0.3s ease; }
+.transition-transform { transition: transform 0.3s ease; }
+.transition-shadow { transition: box-shadow 0.3s ease; }
+
+/* Cursor Utilities */
+.cursor-pointer { cursor: pointer; }
+.cursor-default { cursor: default; }
+.cursor-help { cursor: help; }
+.cursor-not-allowed { cursor: not-allowed; }
+
+/* Overflow Utilities */
+.overflow-hidden { overflow: hidden; }
+.overflow-auto { overflow: auto; }
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.text-truncate-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ==============================================
    Error Pages (404, 500)
    ============================================== */
 
