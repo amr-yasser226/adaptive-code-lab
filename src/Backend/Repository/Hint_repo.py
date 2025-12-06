@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Model.Hint_model import Hint
+from Backend.Model.Hint_model import Hint
 
 class Hint_repo:
     def __init__(self, db):
