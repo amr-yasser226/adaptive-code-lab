@@ -68,6 +68,9 @@ class Course_repo:
             return None
 
     def update(self, course: Course):
+        """
+        FIXED: get_if() -> get_id()
+        """
         try:
             self.db.begin_transaction()
             query = """
@@ -98,7 +101,7 @@ class Course_repo:
                 "credits": course.credits
             })
             self.db.commit()
-            return self.get_by_id(course.get_if())
+            return self.get_by_id(course.get_id())  # FIXED: was get_if()
         except Exception as e:
             self.db.rollback()
             print("Error updating course:", e)
@@ -137,13 +140,17 @@ class Course_repo:
             return None
 
     def list_by_instructor(self, instructor_id: int):
+        """
+        FIXED: Argument order was swapped
+        """
         query = """
             SELECT *
             FROM courses
             WHERE instructor_id = :instructor_id
             ORDER BY created_at DESC
         """
-        result = self.db.execute({"instructor_id": instructor_id}, query)
+        # FIXED: was execute({"instructor_id": instructor_id}, query)
+        result = self.db.execute(query, {"instructor_id": instructor_id})
         rows = result.fetchall()
         return [
             Course(
