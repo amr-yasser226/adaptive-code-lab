@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Model.Student_model import Student
+from Backend.Model.Student_model import Student
 
 class Student_repo:
     def __init__(self, db):
@@ -29,7 +29,7 @@ class Student_repo:
             student_number=row.student_number,
             Program=row.program,  # Model still uses Program parameter
             year_Level=row.YearLevel,
-            is_Active=row.is_active  # Model still uses is_Active
+            is_active=row.is_active  # Model still uses is_Active
         )
 
     def save_student(self, student: Student):
@@ -96,7 +96,7 @@ class Student_repo:
         except Exception as e:
             self.db.rollback()
             print("Error saving student:", e)
-            return None
+            raise # Re-raise the exception instead of returning None
 
     def find_by_number(self, student: Student):
         query = """
@@ -122,5 +122,5 @@ class Student_repo:
             student_number=row.student_number,
             Program=row.program,
             year_Level=row.YearLevel,
-            is_Active=row.is_active
+            is_active=row.is_active
         )
