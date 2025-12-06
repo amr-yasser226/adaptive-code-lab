@@ -26,7 +26,7 @@ class Admin_repo:
             password=row.password_hash,
             created_at=row.created_at,
             updated_at=row.updated_at,
-            is_Active=row.is_active,
+            is_Active=row.is_active,  # Model still uses is_Active for now
             privileges=row.privileges
         )
 
@@ -58,7 +58,7 @@ class Admin_repo:
                 "id": admin.get_id(),
                 "name": admin.name,
                 "email": admin.email,
-                "password_hash": admin.get_password_hash() if hasattr(admin, "get_password_hash") else admin.password
+                "password_hash": admin.get_password_hash()
             })
 
             # INSERT OR UPDATE ADMINS
