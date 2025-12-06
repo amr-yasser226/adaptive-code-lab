@@ -4,7 +4,7 @@ import numpy as np
 from datetime import datetime
 from dotenv import load_dotenv
 import google.generativeai as genai
-from DB.connection import connect_db
+from DB.connection import DB_PATH, connect_db
 
 load_dotenv()
 
@@ -40,7 +40,7 @@ def generate_embedding(code_text):
         return None
 
 
-def store_embedding(submission_id, embedding_vector, db_path=None):
+def store_embedding(submission_id, embedding_vector, db_path=DB_PATH):
     """
     Store embedding vector in database.
 
