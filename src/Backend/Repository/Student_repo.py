@@ -1,11 +1,9 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Model.User_model import User
 from Model.Student_model import Student
 
 class Student_repo:
-    def __init__(self, db ):
-        self.db =db 
-
+    def __init__(self, db):
+        self.db = db
 
     def get_by_id(self, id: int):
         query = """
@@ -33,31 +31,40 @@ class Student_repo:
             year_Level=row.YearLevel,
             is_Active=row.is_active
         )
-    def save_student(self, student:Student):
-        try: 
+
+    def save_student(self, student: Student):
+        try:
             self.db.begin_transaction()
 
-            if student.get_id() is None :
-                raise Exception("Student must have a user ID before Saving Student record")
+            if student.get_id() is None:
+                raise Exception("Student must have a user ID before saving student record")
 
+            # ROLE CHECK
+            role_row = self.db.execute("SELECT role FROM users WHERE id = :id", {"id": student.get_id()}).fetchone()
+            if not role_row:
+                raise Exception("User does not exist")
+            if role_row[0] != "student":
+                raise Exception("User role must be 'student' to save a student record")
+
+            # UPDATE USERS
             update_user_query = """
                 UPDATE users
-                SET 
-                    name = :name,
+                SET name = :name,
                     email = :email,
                     password_hash = :password_hash,
                     updated_at = CURRENT_TIMESTAMP
                 WHERE id = :id
             """
-            self.db.execute(update_user_query,{
+            self.db.execute(update_user_query, {
                 "id": student.get_id(),
                 "name": student.name,
                 "email": student.email,
                 "password_hash": student.get_password_hash(),
-            }) 
-            exists_query="SELECT id FROM students WHERE id = :id"
-            exists = self.db.execute(exists_query , {"id":student.get_id()}).fetchone()
-            if exists : 
+            })
+
+            # INSERT OR UPDATE STUDENTS
+            exists = self.db.execute("SELECT id FROM students WHERE id = :id", {"id": student.get_id()}).fetchone()
+            if exists:
                 update_student = """
                     UPDATE students
                     SET student_number = :num,
@@ -82,15 +89,17 @@ class Student_repo:
                     "program": student.program,
                     "year": student.year_Level
                 })
+
             self.db.commit()
             return self.get_by_id(student.get_id())
-        except Exception as e : 
+
+        except Exception as e:
             self.db.rollback()
             print("Error saving student:", e)
             return None
-    def find_by_Number (self,student:Student):
-        
-        query="""
+
+    def find_by_number(self, student: Student):
+        query = """
             SELECT 
                 u.id, u.name, u.email, u.password_hash, u.role,
                 u.created_at, u.updated_at, u.is_active,
@@ -99,13 +108,10 @@ class Student_repo:
             INNER JOIN students s ON u.id = s.id
             WHERE s.student_number = :num
         """
-        result =self.db.execute(query ,{"num":student.student_number})
-        if result : 
-            row =result.fetchone()
-        else : 
-           row = None 
-        if not row : 
-            return None 
+        result = self.db.execute(query, {"num": student.student_number})
+        row = result.fetchone() if result else None
+        if not row:
+            return None
         return Student(
             id=row.id,
             name=row.name,
@@ -118,14 +124,3 @@ class Student_repo:
             year_Level=row.YearLevel,
             is_Active=row.is_active
         )
-
-
-
-    
-       
-
-
-    
-
-
-
