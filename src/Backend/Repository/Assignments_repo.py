@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Model.Assignmnets_model import Assignmnets
+from Backend.Model.Assignmnets_model import Assignmnets
 
 class Assignments_repo:
     def __init__(self, db):
