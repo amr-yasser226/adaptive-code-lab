@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Model.Files_model import File
+from Backend.Model.Files_model import File
 
 class File_repo:
     def __init__(self, db):
@@ -25,7 +25,7 @@ class File_repo:
             file_name=row.filename,
             content_type=row.content_type,
             size_bytes=row.size_bytes,
-            checksum=row.checksum,  # Match DB column name
+            check_sum=row.checksum,  # Changed from checksum to check_sum
             storage_url=row.storage_url,
             created_at=row.created_at
         )
@@ -94,7 +94,7 @@ class File_repo:
                 file_name=row.filename,
                 content_type=row.content_type,
                 size_bytes=row.size_bytes,
-                checksum=row.checksum,
+                check_sum=row.checksum, # Changed from checksum to check_sum
                 storage_url=row.storage_url,
                 created_at=row.created_at
             ))
