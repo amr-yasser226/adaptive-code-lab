@@ -27,9 +27,9 @@ class Student_repo:
             created_at=row.created_at,
             updated_at=row.updated_at,
             student_number=row.student_number,
-            Program=row.program,
+            Program=row.program,  # Model still uses Program parameter
             year_Level=row.YearLevel,
-            is_Active=row.is_active
+            is_Active=row.is_active  # Model still uses is_Active
         )
 
     def save_student(self, student: Student):
