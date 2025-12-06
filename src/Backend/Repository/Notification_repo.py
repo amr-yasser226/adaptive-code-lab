@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Model.Notification_model import Notification
+from Backend.Model.Notification_model import Notification
 
 
 class Notification_repo:
