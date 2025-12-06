@@ -168,3 +168,20 @@ class Course_repo:
                 credits=row.credits
             ) for row in rows
         ]
+    def get_by_assignment(self , assignment_id:int):
+        query = """
+            SELECT course_id 
+            FROM assignments 
+            WHERE  id =  :aid 
+
+            """
+        row =self.db.execute(query , {"aid":assignment_id}).fetchone()
+
+        if not row : 
+            return None 
+        
+        course_id = row.course_id
+
+        return self.get_by_id(course_id)
+    
+    
