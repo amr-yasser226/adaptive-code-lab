@@ -1,6 +1,6 @@
 import json
 from sqlalchemy.exc import SQLAlchemyError
-from Model.Similarity_Comparison_model import SimilarityComparison
+from Backend.Model.Similarity_Comparison_model import SimilarityComparison
 
 class SimilarityComparison_repo:
     def __init__(self, db):
