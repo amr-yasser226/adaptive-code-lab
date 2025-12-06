@@ -1,7 +1,7 @@
-from Model.User_model import User
+from Backend.Model.User_model import User
 class Admin(User):
-    def __init__(self, id, name, email, password, created_at, updated_at, is_Active=True,privileges=None):
-        super().__init__(id=id, name=name, email=email, password=password, role="admin", created_at=created_at, updated_at=updated_at, is_Active=is_Active)
+    def __init__(self, id, name, email, password, created_at, updated_at, is_active=True,privileges=None):
+        super().__init__(id=id, name=name, email=email, password=password, role="admin", created_at=created_at, updated_at=updated_at, is_active=is_active)
         self.privileges = privileges
     
     def Manage_user_accounts(self, user_id, action):
