@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Model.Course_model import Course
+from Backend.Model.Course_model import Course
 
 class Course_repo:
     def __init__(self, db):
@@ -68,9 +68,6 @@ class Course_repo:
             return None
 
     def update(self, course: Course):
-        """
-        FIXED: get_if() -> get_id()
-        """
         try:
             self.db.begin_transaction()
             query = """
@@ -101,7 +98,7 @@ class Course_repo:
                 "credits": course.credits
             })
             self.db.commit()
-            return self.get_by_id(course.get_id())  # FIXED: was get_if()
+            return self.get_by_id(course.get_id())
         except Exception as e:
             self.db.rollback()
             print("Error updating course:", e)
@@ -140,16 +137,12 @@ class Course_repo:
             return None
 
     def list_by_instructor(self, instructor_id: int):
-        """
-        FIXED: Argument order was swapped
-        """
         query = """
             SELECT *
             FROM courses
             WHERE instructor_id = :instructor_id
             ORDER BY created_at DESC
         """
-        # FIXED: was execute({"instructor_id": instructor_id}, query)
         result = self.db.execute(query, {"instructor_id": instructor_id})
         rows = result.fetchall()
         return [
@@ -168,20 +161,17 @@ class Course_repo:
                 credits=row.credits
             ) for row in rows
         ]
-    def get_by_assignment(self , assignment_id:int):
+    
+    def get_by_assignment(self, assignment_id: int):
         query = """
             SELECT course_id 
             FROM assignments 
-            WHERE  id =  :aid 
-
-            """
-        row =self.db.execute(query , {"aid":assignment_id}).fetchone()
-
-        if not row : 
-            return None 
+            WHERE id = :aid
+        """
+        row = self.db.execute(query, {"aid": assignment_id}).fetchone()
+        
+        if not row:
+            return None
         
         course_id = row.course_id
-
         return self.get_by_id(course_id)
-    
-    
