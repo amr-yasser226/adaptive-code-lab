@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*/__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pkl
+*.sqlite3
+*.db
+
+# Virtual environment
+.venv/
+.env
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# AI / model caches (SentenceTransformers, Torch, HuggingFace)
+*.pt
+*.bin
+*.cache/
+model_cache/
+
+# Ignore pip editable/build info
+*.egg-info/
+
+# Ignore SQLite database
+src/DB/Accl_DB.db
+
+.pytest_cache/
