@@ -155,3 +155,70 @@ class Submission_repo:
             )
             for row in rows
         ]
+    
+    def get_grades (self , student_id:int ): 
+        query ="""
+                SELECT * FROM submissions  WHERE student_id = :sid AND score  IS NOT NULL
+                ORDERD BY grade_at DESC 
+        """    
+        rows = self.db.execute(query, {"sid" : student_id}).fetchall()
+        submission_list = []
+        for row in rows : 
+            Submission(
+                id=row.id,
+            assignment_id=row.assignment_id,
+            student_id=row.student_id,
+            version=row.version,
+            language=row.language,
+            status=row.status,
+            score=row.score,
+            is_late=row.is_late,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+            grade_at=row.grade_at
+            )
+            submission_list.append(Submission)
+
+        return  submission_list
+    
+    def get_laste_submission (self ,student_id:int , assignment_id : int ): 
+        query="""
+            SELECT *
+            FROM submissions
+            WHERE student_id = :sid AND assignment_id = :aid
+            ORDER BY version DESC
+            LIMIT 1
+        """
+
+        row = self.db.execute(query, {"sid": student_id, "aid": assignment_id}).fetchone()
+        
+        if not row : 
+            return None
+        
+        return  Submission(
+        id=row.id,
+        assignment_id=row.assignment_id,
+        student_id=row.student_id,
+        version=row.version,
+        language=row.language,
+        status=row.status,
+        score=row.score,
+        is_late=row.is_late,
+        created_at=row.created_at,
+        updated_at=row.updated_at,
+        grade_at=row.grade_at
+    )
+
+
+    def get_grade_for_assignment (self , student_id : int , assignment_id : int ): 
+        query ="""
+                SELECT score FROM submissions WHERE student_id = :sid  AND assignment_id=:aid  AND score IS NOT NULL ORDER BY grade_at DESC LIMIT 1    
+            
+        """
+        row  =self.db.execute(query,{"sid":student_id , "aid":assignment_id}).fetchone()
+        if row : 
+            return row.score 
+        else : 
+            return None
+    
+    
