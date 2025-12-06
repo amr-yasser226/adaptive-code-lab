@@ -25,12 +25,15 @@ class File_repo:
             file_name=row.filename,
             content_type=row.content_type,
             size_bytes=row.size_bytes,
-            check_sum=row.checksum,
+            checksum=row.checksum,  # Match DB column name
             storage_url=row.storage_url,
             created_at=row.created_at
         )
 
     def save_file(self, file: File):
+        """
+        FIXED: getById() -> get_by_id()
+        """
         try:
             self.db.begin_transaction()
             query = """
@@ -55,7 +58,7 @@ class File_repo:
             })
             new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone().id
             self.db.commit()
-            return self.getById(new_id)
+            return self.get_by_id(new_id)  # FIXED: was getById(new_id)
         except Exception as e:
             self.db.rollback()
             print("Error saving file:", e)
@@ -67,7 +70,7 @@ class File_repo:
             query = "DELETE FROM files WHERE id = :id"
             self.db.execute(query, {"id": id})
             self.db.commit()
-        except SQLAlchemyError : 
+        except SQLAlchemyError:
             self.db.rollback()
             raise
 
@@ -91,7 +94,7 @@ class File_repo:
                 file_name=row.filename,
                 content_type=row.content_type,
                 size_bytes=row.size_bytes,
-                check_sum=row.checksum,
+                checksum=row.checksum,
                 storage_url=row.storage_url,
                 created_at=row.created_at
             ))
