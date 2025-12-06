@@ -1,12 +1,11 @@
 from sqlalchemy.exc import SQLAlchemyError
 from Model.Instructor_model import Instructor
 
-class Instrucotr_repo : 
-    def __init__(self , db ):
+class Instructor_repo:
+    def __init__(self, db):
         self.db = db
 
-
-    def get_by_id(self ,id:int ):
+    def get_by_id(self, id: int):
         query = """
             SELECT 
                 u.id, u.name, u.email, u.password_hash, u.role,
@@ -16,16 +15,10 @@ class Instrucotr_repo :
             INNER JOIN instructors i ON u.id = i.id
             WHERE u.id = :id
         """
-        result =self.db.execute(query, {"id":id})
-        row =result.fetchone()
-        if result: 
-            row =result.fetchone()
-        else : 
-            row = None
-                
-        if not row : 
-            return row
-        
+        result = self.db.execute(query, {"id": id})
+        row = result.fetchone()
+        if not row:
+            return None
         return Instructor(
             id=row.id,
             name=row.name,
@@ -38,8 +31,8 @@ class Instrucotr_repo :
             office_hours=row.office_hours,
             is_Active=row.is_active
         )
-    
-    def get_by_instructor_code (self , instructor_code): 
+
+    def get_by_code(self, instructor_code: str):
         query = """
             SELECT 
                 u.id, u.name, u.email, u.password_hash, u.role,
@@ -49,15 +42,10 @@ class Instrucotr_repo :
             INNER JOIN instructors i ON u.id = i.id
             WHERE i.instructor_code = :code
         """
-        result =self.db.execute(query, {"code": instructor_code})
-        if result : 
-            row = result.fetchone()
-        else : 
-            row = None 
-
-        if row is None : 
+        result = self.db.execute(query, {"code": instructor_code})
+        row = result.fetchone() if result else None
+        if not row:
             return None
-        
         return Instructor(
             id=row.id,
             name=row.name,
@@ -70,10 +58,19 @@ class Instrucotr_repo :
             office_hours=row.office_hours,
             is_Active=row.is_active
         )
-    def save(self, instructor: Instructor) :
+
+    def save(self, instructor: Instructor):
         try:
             self.db.begin_transaction()
 
+            # ROLE CHECK
+            role_row = self.db.execute("SELECT role FROM users WHERE id = :id", {"id": instructor.get_id()}).fetchone()
+            if not role_row:
+                raise Exception("User does not exist")
+            if role_row[0] != "instructor":
+                raise Exception("User role must be 'instructor' to save instructor record")
+
+            # UPDATE USERS
             update_user = """
                 UPDATE users
                 SET name = :name,
@@ -89,12 +86,9 @@ class Instrucotr_repo :
                 "password_hash": instructor.get_password_hash(),
             })
 
-
-            exists_query = "SELECT id FROM instructors WHERE id = :id"
-            row = self.db.execute(exists_query, {"id": instructor.get_id()}).fetchone()
-
-            if row:
-
+            # INSERT OR UPDATE INSTRUCTORS
+            exists = self.db.execute("SELECT id FROM instructors WHERE id = :id", {"id": instructor.get_id()}).fetchone()
+            if exists:
                 update_instructor = """
                     UPDATE instructors
                     SET instructor_code = :code,
@@ -109,7 +103,6 @@ class Instrucotr_repo :
                     "hours": instructor.office_hours
                 })
             else:
-
                 insert_instructor = """
                     INSERT INTO instructors (id, instructor_code, bio, office_hours)
                     VALUES (:id, :code, :bio, :hours)
@@ -122,9 +115,7 @@ class Instrucotr_repo :
                 })
 
             self.db.commit()
-
-
-            return self.getById(instructor.get_id())
+            return self.get_by_id(instructor.get_id())
 
         except Exception as e:
             self.db.rollback()
