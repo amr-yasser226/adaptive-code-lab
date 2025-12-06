@@ -1,0 +1,116 @@
+from sqlalchemy.exc import SQLAlchemyError
+from Model.Admin_model import Admin
+
+class Admin_repo:
+    def __init__(self, db):
+        self.db = db
+
+    def get_by_id(self, id: int):
+        query = """
+            SELECT
+                u.id, u.name, u.email, u.password_hash, u.role,
+                u.created_at, u.updated_at, u.is_active,
+                a.privileges
+            FROM users u
+            LEFT JOIN admins a ON u.id = a.id
+            WHERE u.id = :id
+        """
+        result = self.db.execute(query, {"id": id})
+        row = result.fetchone()
+        if not row:
+            return None
+        return Admin(
+            id=row.id,
+            name=row.name,
+            email=row.email,
+            password=row.password_hash,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+            is_Active=row.is_active,
+            privileges=row.privileges
+        )
+
+    def save_admin(self, admin: Admin):
+        try:
+            self.db.begin_transaction()
+            if admin.get_id() is None:
+                raise Exception("Admin must have a user ID before saving admin record")
+            update_user_query = """
+                UPDATE users
+                SET
+                    name = :name,
+                    email = :email,
+                    password_hash = :password_hash,
+                    role = :role,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = :id
+            """
+            self.db.execute(update_user_query, {
+                "id": admin.get_id(),
+                "name": admin.name,
+                "email": admin.email,
+                "password_hash": admin.get_password_hash() if hasattr(admin, "get_password_hash") else admin.password,
+                "role": "admin"
+            })
+            exists_query = "SELECT id FROM admins WHERE id = :id"
+            exists = self.db.execute(exists_query, {"id": admin.get_id()}).fetchone()
+            if exists:
+                update_admin = """
+                    UPDATE admins
+                    SET privileges = :privileges
+                    WHERE id = :id
+                """
+                self.db.execute(update_admin, {
+                    "id": admin.get_id(),
+                    "privileges": admin.privileges
+                })
+            else:
+                insert_admin = """
+                    INSERT INTO admins (id, privileges)
+                    VALUES (:id, :privileges)
+                """
+                self.db.execute(insert_admin, {
+                    "id": admin.get_id(),
+                    "privileges": admin.privileges
+                })
+            self.db.commit()
+            return self.get_by_id(admin.get_id())
+        except SQLAlchemyError:
+            self.db.rollback()
+            return None
+
+    def delete(self, id: int):
+        try:
+            self.db.begin_transaction()
+            self.db.execute("DELETE FROM admins WHERE id = :id", {"id": id})
+            self.db.commit()
+            return True
+        except SQLAlchemyError:
+            self.db.rollback()
+            return False
+
+    def find_by_privilege(self, privilege_substring: str):
+        query = """
+            SELECT
+                u.id, u.name, u.email, u.password_hash, u.role,
+                u.created_at, u.updated_at, u.is_active,
+                a.privileges
+            FROM users u
+            INNER JOIN admins a ON u.id = a.id
+            WHERE a.privileges LIKE :pat
+        """
+        result = self.db.execute(query, {"pat": f"%{privilege_substring}%"})
+        rows = result.fetchall()
+        return [
+            Admin(
+                id=row.id,
+                name=row.name,
+                email=row.email,
+                password=row.password_hash,
+                created_at=row.created_at,
+                updated_at=row.updated_at,
+                is_Active=row.is_active,
+                privileges=row.privileges
+            )
+            for row in rows
+        ]
