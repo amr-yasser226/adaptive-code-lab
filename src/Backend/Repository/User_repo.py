@@ -1,4 +1,4 @@
-from Model.User_model import User 
+from Backend.Model.User_model import User 
 from sqlalchemy.exc import SQLAlchemyError
 
 class User_repo:
