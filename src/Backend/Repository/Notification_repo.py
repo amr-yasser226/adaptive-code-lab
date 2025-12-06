@@ -77,3 +77,16 @@ class Notification_repo:
                 link=row.link
             ))
         return notifications
+    def delete_by_id(self , id : int ):
+        try : 
+            self.db.begin_transaction()
+            query = "DELETE FROM notifications WHERE id =:id"
+            self.db.execute(query, {"id": id})
+            self.db.commit()
+            return True 
+        except SQLAlchemyError : 
+            self.db.rollback()
+            return False
+            
+
+
