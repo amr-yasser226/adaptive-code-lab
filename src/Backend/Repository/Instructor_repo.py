@@ -29,7 +29,7 @@ class Instructor_repo:
             instructor_code=row.instructor_code,
             bio=row.bio,
             office_hours=row.office_hours,
-            is_Active=row.is_active
+            is_Active=row.is_active  # Model still uses is_Active
         )
 
     def get_by_code(self, instructor_code: str):
