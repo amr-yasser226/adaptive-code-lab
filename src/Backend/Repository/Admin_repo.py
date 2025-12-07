@@ -58,11 +58,7 @@ class Admin_repo:
                 "id": admin.get_id(),
                 "name": admin.name,
                 "email": admin.email,
-<<<<<<< HEAD
-                "password_hash": admin.get_password_hash()
-=======
                 "password_hash": admin.get_password_hash() if hasattr(admin, "get_password_hash") else admin.password
->>>>>>> feature/ai-sandbox
             })
 
             # INSERT OR UPDATE ADMINS
@@ -80,8 +76,4 @@ class Admin_repo:
         except SQLAlchemyError as e:
             self.db.rollback()
             print("Error saving admin:", e)
-<<<<<<< HEAD
             return None
-=======
-            return None
->>>>>>> feature/ai-sandbox
