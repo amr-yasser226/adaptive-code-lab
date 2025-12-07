@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Model.Instructor_model import Instructor
+from Backend.Model.Instructor_model import Instructor
 
 class Instructor_repo:
     def __init__(self, db):
@@ -29,7 +29,7 @@ class Instructor_repo:
             instructor_code=row.instructor_code,
             bio=row.bio,
             office_hours=row.office_hours,
-            is_Active=row.is_active
+            is_active=row.is_active  # Changed from is_Active 
         )
 
     def get_by_code(self, instructor_code: str):
@@ -56,7 +56,7 @@ class Instructor_repo:
             instructor_code=row.instructor_code,
             bio=row.bio,
             office_hours=row.office_hours,
-            is_Active=row.is_active
+            is_active=row.is_active # Changed from is_Active
         )
 
     def save(self, instructor: Instructor):

@@ -37,3 +37,6 @@ model_cache/
 src/DB/Accl_DB.db
 
 .pytest_cache/
+
+.coverage
+htmlcov/

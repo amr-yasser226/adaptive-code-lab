@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Model.Admin_model import Admin
+from Backend.Model.Admin_model import Admin
 
 class Admin_repo:
     def __init__(self, db):
@@ -26,7 +26,7 @@ class Admin_repo:
             password=row.password_hash,
             created_at=row.created_at,
             updated_at=row.updated_at,
-            is_Active=row.is_active,
+            is_active=row.is_active,  # Changed from is_Active
             privileges=row.privileges
         )
 

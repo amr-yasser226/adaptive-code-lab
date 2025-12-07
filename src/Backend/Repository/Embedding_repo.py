@@ -1,11 +1,14 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Model.Embedding_model import Embedding
+from Backend.Model.Embedding_model import Embedding
 
 class Embedding_repo:
     def __init__(self, db):
         self.db = db
 
     def get_by_id(self, id: int):
+        """
+        FIXED: Added submission_id to Embedding constructor
+        """
         query = """
             SELECT 
                 e.id, e.submission_id, e.vector_ref, e.model_version, e.dimension, e.created_at
@@ -18,6 +21,7 @@ class Embedding_repo:
             return None
         return Embedding(
             id=row.id,
+            submission_id=row.submission_id,  # FIXED: Added this field
             vector_ref=row.vector_ref,
             model_version=row.model_version,
             dimensions=row.dimension,
@@ -36,7 +40,7 @@ class Embedding_repo:
                 )
             """
             self.db.execute(query, {
-                "submission_id": embedding.submission_id,
+                "submission_id": embedding.get_submission_id(),
                 "vector_ref": embedding.vector_ref,
                 "model_version": embedding.model_version,
                 "dimension": embedding.dimensions
@@ -50,6 +54,9 @@ class Embedding_repo:
             return None
 
     def find_by_submission(self, submissionId: int):
+        """
+        FIXED: Added submission_id to Embedding constructor
+        """
         query = """
             SELECT 
                 e.id, e.submission_id, e.vector_ref, e.model_version, e.dimension, e.created_at
@@ -62,6 +69,7 @@ class Embedding_repo:
             return None
         return Embedding(
             id=row.id,
+            submission_id=row.submission_id,  # FIXED: Added this field
             vector_ref=row.vector_ref,
             model_version=row.model_version,
             dimensions=row.dimension,

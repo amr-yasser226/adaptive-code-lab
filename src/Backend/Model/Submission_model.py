@@ -1,3 +1,5 @@
+from Backend.Model.Files_model import File
+from datetime import datetime
 class Submission :
     valid_languages =('python', 'java', 'cpp', 'javascript') 
     valid_statuses =('pending','queued', 'running', 'graded', 'failed', 'error')
@@ -33,13 +35,26 @@ class Submission :
     
     def enqueue_for_grading(self):
             self.status = 'queued'
-    def attach_file(): 
-         pass 
+    def attach_file(self , file_repo, path ,file_name ,content_type , size_bytes , uploader_id  , checksum =None , storage_url=None ):
+        file =File(
+        id=None,
+        submission_id=self.get_id(),
+        uploader_id=uploader_id,
+        path=path,
+        file_name=file_name,
+        content_type=content_type,
+        size_bytes=size_bytes,
+        checksum=checksum,
+        storage_url=storage_url,
+        created_at=datetime.now()
+    )
+        return file_repo.save_file(file)
+        
     def get_results(self):
             pass
     def regrade(self):
             pass 
     def calcualted_score(self):
             pass
-    def get_files(self):
-            pass
+    def get_files(self ,file_repo):
+        return file_repo.find_by_submission(self.get_id())

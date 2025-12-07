@@ -1,3 +1,4 @@
+from Repository.Notification_repo import Notification_repo
 class Notification:
     Allowed_Types = ('info', 'warning', 'alert')
     def __init__(self,id,user_id,message,type,is_read=False,created_at=None,read_at=None,link=None):
@@ -21,5 +22,16 @@ class Notification:
     def mark_as_unread(self):
         self.is_read = False
         self.read_at = None
-    def delete_notification(self):
-        pass
+    def delete_notification(self, notification_repo):
+        id =self.get_id() 
+        if id is None :
+            raise Exception("Cannot delete: notification has no ID")
+        
+        success = notification_repo.delete_by_id(id)
+        if not success : 
+            raise Exception("Failed to delete notification")
+        
+        return True
+
+
+        

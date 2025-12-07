@@ -1,7 +1,7 @@
-from Model.User_model import User
+from Backend.Model.User_model import User
 class Instructor(User):
-    def __init__(self, id, name, email, password, created_at, updated_at, instructor_code, bio, office_hours, is_Active=True):
-        super().__init__(id=id, name=name, email=email, password=password, role="instructor", created_at=created_at, updated_at=updated_at, is_Active=is_Active)
+    def __init__(self, id, name, email, password, created_at, updated_at, instructor_code, bio, office_hours, is_active=True):
+        super().__init__(id=id, name=name, email=email, password=password, role="instructor", created_at=created_at, updated_at=updated_at, is_active=is_active)
         self.instructor_code = instructor_code
         self.bio = bio
         self.office_hours = office_hours

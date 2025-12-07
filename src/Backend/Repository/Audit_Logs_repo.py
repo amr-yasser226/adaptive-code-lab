@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Model.AuditLog_model import AuditLog
+from Backend.Model.AuditLog_model import AuditLog
 
 class AuditLog_repo:
     def __init__(self, db):

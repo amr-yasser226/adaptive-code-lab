@@ -21,4 +21,14 @@ class PeerReview :
         if comments is not None:
             self.comments = comments
     def calculate_rubric_score(self):
-        pass
+        if not self.rubric_score : 
+             return 0 
+        
+        values = []
+        for v in self.rubric_score.values() : 
+             if isinstance(v,(int,float)): 
+                  values.append(v)
+        
+        if not values : 
+             return 0 
+        return sum(values)/len(values)

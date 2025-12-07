@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Model.Similarity_flag import SimilarityFlag
+from Backend.Model.Similarity_flag import SimilarityFlag
 
 
 class Flag_repo:
