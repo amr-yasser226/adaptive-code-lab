@@ -1,5 +1,6 @@
 from Backend.Model.Enrollment_model import Enrollment
 from datetime import datetime
+from Backend.Model.Assignmnets_model import Assignmnets
 
 class Course:
     def __init__(self, id, instructor_id, code , title ,describtion,year,semester,max_students,created_at,status,updated_at,credits):
@@ -23,14 +24,27 @@ class Course:
     def get_instructor_id(self):
             return self.__instructor_id
     
-    def add_assignment(self, assignment, assignment_repo):
+    def add_assignment(self, assignment_repo, title, description , release_date , due_date , max_points  , allow_late_submissions =False ,late_penalty=None ):
         # Check the Course's status
         Course_status = self.status
         if Course_status != "active":
                raise Exception("Cannot add assignment in inactive course")
-        
+        assingment=Assignmnets(
+        id=None,
+        course_id=self.get_id(),
+        title=title,
+        describtion=description,
+        releaseDate=release_date,
+        due_date=due_date,
+        max_points=max_points,
+        is_published=False,            # new assignments start unpublished
+        allow_late_submissions=allow_late_submissions,
+        late_submission_penalty=late_penalty,
+        created_at=datetime.now(),
+        updated_at=datetime.now()
+        )
         # Create assignment
-        created_assignment = assignment_repo.create(assignment)
+        created_assignment = assignment_repo.create(assingment)
         return created_assignment
     
     def enroll_student(self, student_id, enrollment_repo, student_repo):
