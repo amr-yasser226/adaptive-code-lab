@@ -1,9 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-<<<<<<< HEAD
 from Backend.Model.Student_model import Student
-=======
-from Model.Student_model import Student
->>>>>>> feature/ai-sandbox
 
 class Student_repo:
     def __init__(self, db):
@@ -100,11 +96,7 @@ class Student_repo:
         except Exception as e:
             self.db.rollback()
             print("Error saving student:", e)
-<<<<<<< HEAD
             raise # Re-raise the exception instead of returning None
-=======
-            return None
->>>>>>> feature/ai-sandbox
 
     def find_by_number(self, student: Student):
         query = """
@@ -130,10 +122,5 @@ class Student_repo:
             student_number=row.student_number,
             Program=row.program,
             year_Level=row.YearLevel,
-<<<<<<< HEAD
             is_active=row.is_active
         )
-=======
-            is_Active=row.is_active
-        )
->>>>>>> feature/ai-sandbox
