@@ -60,6 +60,8 @@ def store_embedding(submission_id, embedding_vector, db_path=DB_PATH):
         VALUES (?, ?, ?, ?, ?)
     """, (submission_id, vector_serialized, EMBEDDING_MODEL, dimension, created_at))
     
+    # vector_ref will store a BLOB - a binary object
+    
     conn.commit()
     conn.close()
 
