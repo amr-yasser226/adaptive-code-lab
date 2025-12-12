@@ -4,4 +4,6 @@ Jinja2==3.1.2
 SQLAlchemy==2.0.23
 PyYAML==6.0
 python-dotenv==1.0.0
+greenlet==3.2.4
+typing_extensions==4.15.0
 
