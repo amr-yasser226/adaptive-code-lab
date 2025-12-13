@@ -1,5 +1,5 @@
 from datetime import datetime
-from src.core.entities.result import Result
+from core.entities.result import Result
 class ResultService:
     def __init__(self, result_repo, submission_repo, testcase_repo):
         self.result_repo = result_repo
