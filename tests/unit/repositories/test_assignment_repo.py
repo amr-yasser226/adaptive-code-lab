@@ -1,5 +1,5 @@
 import pytest
-from Backend.Model.Assignmnets_model import Assignmnets
+from core.entities.assignment import Assignment
 
 
 @pytest.mark.repo
@@ -9,7 +9,7 @@ class TestAssignmentRepo:
     
     def test_create_assignment(self, sample_course, assignment_repo):
         """Test creating a new assignment"""
-        assignment = Assignmnets(
+        assignment = Assignment(
             id=None,
             course_id=sample_course.get_id(),
             title="Lab 2",
@@ -73,7 +73,7 @@ class TestAssignmentRepo:
         """Test listing assignments by course"""
         # Create multiple assignments
         for i in range(3):
-            assignment = Assignmnets(
+            assignment = Assignment(
                 id=None,
                 course_id=sample_course.get_id(),
                 title=f"Assignment {i}",

@@ -1,5 +1,5 @@
 import pytest
-from Backend.Model.Similarity_flag import SimilarityFlag
+from core.entities.similarity_flag import SimilarityFlag
 
 
 @pytest.mark.repo
