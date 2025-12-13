@@ -5,7 +5,7 @@ from core.entities.similarity_flag import SimilarityFlag
 @pytest.mark.repo
 @pytest.mark.unit
 class TestSimilarityFlagRepo:
-    """Test suite for SimilarityFlag_repo"""
+    """Test suite for SimilarityFlagRepository"""
     
     def test_create_similarity_flag(self, sample_submission, similarity_flag_repo):
         """Test creating a new similarity flag"""

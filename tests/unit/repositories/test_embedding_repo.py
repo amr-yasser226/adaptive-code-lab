@@ -5,7 +5,7 @@ from core.entities.embedding import Embedding
 @pytest.mark.repo
 @pytest.mark.unit
 class TestEmbeddingRepo:
-    """Test suite for Embedding_repo"""
+    """Test suite for EmbeddingRepository"""
     
     def test_save_embedding(self, sample_submission, embedding_repo):
         """Test saving a new embedding"""

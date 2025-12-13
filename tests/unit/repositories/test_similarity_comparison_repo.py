@@ -6,7 +6,7 @@ from core.entities.submission import Submission
 @pytest.mark.repo
 @pytest.mark.unit
 class TestSimilarityComparisonRepo:
-    """Test suite for SimilarityComparison_repo"""
+    """Test suite for SimilarityComparisonRepository"""
     
     def test_create_similarity_comparison(self, sample_submission, similarity_flag_repo, 
                                           similarity_comparison_repo, sample_student,
