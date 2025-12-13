@@ -2,11 +2,16 @@ import sqlite3
 import os
 from dotenv import load_dotenv
 
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
+
 load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
 
 # Adjust DB path to be in /data or relative to root, ensuring consistency
-DB_PATH = os.getenv("ACCL_DB_PATH", os.path.join(PROJECT_ROOT, "Accl_DB.db"))
+DB_PATH = os.getenv("ACCL_DB_PATH", os.path.join("data", "Accl_DB.db"))
+
+# Remove sqlite:/// prefix if present
+if DB_PATH.startswith("sqlite:///"):
+    DB_PATH = DB_PATH.replace("sqlite:///", "")
 if not os.path.isabs(DB_PATH):
     DB_PATH = os.path.join(PROJECT_ROOT, DB_PATH)
 
@@ -16,6 +21,9 @@ TABLES_DIR = os.path.join(os.path.dirname(__file__), "schema")
 def run_migrations(db_path=DB_PATH, tables_dir=TABLES_DIR):
     print(f"Using DB: {db_path}")
     print(f"Loading SQL files from: {tables_dir}")
+
+    # ✅ Ensure data directory exists
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
