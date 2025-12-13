@@ -54,7 +54,7 @@ class Submission :
             pass
     def regrade(self):
             pass 
-    def calcualted_score(self):
+    def calculated_score(self):
             pass
     def get_files(self ,file_repo):
         return file_repo.find_by_submission(self.get_id())
