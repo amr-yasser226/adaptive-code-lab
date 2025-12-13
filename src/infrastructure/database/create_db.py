@@ -3,11 +3,14 @@ import sqlite3
 from dotenv import load_dotenv
 
 # Load .env
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
 load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
 
 # Use DB path from .env
-DB_PATH = os.getenv("ACCL_DB_PATH", os.path.join(PROJECT_ROOT, "DB", "Accl_DB.db"))
+DB_PATH = os.getenv("ACCL_DB_PATH", "data/Accl_DB.db")
+if DB_PATH.startswith("sqlite:///"):
+    DB_PATH = DB_PATH.replace("sqlite:///", "")
+
 if not os.path.isabs(DB_PATH):
     DB_PATH = os.path.join(PROJECT_ROOT, DB_PATH)
 
