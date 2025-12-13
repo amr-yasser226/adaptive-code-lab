@@ -1,15 +1,4 @@
-#!/usr/bin/env python3
-"""
-Verification script for Adaptive Code Lab Refactoring.
-Run this script to verify that all modules can be imported correctly 
-after the Clean Architecture restructure.
-
-Usage:
-    python verify_installation.py
-"""
-
 import sys
-import os
 from pathlib import Path
 
 # Add src to path

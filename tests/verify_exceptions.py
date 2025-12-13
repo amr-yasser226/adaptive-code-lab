@@ -16,18 +16,18 @@ from infrastructure.repositories.student_repository import StudentRepository
 from infrastructure.repositories.instructor_repository import InstructorRepository
 from infrastructure.repositories.enrollment_repository import EnrollmentRepository
 from infrastructure.repositories.submission_repository import SubmissionRepository
-from infrastructure.repositories.result_repository import Result_repo
-from infrastructure.repositories.audit_log_repository import AuditLog_repo
-from infrastructure.repositories.hint_repository import Hint_repo
+from infrastructure.repositories.result_repository import ResultRepository
+from infrastructure.repositories.audit_log_repository import AuditLogRepository
+from infrastructure.repositories.hint_repository import HintRepository
 from infrastructure.repositories.peer_review_repository import PeerReviewRepository
-from infrastructure.repositories.similarity_comparison_repository import SimilarityComparison_repo
+from infrastructure.repositories.similarity_comparison_repository import SimilarityComparisonRepository
 from infrastructure.repositories.similarity_flag_repository import SimilarityFlagRepository
-from infrastructure.repositories.file_repository import File_repo
-from infrastructure.repositories.admin_repository import Admin_repo
+from infrastructure.repositories.file_repository import FileRepository
+from infrastructure.repositories.admin_repository import AdminRepository
 from infrastructure.repositories.notification_repository import NotificationRepository
-from infrastructure.repositories.embedding_repository import Embedding_repo
+from infrastructure.repositories.embedding_repository import EmbeddingRepository
 from infrastructure.repositories.test_case_repository import TestCaseRepository
-from infrastructure.repositories.flag_repository import Flag_repo
+from infrastructure.repositories.flag_repository import FlagRepository
 
 class TestExceptionHandling(unittest.TestCase):
     def setUp(self):
@@ -95,7 +95,7 @@ class TestExceptionHandling(unittest.TestCase):
 
     def test_admin_repo(self):
         print("Testing AdminRepository...")
-        repo = Admin_repo(self.mock_db)
+        repo = AdminRepository(self.mock_db)
         admin = MagicMock()
         admin.get_id.return_value = 123 # Fix: Must have ID to pass validation
         admin.name = "Test Admin"
@@ -118,7 +118,7 @@ class TestExceptionHandling(unittest.TestCase):
         
     def test_embedding_repo(self):
         print("Testing EmbeddingRepository...")
-        repo = Embedding_repo(self.mock_db)
+        repo = EmbeddingRepository(self.mock_db)
         emb = MagicMock()
         result = repo.save_embedding(emb)
         self.assertIsNone(result)
@@ -127,7 +127,7 @@ class TestExceptionHandling(unittest.TestCase):
 
     def test_hint_repo(self):
         print("Testing HintRepository...")
-        repo = Hint_repo(self.mock_db)
+        repo = HintRepository(self.mock_db)
         hint = MagicMock()
         hint.get_id.return_value = None
         result = repo.create(hint)
@@ -147,7 +147,7 @@ class TestExceptionHandling(unittest.TestCase):
 
     def test_similarity_comparison_repo(self):
         print("Testing SimilarityComparisonRepository...")
-        repo = SimilarityComparison_repo(self.mock_db)
+        repo = SimilarityComparisonRepository(self.mock_db)
         comp = MagicMock()
         comp.match_segments = None # Fix: JSON serialization
         result = repo.create(comp)
@@ -167,7 +167,7 @@ class TestExceptionHandling(unittest.TestCase):
 
     def test_file_repo(self):
         print("Testing FileRepository...")
-        repo = File_repo(self.mock_db)
+        repo = FileRepository(self.mock_db)
         file_entity = MagicMock()
         file_entity.get_id.return_value = None
         result = repo.save_file(file_entity)
@@ -187,7 +187,7 @@ class TestExceptionHandling(unittest.TestCase):
 
     def test_flag_repo(self):
         print("Testing FlagRepository...")
-        repo = Flag_repo(self.mock_db)
+        repo = FlagRepository(self.mock_db)
         flag = MagicMock()
         flag.highlighted_spans = None # Fix: JSON serialization
         result = repo.save_similarityflag(flag)
@@ -234,7 +234,7 @@ class TestExceptionHandling(unittest.TestCase):
 
     def test_result_repo(self):
         print("Testing ResultRepository...")
-        repo = Result_repo(self.mock_db)
+        repo = ResultRepository(self.mock_db)
         result_entity = MagicMock()
         result_entity.passed = True
         result = repo.save_result(result_entity)
@@ -244,7 +244,7 @@ class TestExceptionHandling(unittest.TestCase):
 
     def test_audit_log_repo(self):
         print("Testing AuditLogRepository...")
-        repo = AuditLog_repo(self.mock_db)
+        repo = AuditLogRepository(self.mock_db)
         log = MagicMock()
         log.get_id.return_value = None
         result = repo.save(log)
