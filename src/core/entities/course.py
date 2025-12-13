@@ -3,13 +3,13 @@ from datetime import datetime
 from core.entities.assignment import Assignment
 
 class Course:
-    def __init__(self, id, instructor_id, code , title ,describtion,year,semester,max_students,created_at,status,updated_at,credits):
+    def __init__(self, id, instructor_id, code, title, description, year, semester, max_students, created_at, status, updated_at, credits):
 
         self.__id = id
         self.__instructor_id = instructor_id
         self.code = code
         self.title = title
-        self.describtion = describtion
+        self.description = description
         self.year = year
         self.semester = semester
         self.max_students = max_students
@@ -33,7 +33,7 @@ class Course:
         id=None,
         course_id=self.get_id(),
         title=title,
-        describtion=description,
+            description=description,
         releaseDate=release_date,
         due_date=due_date,
         max_points=max_points,
