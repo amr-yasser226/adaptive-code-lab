@@ -46,8 +46,8 @@
             </div>
             <div class="detail-content">
                 <h6>Due Date</h6>
-                <p class="mb-1">{{ assignment.due_date.strftime('%B %d, %Y') }}</p>
-                <small>{{ assignment.due_date.strftime('%I:%M %p') }}</small>
+                <p class="mb-1">{{ assignment.due_date|format_date('%B %d, %Y') }}</p>
+                <small>{{ assignment.due_date|format_date('%I:%M %p') }}</small>
                 {% if assignment.is_overdue %}
                 <div><span class="badge bg-danger mt-1"><i class="fas fa-clock"></i> Overdue</span></div>
                 {% elif assignment.is_due_soon %}
@@ -144,7 +144,8 @@
                     {% endif %}
                     <div class="info-row">
                         <span class="info-label">Submitted</span>
-                        <span class="info-value small">{{ latest_submission.submitted_at.strftime('%b %d, %Y') }}</span>
+                        <span class="info-value small">{{ latest_submission.submitted_at|format_date('%b %d, %Y')
+                            }}</span>
                     </div>
                     <a href="{{ url_for('student.submission_results', submission_id=latest_submission.id) }}"
                         class="btn btn-info w-100 mb-2">

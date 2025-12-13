@@ -128,6 +128,6 @@ class Hint_repo:
             self.db.execute("UPDATE hints SET is_helpful = 0 WHERE id = :id", {"id": id})
             self.db.commit()
             return self.get_by_id(id)
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return None

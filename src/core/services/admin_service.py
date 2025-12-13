@@ -37,11 +37,11 @@ class AdminService:
             raise ValidationError("User not found")
 
         if action == "activate":
-            user.Activate_account()
+            user.activate_account()
             return self.user_repo.Update_data(user)
 
         if action == "deactivate":
-            user.Deactivate_account()
+            user.deactivate_account()
             return self.user_repo.Update_data(user)
 
         if action == "delete":

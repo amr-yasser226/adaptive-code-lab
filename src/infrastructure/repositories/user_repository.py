@@ -84,7 +84,7 @@ class UserRepository:
             query = "DELETE FROM users WHERE id = :id"
             self.db.execute(query, {"id": id})
             self.db.commit()
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             raise
     

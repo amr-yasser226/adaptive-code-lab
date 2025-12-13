@@ -116,7 +116,7 @@ class SimilarityFlagRepository:
             self.db.execute("DELETE FROM similarity_flags WHERE id = :id", {"id": id})
             self.db.commit()
             return True
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return False
 
@@ -156,7 +156,7 @@ class SimilarityFlagRepository:
             """, {"id": id, "reviewer_id": reviewer_id, "review_notes": review_notes, "reviewed_at": reviewed_at})
             self.db.commit()
             return self.get_by_id(id)
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return None
 
@@ -169,7 +169,7 @@ class SimilarityFlagRepository:
             """, {"id": id, "reviewer_id": reviewer_id, "notes": "Dismissed", "reviewed_at": reviewed_at})
             self.db.commit()
             return self.get_by_id(id)
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return None
 
@@ -182,6 +182,6 @@ class SimilarityFlagRepository:
             """, {"id": id, "reviewer_id": reviewer_id, "notes": "Escalated for further investigation", "reviewed_at": reviewed_at})
             self.db.commit()
             return self.get_by_id(id)
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return None

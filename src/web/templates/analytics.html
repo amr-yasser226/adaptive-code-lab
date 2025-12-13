@@ -136,7 +136,7 @@
                             <td>
                                 <strong>{{ assignment.title }}</strong>
                                 <br>
-                                <small class="text-muted">{{ assignment.due_date.strftime('%b %d') }}</small>
+                                <small class="text-muted">{{ assignment.due_date|format_date('%b %d') }}</small>
                             </td>
                             <td>
                                 <span class="badge bg-light text-dark">{{ assignment.submission_count }}/{{

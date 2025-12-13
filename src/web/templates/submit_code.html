@@ -327,13 +327,13 @@
                 <div class="detail-row">
                     <span class="detail-label">Due Date</span>
                     <span class="detail-value">
-                        {{ assignment.due_date.strftime('%b %d, %Y') }}
+                        {{ assignment.due_date|format_date('%b %d, %Y') }}
                     </span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Time</span>
                     <span class="detail-value">
-                        {{ assignment.due_date.strftime('%I:%M %p') }}
+                        {{ assignment.due_date|format_date('%I:%M %p') }}
                     </span>
                 </div>
                 <div class="detail-row">
@@ -364,7 +364,7 @@
                 <div class="submission-item">
                     <div class="submission-header">
                         <strong>Version {{ prev.version_number }}</strong>
-                        <small class="text-muted">{{ prev.submitted_at.strftime('%m/%d %H:%M') }}</small>
+                        <small class="text-muted">{{ prev.submitted_at|format_date('%m/%d %H:%M') }}</small>
                     </div>
                     <div class="submission-details">
                         <span class="badge bg-secondary">{{ prev.language }}</span>

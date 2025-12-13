@@ -157,7 +157,7 @@
                                 </td>
                                 <td>
                                     <i class="fas fa-calendar"></i>
-                                    {{ assignment.due_date.strftime('%m/%d/%Y') }}
+                                    {{ assignment.due_date|format_date('%m/%d/%Y') }}
                                 </td>
                                 <td>
                                     {% if assignment.status == 'submitted' %}
@@ -211,7 +211,7 @@
                         class="list-group-item list-group-item-action">
                         <div class="d-flex w-100 justify-content-between">
                             <h6 class="mb-1">{{ submission.assignment.title }}</h6>
-                            <small>{{ submission.submitted_at.strftime('%m/%d') }}</small>
+                            <small>{{ submission.submitted_at|format_date('%m/%d') }}</small>
                         </div>
                         <p class="mb-1 small text-muted">Version {{ submission.version_number }}</p>
                     </a>
@@ -251,7 +251,7 @@
                             <tr>
                                 <td>{{ submission.student.name }}</td>
                                 <td>{{ submission.assignment.title }}</td>
-                                <td>{{ submission.submitted_at.strftime('%m/%d %H:%M') }}</td>
+                                <td>{{ submission.submitted_at|format_date('%m/%d %H:%M') }}</td>
                                 <td>
                                     {% if submission.status == 'graded' %}
                                     <span class="badge bg-success">Graded</span>

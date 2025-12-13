@@ -84,7 +84,7 @@ class SimilarityComparison_repo:
             )
             self.db.commit()
             return True
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return False
 

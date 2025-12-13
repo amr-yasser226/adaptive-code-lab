@@ -47,6 +47,26 @@ def create_app(test_config=None):
     if test_config:
         app.config.update(test_config)
 
+    # --- Custom Jinja2 Filters ---
+    from datetime import datetime as dt
+    def format_date(value, fmt='%b %d, %Y'):
+        """Safely format a date value (string or datetime) to a string."""
+        if value is None:
+            return 'N/A'
+        if isinstance(value, str):
+            # Try parsing common formats
+            for parse_fmt in ['%Y-%m-%d %H:%M:%S', '%Y-%m-%d', '%Y-%m-%dT%H:%M:%S']:
+                try:
+                    value = dt.strptime(value, parse_fmt)
+                    break
+                except ValueError:
+                    continue
+            else:
+                return value  # Return as-is if unparseable
+        return value.strftime(fmt)
+    
+    app.jinja_env.filters['format_date'] = format_date
+
     # Initialize Database Singleton (Bonus #4)
     # This ensures the DB connection logic is ready
     db_manager = DatabaseManager.get_instance()

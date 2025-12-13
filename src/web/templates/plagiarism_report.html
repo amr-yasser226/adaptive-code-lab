@@ -214,14 +214,14 @@
                         <strong>Submission 1</strong>
                         <p class="small text-muted">
                             {{ pair.submission1.student.name }}<br>
-                            Submitted: {{ pair.submission1.submitted_at.strftime('%b %d, %Y') }}
+                            Submitted: {{ pair.submission1.submitted_at|format_date('%b %d, %Y') }}
                         </p>
                     </div>
                     <div class="col-md-6">
                         <strong>Submission 2</strong>
                         <p class="small text-muted">
                             {{ pair.submission2.student.name }}<br>
-                            Submitted: {{ pair.submission2.submitted_at.strftime('%b %d, %Y') }}
+                            Submitted: {{ pair.submission2.submitted_at|format_date('%b %d, %Y') }}
                         </p>
                     </div>
                 </div>

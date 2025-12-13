@@ -13,7 +13,7 @@ if DB_PATH.startswith("sqlite:///"):
 if not os.path.isabs(DB_PATH):
     DB_PATH = os.path.join(PROJECT_ROOT, DB_PATH)
 
-print("Using DB:", DB_PATH)    # debug
+
 
 import threading
 
@@ -31,7 +31,7 @@ class DatabaseManager:
 
     def _init_connection(self, db_path):
         self.db_path = db_path if db_path else DB_PATH
-        print(f"DatabaseManager initialized with: {self.db_path}")
+        # DatabaseManager initialized silently
 
     @classmethod
     def get_instance(cls):

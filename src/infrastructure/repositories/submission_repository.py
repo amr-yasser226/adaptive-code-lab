@@ -153,30 +153,30 @@ class SubmissionRepository:
             for row in rows
         ]
     
-    def get_grades (self , student_id:int ): 
-        query ="""
-                SELECT * FROM submissions  WHERE student_id = :sid AND score  IS NOT NULL
-                ORDERD BY grade_at DESC 
+    def get_grades(self, student_id: int): 
+        query = """
+            SELECT * FROM submissions WHERE student_id = :sid AND score IS NOT NULL
+            ORDER BY grade_at DESC 
         """    
-        rows = self.db.execute(query, {"sid" : student_id}).fetchall()
+        rows = self.db.execute(query, {"sid": student_id}).fetchall()
         submission_list = []
-        for row in rows : 
-            Submission(
+        for row in rows:
+            sub = Submission(
                 id=row.id,
-            assignment_id=row.assignment_id,
-            student_id=row.student_id,
-            version=row.version,
-            language=row.language,
-            status=row.status,
-            score=row.score,
-            is_late=row.is_late,
-            created_at=row.created_at,
-            updated_at=row.updated_at,
-            grade_at=row.grade_at
+                assignment_id=row.assignment_id,
+                student_id=row.student_id,
+                version=row.version,
+                language=row.language,
+                status=row.status,
+                score=row.score,
+                is_late=row.is_late,
+                created_at=row.created_at,
+                updated_at=row.updated_at,
+                grade_at=row.grade_at
             )
-            submission_list.append(Submission)
+            submission_list.append(sub)
 
-        return  submission_list
+        return submission_list
     
     def get_last_submission(self, student_id: int, assignment_id: int): 
         query="""

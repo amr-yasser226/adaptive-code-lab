@@ -58,14 +58,14 @@ class Student(User):
             raise Exception("You cannot submit. You are not enrolled in this course.")
         
         # Determine version number
-        last_submission = Submission_repo.get_laste_submission(
+        last_submission = Submission_repo.get_last_submission(
             self.get_id(), 
             assignment_id
         )
         new_version = last_submission.version + 1 if last_submission else 1
         
         # Check if late
-        is_late = datetime.now() > assignment.dueDate
+        is_late = datetime.now() > assignment.due_date
         
         # Create submission
         new_submission = Submission(

@@ -151,11 +151,12 @@ def profile():
     student_service = get_service('student_service')
     # auth_service = get_service('auth_service') # to get user details
     
+    student = student_service.get_student(user_id)
     submissions = student_service.get_student_submissions(user_id)
     avg_score = 0 # Calculate from submissions
     
     return render_template('profile.html',
-        user={'role': 'student', 'name': 'Student'}, # TODO: real user
+        user=student,
         submissions_count=len(submissions),
         avg_score=avg_score,
         current_user={'role': 'student'})

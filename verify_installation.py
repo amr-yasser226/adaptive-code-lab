@@ -76,14 +76,14 @@ for repo in repositories:
     results.append(check_import(f"infrastructure.repositories.{repo}"))
 
 print("\n--- Infrastructure Layer (AI) ---")
-results.append(check_import("infrastructure.ai.embeddings", "generate_embedding"))
+results.append(check_import("infrastructure.ai.gemini_client", "GeminiClient"))
 
 print("\n--- Infrastructure Layer (Database) ---")
-results.append(check_import("infrastructure.database.connection", "connect_db"))
+results.append(check_import("infrastructure.database.connection", "DatabaseManager"))
 results.append(check_import("infrastructure.database.create_db", "create_database"))
 
 print("\n--- Web Layer ---")
-results.append(check_import("web.app", "app"))
+results.append(check_import("web.app", "create_app"))
 
 print("\n" + "="*40)
 if all(results):
