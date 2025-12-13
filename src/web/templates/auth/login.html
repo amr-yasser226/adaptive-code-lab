@@ -13,23 +13,27 @@
 
                 <!-- Display Errors -->
                 {% if error %}
-                    <div class="alert alert-danger" role="alert">
-                        {{ error }}
-                    </div>
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
                 {% endif %}
 
-                <form method="POST" action="{{ url_for('login') }}" id="loginForm" novalidate>
+                <form method="POST" action="{{ url_for('auth.login') }}" id="loginForm" novalidate>
                     <!-- Email Field -->
                     <div class="mb-3">
                         <label for="email" class="form-label">Email Address</label>
-                        <input type="email" name="email" class="form-control" placeholder="Enter your email (e.g., user@example.com)" id="email" required pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$" autocomplete="email">
+                        <input type="email" name="email" class="form-control"
+                            placeholder="Enter your email (e.g., user@example.com)" id="email" required
+                            pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$" autocomplete="email">
                         <small class="form-text text-muted">Please enter a valid email address</small>
                     </div>
 
                     <!-- Password Field -->
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" placeholder="Enter your password (min. 6 characters)" id="password" required minlength="6" autocomplete="current-password">
+                        <input type="password" name="password" class="form-control"
+                            placeholder="Enter your password (min. 6 characters)" id="password" required minlength="6"
+                            autocomplete="current-password">
                         <small class="form-text text-muted">Password must be at least 6 characters</small>
                     </div>
 
@@ -55,8 +59,8 @@
                 <!-- Links -->
                 <div class="text-center">
                     <p class="mb-2">
-                        Don't have an account? 
-                        <a href="{{ url_for('register') }}">Register here</a>
+                        Don't have an account?
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-link">Need an account?</a>
                     </p>
                     <p class="small">
                         <a href="#">Forgot your password?</a>
@@ -83,12 +87,12 @@
 {% block extra_js %}
 <script>
     // Form validation
-    (function() {
+    (function () {
         'use strict';
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             var forms = document.querySelectorAll('form[novalidate]');
-            Array.prototype.slice.call(forms).forEach(function(form) {
-                form.addEventListener('submit', function(event) {
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
                     if (form.checkValidity() === false) {
                         event.preventDefault();
                         event.stopPropagation();

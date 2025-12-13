@@ -13,16 +13,17 @@
 
                 <!-- Display Errors -->
                 {% if error %}
-                    <div class="alert alert-danger" role="alert">
-                        {{ error }}
-                    </div>
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
                 {% endif %}
 
-                <form method="POST" action="{{ url_for('register') }}" id="registerForm" novalidate>
+                <form method="POST" action="{{ url_for('auth.register') }}" id="registerForm" novalidate>
                     <!-- Name Field -->
                     <div class="mb-3">
                         <label for="name" class="form-label">Full Name</label>
-                        <input type="text" name="name" class="form-control" placeholder="Enter your full name" id="name" minlength="3" maxlength="100" required>
+                        <input type="text" name="name" class="form-control" placeholder="Enter your full name" id="name"
+                            minlength="3" maxlength="100" required>
                         <small class="form-text text-muted">3-100 characters</small>
                     </div>
 
@@ -42,14 +43,17 @@
                     <!-- Email Field -->
                     <div class="mb-3">
                         <label for="email" class="form-label">Email Address</label>
-                        <input type="email" name="email" class="form-control" placeholder="example@university.edu" id="email" required autocomplete="email" pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$">
+                        <input type="email" name="email" class="form-control" placeholder="example@university.edu"
+                            id="email" required autocomplete="email" pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$">
                         <small class="form-text text-muted">Must be a valid email address</small>
                     </div>
 
                     <!-- Password Field -->
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" placeholder="Enter a strong password" id="password" minlength="8" required autocomplete="new-password">
+                        <input type="password" name="password" class="form-control"
+                            placeholder="Enter a strong password" id="password" minlength="8" required
+                            autocomplete="new-password">
                         <div class="password-strength mt-2">
                             <small class="form-text text-muted">
                                 Requirements: At least 8 characters, with uppercase, lowercase, and numbers
@@ -63,8 +67,11 @@
                     <!-- Confirm Password Field -->
                     <div class="mb-3">
                         <label for="confirm_password" class="form-label">Confirm Password</label>
-                        <input type="password" name="confirm_password" class="form-control" placeholder="Re-enter your password" id="confirm_password" minlength="8" required autocomplete="new-password">
-                        <small class="form-text text-danger" id="passwordMatch" style="display:none;">Passwords do not match</small>
+                        <input type="password" name="confirm_password" class="form-control"
+                            placeholder="Re-enter your password" id="confirm_password" minlength="8" required
+                            autocomplete="new-password">
+                        <small class="form-text text-danger" id="passwordMatch" style="display:none;">Passwords do not
+                            match</small>
                     </div>
 
                     <!-- Terms Agreement -->
@@ -89,8 +96,8 @@
                 <!-- Login Link -->
                 <div class="text-center">
                     <p class="mb-0">
-                        Already have an account? 
-                        <a href="{{ url_for('login') }}">Login here</a>
+                        Already have an account?
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-link">Already have an account?</a>
                     </p>
                 </div>
             </div>
@@ -102,12 +109,12 @@
 {% block extra_js %}
 <script>
     // Form validation
-    (function() {
+    (function () {
         'use strict';
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             var forms = document.querySelectorAll('form[novalidate]');
-            Array.prototype.slice.call(forms).forEach(function(form) {
-                form.addEventListener('submit', function(event) {
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
                     if (form.checkValidity() === false) {
                         event.preventDefault();
                         event.stopPropagation();
@@ -119,16 +126,16 @@
     })();
 
     // Password strength indicator
-    document.getElementById('password').addEventListener('input', function() {
+    document.getElementById('password').addEventListener('input', function () {
         var password = this.value;
         var strength = 0;
-        
+
         if (password.length >= 8) strength++;
         if (/[a-z]/.test(password)) strength++;
         if (/[A-Z]/.test(password)) strength++;
         if (/[0-9]/.test(password)) strength++;
         if (/[^a-zA-Z0-9]/.test(password)) strength++;
-        
+
         // Visual feedback can be added here
     });
 </script>

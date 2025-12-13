@@ -25,7 +25,8 @@
     <i class="fas fa-exclamation-circle"></i>
     <strong>Potential Academic Integrity Violations Detected</strong>
     <p class="mb-0">3 submissions flagged with high similarity scores requiring review</p>
-    <button type="button" class="btn btn-sm btn-danger float-end"><i class="fas fa-arrow-right"></i> Review All →</button>
+    <button type="button" class="btn btn-sm btn-danger float-end"><i class="fas fa-arrow-right"></i> Review All
+        →</button>
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 </div>
 
@@ -38,7 +39,7 @@
             <p>Total Scans</p>
         </div>
     </div>
-    
+
     <div class="col-md-3 mb-3">
         <div class="overview-card overview-card-red">
             <i class="fas fa-exclamation"></i>
@@ -46,7 +47,7 @@
             <p>High Similarity</p>
         </div>
     </div>
-    
+
     <div class="col-md-3 mb-3">
         <div class="overview-card overview-card-yellow">
             <i class="fas fa-bolt"></i>
@@ -54,7 +55,7 @@
             <p>Medium Similarity</p>
         </div>
     </div>
-    
+
     <div class="col-md-3 mb-3">
         <div class="overview-card overview-card-green">
             <i class="fas fa-check"></i>
@@ -111,7 +112,8 @@
                 <p class="comparison-details">Matched Lines: 247/265 | Identical Blocks: 18 | Similar Functions: 12</p>
             </div>
             <div class="similarity-card-footer">
-                <button class="btn btn-sm btn-danger"><i class="fas fa-arrow-right"></i> View Detailed Comparison →</button>
+                <button class="btn btn-sm btn-danger"><i class="fas fa-arrow-right"></i> View Detailed Comparison
+                    →</button>
             </div>
         </div>
 
@@ -140,7 +142,8 @@
                 <p class="comparison-details">Matched Lines: 131/205 | Identical Blocks: 8 | Similar Algorithms: 5</p>
             </div>
             <div class="similarity-card-footer">
-                <button class="btn btn-sm btn-warning"><i class="fas fa-arrow-right"></i> View Detailed Comparison →</button>
+                <button class="btn btn-sm btn-warning"><i class="fas fa-arrow-right"></i> View Detailed Comparison
+                    →</button>
             </div>
         </div>
     </div>
@@ -161,7 +164,7 @@
             </div>
             <div class="insight-item">
                 <i class="fas fa-sliders-h"></i>
-                <p>Threshold Settings: High (>80%), Medium (60-80%), Low (<60%)</p>
+                <p>Threshold Settings: High (>80%), Medium (60-80%), Low (<60%)< /p>
             </div>
             <div class="insight-item">
                 <i class="fas fa-chart-line"></i>
@@ -184,81 +187,86 @@
     </div>
 </div><!-- Similarity Pairs List -->
 {% if similarities %}
-    <div class="row">
-        {% for pair in similarities %}
-            <div class="col-md-12 mb-4">
-                <div class="card {% if pair.similarity_score > 75 %}border-danger{% elif pair.similarity_score > 50 %}border-warning{% else %}border-success{% endif %}">
-                    <div class="card-header {% if pair.similarity_score > 75 %}bg-danger{% elif pair.similarity_score > 50 %}bg-warning{% else %}bg-success{% endif %} text-white">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-users"></i> 
-                                    {{ pair.submission1.student.name }} 
-                                    <i class="fas fa-exchange-alt"></i>
-                                    {{ pair.submission2.student.name }}
-                                </h5>
-                            </div>
-                            <div class="col-auto">
-                                <h4 class="mb-0">{{ "%.1f"|format(pair.similarity_score) }}%</h4>
-                            </div>
-                        </div>
+<div class="row">
+    {% for pair in similarities %}
+    <div class="col-md-12 mb-4">
+        <div
+            class="card {% if pair.similarity_score > 75 %}border-danger{% elif pair.similarity_score > 50 %}border-warning{% else %}border-success{% endif %}">
+            <div
+                class="card-header {% if pair.similarity_score > 75 %}bg-danger{% elif pair.similarity_score > 50 %}bg-warning{% else %}bg-success{% endif %} text-white">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h5 class="mb-0">
+                            <i class="fas fa-users"></i>
+                            {{ pair.submission1.student.name }}
+                            <i class="fas fa-exchange-alt"></i>
+                            {{ pair.submission2.student.name }}
+                        </h5>
                     </div>
-                    <div class="card-body">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <strong>Submission 1</strong>
-                                <p class="small text-muted">
-                                    {{ pair.submission1.student.name }}<br>
-                                    Submitted: {{ pair.submission1.submitted_at.strftime('%b %d, %Y') }}
-                                </p>
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Submission 2</strong>
-                                <p class="small text-muted">
-                                    {{ pair.submission2.student.name }}<br>
-                                    Submitted: {{ pair.submission2.submitted_at.strftime('%b %d, %Y') }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Matching Snippets -->
-                        {% if pair.matching_blocks %}
-                            <h6 class="mb-3">Matching Code Snippets</h6>
-                            {% for block in pair.matching_blocks[:3] %}
-                                <div class="mb-3">
-                                    <small class="text-muted">Match {{ loop.index }}: {{ "%.1f"|format(block.similarity * 100) }}% similar</small>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="bg-light p-2 rounded border" style="font-family: monospace; font-size: 0.85em; max-height: 100px; overflow: hidden;">
-                                                {{ block.code1[:150] }}...
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="bg-light p-2 rounded border" style="font-family: monospace; font-size: 0.85em; max-height: 100px; overflow: hidden;">
-                                                {{ block.code2[:150] }}...
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-                    <div class="card-footer">
-                        <a href="{{ url_for('plagiarism.compare', pair_id=pair.id) }}" class="btn btn-sm btn-primary">
-                            <i class="fas fa-eye"></i> Detailed Comparison
-                        </a>
-                        <button class="btn btn-sm btn-outline-danger" onclick="markAsFalsePositive('{{ pair.id }}')">
-                            <i class="fas fa-check"></i> Mark as False Positive
-                        </button>
+                    <div class="col-auto">
+                        <h4 class="mb-0">{{ "%.1f"|format(pair.similarity_score) }}%</h4>
                     </div>
                 </div>
             </div>
-        {% endfor %}
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Submission 1</strong>
+                        <p class="small text-muted">
+                            {{ pair.submission1.student.name }}<br>
+                            Submitted: {{ pair.submission1.submitted_at.strftime('%b %d, %Y') }}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Submission 2</strong>
+                        <p class="small text-muted">
+                            {{ pair.submission2.student.name }}<br>
+                            Submitted: {{ pair.submission2.submitted_at.strftime('%b %d, %Y') }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Matching Snippets -->
+                {% if pair.matching_blocks %}
+                <h6 class="mb-3">Matching Code Snippets</h6>
+                {% for block in pair.matching_blocks[:3] %}
+                <div class="mb-3">
+                    <small class="text-muted">Match {{ loop.index }}: {{ "%.1f"|format(block.similarity * 100) }}%
+                        similar</small>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="bg-light p-2 rounded border"
+                                style="font-family: monospace; font-size: 0.85em; max-height: 100px; overflow: hidden;">
+                                {{ block.code1[:150] }}...
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="bg-light p-2 rounded border"
+                                style="font-family: monospace; font-size: 0.85em; max-height: 100px; overflow: hidden;">
+                                {{ block.code2[:150] }}...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <a href="#" class="btn btn-sm btn-primary">
+                    <i class="fas fa-eye"></i> Detailed Comparison
+                </a>
+                <button class="btn btn-sm btn-outline-danger" onclick="markAsFalsePositive('{{ pair.id }}')">
+                    <i class="fas fa-check"></i> Mark as False Positive
+                </button>
+            </div>
+        </div>
     </div>
+    {% endfor %}
+</div>
 {% else %}
-    <div class="alert alert-info" role="alert">
-        <i class="fas fa-info-circle"></i> No suspicious similarities found above the threshold.
-    </div>
+<div class="alert alert-info" role="alert">
+    <i class="fas fa-info-circle"></i> No suspicious similarities found above the threshold.
+</div>
 {% endif %}
 
 <!-- Legend -->
@@ -277,12 +285,14 @@
                         <span class="ms-2">High - Review Recommended</span>
                     </div>
                     <div class="col-md-4">
-                        <span class="badge bg-success">< 50%</span>
-                        <span class="ms-2">Low - Likely Independent Work</span>
+                        <span class="badge bg-success">
+                            < 50%</span>
+                                <span class="ms-2">Low - Likely Independent Work</span>
                     </div>
                 </div>
                 <p class="small text-muted mt-2 mb-0">
-                    <strong>Note:</strong> This tool is for advisory purposes only. Similar code does not necessarily indicate plagiarism 
+                    <strong>Note:</strong> This tool is for advisory purposes only. Similar code does not necessarily
+                    indicate plagiarism
                     as students may legitimately arrive at similar solutions.
                 </p>
             </div>
@@ -292,22 +302,22 @@
 {% endblock %}
 
 <script>
-function markAsFalsePositive(pairId) {
-    if (confirm('Mark this pair as a false positive?')) {
-        fetch('{{ url_for("plagiarism.mark_false_positive") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({ pair_id: pairId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            }
-        });
+    function markAsFalsePositive(pairId) {
+        if (confirm('Mark this pair as a false positive?')) {
+            fetch('{{ url_for("plagiarism.mark_false_positive") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ pair_id: pairId })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    }
+                });
+        }
     }
-}
 </script>

@@ -7,8 +7,11 @@
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Home</a></li>
-        <li class="breadcrumb-item"><a href="{{ url_for('assignments') }}"><i class="fas fa-list"></i> Assignments</a></li>
-        <li class="breadcrumb-item"><a href="{{ url_for('assignment_detail', assignment_id=assignment.id) }}">{{ assignment.title }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('student.assignments') }}"><i class="fas fa-list"></i>
+                Assignments</a>
+        </li>
+        <li class="breadcrumb-item"><a href="{{ url_for('student.assignment_detail', assignment_id=assignment.id) }}">{{
+                assignment.title }}</a></li>
         <li class="breadcrumb-item active" aria-current="page">Submit Code</li>
     </ol>
 </nav>
@@ -44,7 +47,7 @@
                     </div>
                     <div class="col-auto">
                         <small class="text-muted">
-                            <i class="fas fa-history"></i> Version 
+                            <i class="fas fa-history"></i> Version
                             <span id="versionNumber">1</span>
                         </small>
                     </div>
@@ -52,8 +55,9 @@
             </div>
 
             <div class="editor-body">
-                <form method="POST" action="{{ url_for('submit_code', assignment_id=assignment.id) }}" novalidate id="codeForm">
-                    
+                <form method="POST" action="{{ url_for('student.submit_code', assignment_id=assignment.id) }}"
+                    novalidate id="codeForm">
+
                     <!-- Language & Options Bar -->
                     <div class="editor-toolbar">
                         <div class="row g-2 align-items-end">
@@ -61,7 +65,8 @@
                                 <label for="language" class="form-label">
                                     <i class="fas fa-code"></i> Language
                                 </label>
-                                <select name="language" class="form-select" id="language" required onchange="updateLanguageHint()">
+                                <select name="language" class="form-select" id="language" required
+                                    onchange="updateLanguageHint()">
                                     <option value="">Select language...</option>
                                     <option value="python" selected>Python 3.11</option>
                                     <option value="java">Java 17</option>
@@ -90,13 +95,9 @@
 
                     <!-- Code Textarea -->
                     <div class="code-input-wrapper">
-                        <textarea 
-                            name="code" 
-                            id="code" 
-                            class="code-editor form-control"
+                        <textarea name="code" id="code" class="code-editor form-control"
                             placeholder="Paste or write your code here...&#10;&#10;Tips:&#10;- Use Tab to indent&#10;- Ctrl+Z to undo&#10;- Make sure to handle all edge cases"
-                            required
-                            spellcheck="false"></textarea>
+                            required spellcheck="false"></textarea>
                     </div>
 
                     <!-- File Upload Section -->
@@ -106,12 +107,8 @@
                             <i class="fas fa-cloud-upload-alt"></i>
                             <span>Upload Code File</span>
                         </label>
-                        <input 
-                            type="file" 
-                            class="form-control d-none" 
-                            id="file_upload" 
-                            accept=".py,.java,.cpp,.c,.js,.go,.rb,.cs"
-                        >
+                        <input type="file" class="form-control d-none" id="file_upload"
+                            accept=".py,.java,.cpp,.c,.js,.go,.rb,.cs">
                         <small class="form-text text-muted d-block mt-2">
                             Supported formats: .py, .java, .cpp, .js, .cs (Max: 2MB)
                         </small>
@@ -122,8 +119,8 @@
                         <button type="submit" class="btn btn-primary btn-lg">
                             <i class="fas fa-paper-plane"></i> Submit Code
                         </button>
-                        <a href="{{ url_for('assignment_detail', assignment_id=assignment.id) }}" 
-                           class="btn btn-outline-secondary btn-lg">
+                        <a href="{{ url_for('student.assignment_detail', assignment_id=assignment.id) }}"
+                            class="btn btn-outline-secondary btn-lg">
                             Cancel
                         </a>
                         <button type="button" class="btn btn-outline-info btn-lg" onclick="formatCode()">
@@ -187,17 +184,20 @@
                 <!-- Input/Output Tabs -->
                 <ul class="nav nav-tabs execution-tabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="input-tab" data-bs-toggle="tab" data-bs-target="#input-panel" type="button" role="tab">
+                        <button class="nav-link active" id="input-tab" data-bs-toggle="tab"
+                            data-bs-target="#input-panel" type="button" role="tab">
                             <i class="fas fa-keyboard"></i> Input
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="output-tab" data-bs-toggle="tab" data-bs-target="#output-panel" type="button" role="tab">
+                        <button class="nav-link" id="output-tab" data-bs-toggle="tab" data-bs-target="#output-panel"
+                            type="button" role="tab">
                             <i class="fas fa-terminal"></i> Output
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="tests-tab" data-bs-toggle="tab" data-bs-target="#tests-panel" type="button" role="tab">
+                        <button class="nav-link" id="tests-tab" data-bs-toggle="tab" data-bs-target="#tests-panel"
+                            type="button" role="tab">
                             <i class="fas fa-flask"></i> Test Cases
                         </button>
                     </li>
@@ -207,7 +207,8 @@
                     <!-- Input Panel -->
                     <div class="tab-pane fade show active" id="input-panel" role="tabpanel">
                         <label class="input-label"><i class="fas fa-comment"></i> Standard Input</label>
-                        <textarea id="codeInput" class="code-input-area" placeholder="Enter input for your program (if needed)&#10;Example:&#10;5&#10;3"></textarea>
+                        <textarea id="codeInput" class="code-input-area"
+                            placeholder="Enter input for your program (if needed)&#10;Example:&#10;5&#10;3"></textarea>
                     </div>
 
                     <!-- Output Panel -->
@@ -232,7 +233,8 @@
                             <div class="test-case-item">
                                 <div class="test-case-header">
                                     <span class="test-number">Test Case 1</span>
-                                    <span class="test-status pending"><i class="fas fa-hourglass-half"></i> Pending</span>
+                                    <span class="test-status pending"><i class="fas fa-hourglass-half"></i>
+                                        Pending</span>
                                 </div>
                                 <div class="test-case-body">
                                     <div class="test-row">
@@ -249,7 +251,8 @@
                             <div class="test-case-item">
                                 <div class="test-case-header">
                                     <span class="test-number">Test Case 2</span>
-                                    <span class="test-status pending"><i class="fas fa-hourglass-half"></i> Pending</span>
+                                    <span class="test-status pending"><i class="fas fa-hourglass-half"></i>
+                                        Pending</span>
                                 </div>
                                 <div class="test-case-body">
                                     <div class="test-row">
@@ -266,7 +269,8 @@
                             <div class="test-case-item">
                                 <div class="test-case-header">
                                     <span class="test-number">Test Case 3</span>
-                                    <span class="test-status pending"><i class="fas fa-hourglass-half"></i> Pending</span>
+                                    <span class="test-status pending"><i class="fas fa-hourglass-half"></i>
+                                        Pending</span>
                                 </div>
                                 <div class="test-case-body">
                                     <div class="test-row">
@@ -342,7 +346,7 @@
                     <span class="detail-label">Languages</span>
                     <div class="detail-badges">
                         {% for lang in assignment.languages %}
-                            <span class="badge bg-success">{{ lang }}</span>
+                        <span class="badge bg-success">{{ lang }}</span>
                         {% endfor %}
                     </div>
                 </div>
@@ -351,40 +355,39 @@
 
         <!-- Previous Submissions -->
         {% if previous_submissions %}
-            <div class="submissions-sidebar-card mt-4">
-                <div class="sidebar-header">
-                    <h5><i class="fas fa-history"></i> Previous Submissions</h5>
-                </div>
-                <div class="submissions-list">
-                    {% for prev in previous_submissions %}
-                        <div class="submission-item">
-                            <div class="submission-header">
-                                <strong>Version {{ prev.version_number }}</strong>
-                                <small class="text-muted">{{ prev.submitted_at.strftime('%m/%d %H:%M') }}</small>
-                            </div>
-                            <div class="submission-details">
-                                <span class="badge bg-secondary">{{ prev.language }}</span>
-                                {% if prev.score %}
-                                    <span class="score-badge">
-                                        {{ prev.score }}/100
-                                    </span>
-                                {% endif %}
-                            </div>
-                            <a href="{{ url_for('submission_results', submission_id=prev.id) }}" 
-                               class="view-link">
-                                <i class="fas fa-eye"></i> View
-                            </a>
-                        </div>
-                    {% endfor %}
-                </div>
+        <div class="submissions-sidebar-card mt-4">
+            <div class="sidebar-header">
+                <h5><i class="fas fa-history"></i> Previous Submissions</h5>
             </div>
+            <div class="submissions-list">
+                {% for prev in previous_submissions %}
+                <div class="submission-item">
+                    <div class="submission-header">
+                        <strong>Version {{ prev.version_number }}</strong>
+                        <small class="text-muted">{{ prev.submitted_at.strftime('%m/%d %H:%M') }}</small>
+                    </div>
+                    <div class="submission-details">
+                        <span class="badge bg-secondary">{{ prev.language }}</span>
+                        {% if prev.score %}
+                        <span class="score-badge">
+                            {{ prev.score }}/100
+                        </span>
+                        {% endif %}
+                    </div>
+                    <a href="{{ url_for('student.submission_results', submission_id=prev.id) }}" class="view-link">
+                        <i class="fas fa-eye"></i> View
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
         {% else %}
-            <div class="empty-state-card mt-4">
-                <div class="empty-icon">
-                    <i class="fas fa-inbox"></i>
-                </div>
-                <p class="text-muted text-center">No previous submissions</p>
+        <div class="empty-state-card mt-4">
+            <div class="empty-icon">
+                <i class="fas fa-inbox"></i>
             </div>
+            <p class="text-muted text-center">No previous submissions</p>
+        </div>
         {% endif %}
 
         <!-- Quick Template -->
@@ -418,13 +421,13 @@ if __name__ == "__main__":
 
     // Update character and line count
     if (codeInput) {
-        codeInput.addEventListener('input', function() {
+        codeInput.addEventListener('input', function () {
             charCount.textContent = this.value.length;
             lineCount.textContent = this.value.split('\n').length;
         });
 
         // Tab support in textarea
-        codeInput.addEventListener('keydown', function(e) {
+        codeInput.addEventListener('keydown', function (e) {
             if (e.key === 'Tab') {
                 e.preventDefault();
                 const start = this.selectionStart;
@@ -439,7 +442,7 @@ if __name__ == "__main__":
 
     // File upload handling
     if (fileInput && codeInput) {
-        fileInput.addEventListener('change', function(e) {
+        fileInput.addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) {
                 if (file.size > 2 * 1024 * 1024) {
@@ -447,7 +450,7 @@ if __name__ == "__main__":
                     return;
                 }
                 const reader = new FileReader();
-                reader.onload = function(event) {
+                reader.onload = function (event) {
                     codeInput.value = event.target.result;
                     charCount.textContent = codeInput.value.length;
                     lineCount.textContent = codeInput.value.split('\n').length;
@@ -537,7 +540,7 @@ if __name__ == "__main__":
             setTimeout(() => {
                 // Mock test execution
                 const isPassed = Math.random() > 0.3; // 70% pass rate for demo
-                
+
                 if (isPassed) {
                     passedCount++;
                     status.innerHTML = '<i class="fas fa-check-circle"></i> Passed';
@@ -557,8 +560,8 @@ if __name__ == "__main__":
             summary.className = 'test-summary';
             summary.innerHTML = `
                 <strong>Summary:</strong> ${passedCount}/${testCases.length} tests passed
-                ${passedCount === testCases.length ? 
-                    '<span class="badge bg-success ms-2">All Passed!</span>' : 
+                ${passedCount === testCases.length ?
+                    '<span class="badge bg-success ms-2">All Passed!</span>' :
                     '<span class="badge bg-warning ms-2">Some Failed</span>'}
             `;
             document.querySelector('.test-cases-container').appendChild(summary);
@@ -568,7 +571,7 @@ if __name__ == "__main__":
     function simulateCodeExecution(code, input, language) {
         // Mock execution - in production, this would call backend API
         const lines = code.split('\n').filter(l => l.trim());
-        
+
         if (language === 'python') {
             // Simple Python simulation
             if (code.includes('print')) {
@@ -576,7 +579,7 @@ if __name__ == "__main__":
             }
             return `Program executed successfully\nExecution time: 45 ms`;
         }
-        
+
         return `Program executed successfully\nLanguage: ${language}\nExecution time: 125 ms\nMemory: 2.3 MB`;
     }
 
@@ -628,7 +631,7 @@ if __name__ == "__main__":
 
     // Version tracking (mock)
     let submissionCount = 0;
-    document.getElementById('codeForm').addEventListener('submit', function() {
+    document.getElementById('codeForm').addEventListener('submit', function () {
         submissionCount++;
         versionNumber.textContent = submissionCount + 1;
     });

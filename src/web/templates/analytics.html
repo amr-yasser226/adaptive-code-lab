@@ -22,9 +22,10 @@
                 <select name="assignment" class="form-select" id="assignment">
                     <option value="">All Assignments</option>
                     {% for assignment in assignments %}
-                        <option value="{{ assignment.id }}" {% if request.args.get('assignment') == assignment.id|string %}selected{% endif %}>
-                            {{ assignment.title }}
-                        </option>
+                    <option value="{{ assignment.id }}" {% if request.args.get('assignment')==assignment.id|string
+                        %}selected{% endif %}>
+                        {{ assignment.title }}
+                    </option>
                     {% endfor %}
                 </select>
             </div>
@@ -33,17 +34,21 @@
                     <i class="fas fa-calendar"></i> Date Range
                 </label>
                 <select name="date_range" class="form-select" id="date_range">
-                    <option value="all" {% if request.args.get('date_range') == 'all' %}selected{% endif %}>All Time</option>
-                    <option value="week" {% if request.args.get('date_range') == 'week' %}selected{% endif %}>Last Week</option>
-                    <option value="month" {% if request.args.get('date_range') == 'month' %}selected{% endif %}>Last Month</option>
-                    <option value="semester" {% if request.args.get('date_range') == 'semester' %}selected{% endif %}>This Semester</option>
+                    <option value="all" {% if request.args.get('date_range')=='all' %}selected{% endif %}>All Time
+                    </option>
+                    <option value="week" {% if request.args.get('date_range')=='week' %}selected{% endif %}>Last Week
+                    </option>
+                    <option value="month" {% if request.args.get('date_range')=='month' %}selected{% endif %}>Last Month
+                    </option>
+                    <option value="semester" {% if request.args.get('date_range')=='semester' %}selected{% endif %}>This
+                        Semester</option>
                 </select>
             </div>
             <div class="col-md-4 d-flex align-items-end">
                 <button type="submit" class="btn btn-primary w-100">
                     <i class="fas fa-filter"></i> Apply Filters
                 </button>
-                <a href="{{ url_for('analytics.export_csv') }}" class="btn btn-success ms-2">
+                <a href="#" class="btn btn-success ms-2">
                     <i class="fas fa-download"></i>
                 </a>
             </div>
@@ -127,35 +132,39 @@
                     </thead>
                     <tbody>
                         {% for assignment in assignment_stats %}
-                            <tr>
-                                <td>
-                                    <strong>{{ assignment.title }}</strong>
-                                    <br>
-                                    <small class="text-muted">{{ assignment.due_date.strftime('%b %d') }}</small>
-                                </td>
-                                <td>
-                                    <span class="badge bg-light text-dark">{{ assignment.submission_count }}/{{ assignment.student_count }}</span>
-                                </td>
-                                <td>
-                                    <strong>{{ "%.1f"|format(assignment.average_score) }}%</strong>
-                                </td>
-                                <td>
-                                    {% if assignment.pass_rate >= 80 %}
-                                        <span class="badge bg-success"><i class="fas fa-check-circle"></i> {{ "%.0f"|format(assignment.pass_rate) }}%</span>
-                                    {% elif assignment.pass_rate >= 60 %}
-                                        <span class="badge bg-warning"><i class="fas fa-exclamation-circle"></i> {{ "%.0f"|format(assignment.pass_rate) }}%</span>
-                                    {% else %}
-                                        <span class="badge bg-danger"><i class="fas fa-times-circle"></i> {{ "%.0f"|format(assignment.pass_rate) }}%</span>
-                                    {% endif %}
-                                </td>
-                                <td><code class="text-muted">{{ assignment.median_submission_time }}</code></td>
-                                <td>
-                                    <a href="{{ url_for('analytics.assignment_detail', assignment_id=assignment.id) }}" 
-                                       class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-eye"></i> View
-                                    </a>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td>
+                                <strong>{{ assignment.title }}</strong>
+                                <br>
+                                <small class="text-muted">{{ assignment.due_date.strftime('%b %d') }}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark">{{ assignment.submission_count }}/{{
+                                    assignment.student_count }}</span>
+                            </td>
+                            <td>
+                                <strong>{{ "%.1f"|format(assignment.average_score) }}%</strong>
+                            </td>
+                            <td>
+                                {% if assignment.pass_rate >= 80 %}
+                                <span class="badge bg-success"><i class="fas fa-check-circle"></i> {{
+                                    "%.0f"|format(assignment.pass_rate) }}%</span>
+                                {% elif assignment.pass_rate >= 60 %}
+                                <span class="badge bg-warning"><i class="fas fa-exclamation-circle"></i> {{
+                                    "%.0f"|format(assignment.pass_rate) }}%</span>
+                                {% else %}
+                                <span class="badge bg-danger"><i class="fas fa-times-circle"></i> {{
+                                    "%.0f"|format(assignment.pass_rate) }}%</span>
+                                {% endif %}
+                            </td>
+                            <td><code class="text-muted">{{ assignment.median_submission_time }}</code></td>
+                            <td>
+                                <a href="{{ url_for('student.assignment_detail', assignment_id=assignment.id) }}"
+                                    class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -191,10 +200,13 @@
                     <div class="performance-tier mb-3">
                         <div class="tier-header">
                             <small class="tier-label">Excellent (90-100%)</small>
-                            <small class="tier-percent text-success">{{ "%.1f"|format((performance_tiers.excellent / stats.total_students * 100) if stats.total_students > 0 else 0) }}%</small>
+                            <small class="tier-percent text-success">{{ "%.1f"|format((performance_tiers.excellent /
+                                stats.total_students * 100) if stats.total_students > 0 else 0) }}%</small>
                         </div>
                         <div class="tier-bar">
-                            <div class="tier-progress" style="width: {{ (performance_tiers.excellent / stats.total_students * 100) if stats.total_students > 0 else 0 }}%; background: linear-gradient(90deg, #28a745, #20c997);"></div>
+                            <div class="tier-progress"
+                                style="width: {{ (performance_tiers.excellent / stats.total_students * 100) if stats.total_students > 0 else 0 }}%; background: linear-gradient(90deg, #28a745, #20c997);">
+                            </div>
                         </div>
                         <small class="text-muted">{{ performance_tiers.excellent }} students</small>
                     </div>
@@ -202,10 +214,13 @@
                     <div class="performance-tier mb-3">
                         <div class="tier-header">
                             <small class="tier-label">Good (80-89%)</small>
-                            <small class="tier-percent text-info">{{ "%.1f"|format((performance_tiers.good / stats.total_students * 100) if stats.total_students > 0 else 0) }}%</small>
+                            <small class="tier-percent text-info">{{ "%.1f"|format((performance_tiers.good /
+                                stats.total_students * 100) if stats.total_students > 0 else 0) }}%</small>
                         </div>
                         <div class="tier-bar">
-                            <div class="tier-progress" style="width: {{ (performance_tiers.good / stats.total_students * 100) if stats.total_students > 0 else 0 }}%; background: linear-gradient(90deg, #17a2b8, #00d4ff);"></div>
+                            <div class="tier-progress"
+                                style="width: {{ (performance_tiers.good / stats.total_students * 100) if stats.total_students > 0 else 0 }}%; background: linear-gradient(90deg, #17a2b8, #00d4ff);">
+                            </div>
                         </div>
                         <small class="text-muted">{{ performance_tiers.good }} students</small>
                     </div>
@@ -213,10 +228,13 @@
                     <div class="performance-tier mb-3">
                         <div class="tier-header">
                             <small class="tier-label">Average (70-79%)</small>
-                            <small class="tier-percent text-warning">{{ "%.1f"|format((performance_tiers.average / stats.total_students * 100) if stats.total_students > 0 else 0) }}%</small>
+                            <small class="tier-percent text-warning">{{ "%.1f"|format((performance_tiers.average /
+                                stats.total_students * 100) if stats.total_students > 0 else 0) }}%</small>
                         </div>
                         <div class="tier-bar">
-                            <div class="tier-progress" style="width: {{ (performance_tiers.average / stats.total_students * 100) if stats.total_students > 0 else 0 }}%; background: linear-gradient(90deg, #ffc107, #ff9800);"></div>
+                            <div class="tier-progress"
+                                style="width: {{ (performance_tiers.average / stats.total_students * 100) if stats.total_students > 0 else 0 }}%; background: linear-gradient(90deg, #ffc107, #ff9800);">
+                            </div>
                         </div>
                         <small class="text-muted">{{ performance_tiers.average }} students</small>
                     </div>
@@ -224,10 +242,14 @@
                     <div class="performance-tier">
                         <div class="tier-header">
                             <small class="tier-label">Needs Improvement (&lt;70%)</small>
-                            <small class="tier-percent text-danger">{{ "%.1f"|format((performance_tiers.needs_improvement / stats.total_students * 100) if stats.total_students > 0 else 0) }}%</small>
+                            <small class="tier-percent text-danger">{{
+                                "%.1f"|format((performance_tiers.needs_improvement / stats.total_students * 100) if
+                                stats.total_students > 0 else 0) }}%</small>
                         </div>
                         <div class="tier-bar">
-                            <div class="tier-progress" style="width: {{ (performance_tiers.needs_improvement / stats.total_students * 100) if stats.total_students > 0 else 0 }}%; background: linear-gradient(90deg, #dc3545, #c82333);"></div>
+                            <div class="tier-progress"
+                                style="width: {{ (performance_tiers.needs_improvement / stats.total_students * 100) if stats.total_students > 0 else 0 }}%; background: linear-gradient(90deg, #dc3545, #c82333);">
+                            </div>
                         </div>
                         <small class="text-muted">{{ performance_tiers.needs_improvement }} students</small>
                     </div>
