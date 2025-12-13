@@ -1,7 +1,7 @@
 import sqlite3
 from core.entities.hint import Hint
 
-class Hint_repo:
+class HintRepository:
     def __init__(self, db):
         self.db = db
 

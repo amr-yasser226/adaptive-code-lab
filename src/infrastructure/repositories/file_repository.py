@@ -1,7 +1,7 @@
 import sqlite3
 from core.entities.file import File
 
-class File_repo:
+class FileRepository:
     def __init__(self, db):
         self.db = db
 

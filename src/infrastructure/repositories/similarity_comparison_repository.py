@@ -2,7 +2,7 @@ import json
 import sqlite3
 from core.entities.similarity_comparison import SimilarityComparison
 
-class SimilarityComparison_repo:
+class SimilarityComparisonRepository:
     def __init__(self, db):
         self.db = db
 

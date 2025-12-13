@@ -1,7 +1,7 @@
 import sqlite3
 from core.entities.admin import Admin
 
-class Admin_repo:
+class AdminRepository:
     def __init__(self, db):
         self.db = db
 

@@ -1,7 +1,7 @@
 import sqlite3
 from core.entities.embedding import Embedding
 
-class Embedding_repo:
+class EmbeddingRepository:
     def __init__(self, db):
         self.db = db
 

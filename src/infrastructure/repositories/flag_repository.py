@@ -2,7 +2,7 @@ import sqlite3
 from core.entities.similarity_flag import SimilarityFlag
 
 
-class Flag_repo:
+class FlagRepository:
     def __init__(self, db):
         self.db = db
 

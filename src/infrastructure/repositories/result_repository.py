@@ -2,7 +2,7 @@ import sqlite3
 from core.entities.result import Result
 
 
-class Result_repo:
+class ResultRepository:
     def __init__(self, db):
         self.db = db
 

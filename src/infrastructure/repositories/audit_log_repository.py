@@ -1,7 +1,7 @@
 import sqlite3
 from core.entities.audit_log import AuditLog
 
-class AuditLog_repo:
+class AuditLogRepository:
     def __init__(self, db):
         self.db = db
 
