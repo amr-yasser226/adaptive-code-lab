@@ -24,8 +24,8 @@ class Assignments_repo:
             id=row.id,
             course_id=row.course_id,
             title=row.title,
-            describtion=row.description,
-            releaseDate=row.release_date,
+            description=row.description,
+            release_date=row.release_date,
             due_date=row.due_date,
             max_points=row.max_points,
             is_published=row.is_published,
@@ -55,13 +55,13 @@ class Assignments_repo:
             self.db.execute(query, {
                 "course_id": assignment.get_course_id(),
                 "title": assignment.title,
-                "description": assignment.describtion,
-                "release_date": assignment.releaseDate,
-                "due_date": assignment.dueDate,
-                "max_points": assignment.maxpoints,
-                "is_published": int(assignment.ispublished),
-                "allow_late_submissions": int(assignment.allowlateSubmissions),
-                "late_submission_penalty": assignment.latesubmission_penealty,
+                "description": assignment.description,
+                "release_date": assignment.release_date,
+                "due_date": assignment.due_date,
+                "max_points": assignment.max_points,
+                "is_published": int(assignment.is_published),
+                "allow_late_submissions": int(assignment.allow_late_submissions),
+                "late_submission_penalty": assignment.late_submission_penalty,
             })
             new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone().id
             self.db.commit()
@@ -91,13 +91,13 @@ class Assignments_repo:
             self.db.execute(query, {
                 "id": assignment.get_id(),
                 "title": assignment.title,
-                "description": assignment.describtion,
-                "release_date": assignment.releaseDate,
-                "due_date": assignment.dueDate,
-                "max_points": assignment.maxpoints,
-                "is_published": int(assignment.ispublished),
-                "allow_late": int(assignment.allowlateSubmissions),
-                "penalty": assignment.latesubmission_penealty,
+                "description": assignment.description,
+                "release_date": assignment.release_date,
+                "due_date": assignment.due_date,
+                "max_points": assignment.max_points,
+                "is_published": int(assignment.is_published),
+                "allow_late": int(assignment.allow_late_submissions),
+                "penalty": assignment.late_submission_penalty,
             })
             self.db.commit()
             return self.get_by_id(assignment.get_id())
@@ -168,8 +168,8 @@ class Assignments_repo:
                 id=row.id,
                 course_id=row.course_id,
                 title=row.title,
-                describtion=row.description,
-                releaseDate=row.release_date,
+                description=row.description,
+                release_date=row.release_date,
                 due_date=row.due_date,
                 max_points=row.max_points,
                 is_published=row.is_published,
