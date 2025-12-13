@@ -1,5 +1,5 @@
 import pytest
-from Backend.Model.Files_model import File
+from core.entities.file import File
 
 
 @pytest.mark.repo

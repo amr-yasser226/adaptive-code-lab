@@ -1,5 +1,5 @@
-from DB.connection import connect_db
-from Backend.AI.embeddings import process_submission_embedding
+from infrastructure.database.connection import connect_db
+from infrastructure.ai.embeddings import process_submission_embedding
 
 conn = connect_db()
 c = conn.cursor()

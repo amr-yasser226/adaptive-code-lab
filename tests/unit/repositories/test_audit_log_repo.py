@@ -1,5 +1,5 @@
 import pytest
-from Backend.Model.AuditLog_model import AuditLog
+from core.entities.audit_log import AuditLog
 
 
 @pytest.mark.repo

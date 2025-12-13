@@ -1,5 +1,5 @@
 import pytest
-from Backend.Model.Assignment_model import Assignment
+from core.entities.assignment import Assignment
 
 
 @pytest.mark.repo

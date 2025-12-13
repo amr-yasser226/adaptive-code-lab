@@ -1,5 +1,5 @@
 import pytest
-from Backend.Model.Enrollment_model import Enrollment
+from core.entities.enrollment import Enrollment
 
 
 @pytest.mark.repo

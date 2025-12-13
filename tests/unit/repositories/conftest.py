@@ -10,44 +10,44 @@ project_root = Path(__file__).parent.parent.parent.parent
 src_path = project_root / "src"
 sys.path.insert(0, str(src_path))
 
-from Backend.Repository.DB_repo import Database
-from Backend.Repository.User_repo import User_repo
-from Backend.Repository.Student_repo import Student_repo
-from Backend.Repository.Instructor_repo import Instructor_repo
-from Backend.Repository.Admin_repo import Admin_repo
-from Backend.Repository.Course_repo import Course_repo
-from Backend.Repository.Assignments_repo import Assignments_repo
-from Backend.Repository.Submission_repo import Submission_repo
-from Backend.Repository.Test_cases_repo import Testcase_repo
-from Backend.Repository.Result_repo import Result_repo
-from Backend.Repository.Enrollment_repo import Enrollment_repo
-from Backend.Repository.Notification_repo import Notification_repo
-from Backend.Repository.Hint_repo import Hint_repo
-from Backend.Repository.File_repo import File_repo
-from Backend.Repository.Embedding_repo import Embedding_repo
-from Backend.Repository.Peer_review import PeerReview_repo
-from Backend.Repository.Similarity_flag_repo import SimilarityFlag_repo
-from Backend.Repository.Similarity_Comparison_repo import SimilarityComparison_repo
-from Backend.Repository.Audit_Logs_repo import AuditLog_repo
+from infrastructure.repositories.database import Database
+from infrastructure.repositories.user_repository import User_repo
+from infrastructure.repositories.student_repository import Student_repo
+from infrastructure.repositories.instructor_repository import Instructor_repo
+from infrastructure.repositories.admin_repository import Admin_repo
+from infrastructure.repositories.course_repository import Course_repo
+from infrastructure.repositories.assignment_repository import Assignments_repo
+from infrastructure.repositories.submission_repository import Submission_repo
+from infrastructure.repositories.test_case_repository import Testcase_repo
+from infrastructure.repositories.result_repository import Result_repo
+from infrastructure.repositories.enrollment_repository import Enrollment_repo
+from infrastructure.repositories.notification_repository import Notification_repo
+from infrastructure.repositories.hint_repository import Hint_repo
+from infrastructure.repositories.file_repository import File_repo
+from infrastructure.repositories.embedding_repository import Embedding_repo
+from infrastructure.repositories.peer_review_repository import PeerReview_repo
+from infrastructure.repositories.similarity_flag_repository import SimilarityFlag_repo
+from infrastructure.repositories.similarity_comparison_repository import SimilarityComparison_repo
+from infrastructure.repositories.audit_log_repository import AuditLog_repo
 
-from Backend.Model.User_model import User
-from Backend.Model.Student_model import Student
-from Backend.Model.Instructor_model import Instructor
-from Backend.Model.Admin_model import Admin
-from Backend.Model.Course_model import Course
-from Backend.Model.Assignment_model import Assignment
-from Backend.Model.Submission_model import Submission
-from Backend.Model.TestCase_model import Testcase
-from Backend.Model.Results_model import Result
-from Backend.Model.Enrollment_model import Enrollment
-from Backend.Model.Notification_model import Notification
-from Backend.Model.Hint_model import Hint
-from Backend.Model.Files_model import File
-from Backend.Model.Embedding_model import Embedding
-from Backend.Model.Peer_review_model import PeerReview
-from Backend.Model.Similarity_flag import SimilarityFlag
-from Backend.Model.Similarity_Comparison_model import SimilarityComparison
-from Backend.Model.AuditLog_model import AuditLog
+from core.entities.user import User
+from core.entities.student import Student
+from core.entities.instructor import Instructor
+from core.entities.admin import Admin
+from core.entities.course import Course
+from core.entities.assignment import Assignment
+from core.entities.submission import Submission
+from core.entities.test_case import Testcase
+from core.entities.result import Result
+from core.entities.enrollment import Enrollment
+from core.entities.notification import Notification
+from core.entities.hint import Hint
+from core.entities.file import File
+from core.entities.embedding import Embedding
+from core.entities.peer_review import PeerReview
+from core.entities.similarity_flag import SimilarityFlag
+from core.entities.similarity_comparison import SimilarityComparison
+from core.entities.audit_log import AuditLog
 
 
 @pytest.fixture(scope="session")
@@ -70,7 +70,7 @@ def setup_test_database(test_db_path):
     conn.close()
     
     # Run migrations to create tables
-    from DB.run_migrations import run_migrations
+    from infrastructure.database.migrations import run_migrations
     tables = run_migrations(
         db_path=test_db_path,
         tables_dir=str(project_root / "src" / "DB" / "Tables")

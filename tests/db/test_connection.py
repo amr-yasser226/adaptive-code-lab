@@ -1,7 +1,7 @@
 import sqlite3
 import tempfile
 import pytest
-from DB.connection import connect_db
+from infrastructure.database.connection import connect_db
 
 @pytest.fixture
 def temp_db_path():

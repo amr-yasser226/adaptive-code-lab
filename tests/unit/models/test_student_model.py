@@ -1,10 +1,10 @@
 import pytest
 from datetime import datetime
-from Backend.Model.Student_model import Student
-from Backend.Model.Course_model import Course
-from Backend.Model.Assignment_model import Assignment
-from Backend.Model.Enrollment_model import Enrollment
-from Backend.Model.Submission_model import Submission
+from core.entities.student import Student
+from core.entities.course import Course
+from core.entities.assignment import Assignment
+from core.entities.enrollment import Enrollment
+from core.entities.submission import Submission
 
 
 @pytest.mark.model

@@ -1,7 +1,7 @@
 import pytest
-from Backend.Model.Similarity_Comparison_model import SimilarityComparison
-from Backend.Model.Similarity_flag import SimilarityFlag
-from Backend.Model.Submission_model import Submission
+from core.entities.similarity_comparison import SimilarityComparison
+from core.entities.similarity_flag import SimilarityFlag
+from core.entities.submission import Submission
 
 @pytest.mark.repo
 @pytest.mark.unit

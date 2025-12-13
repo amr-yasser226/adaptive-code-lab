@@ -1,5 +1,5 @@
 import pytest
-from Backend.Model.Course_model import Course
+from core.entities.course import Course
 
 
 @pytest.mark.repo

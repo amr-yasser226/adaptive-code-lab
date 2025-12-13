@@ -1,6 +1,6 @@
 import pytest
-from Backend.Model.Results_model import Result
-from Backend.Model.TestCase_model import Testcase
+from core.entities.result import Result
+from core.entities.test_case import Testcase
 
 @pytest.mark.repo
 @pytest.mark.unit

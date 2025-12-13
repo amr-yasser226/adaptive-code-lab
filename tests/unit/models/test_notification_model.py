@@ -1,5 +1,5 @@
 import pytest
-from Backend.Model.Notification_model import Notification
+from core.entities.notification import Notification
 
 
 @pytest.mark.model
@@ -153,8 +153,8 @@ class TestCourseRepoNewFunctions:
                                                       course_repo,
                                                       assignment_repo):
         """Test get_by_assignment distinguishes between courses"""
-        from Backend.Model.Course_model import Course
-        from Backend.Model.Assignment_model import Assignment
+        from core.entities.course import Course
+        from core.entities.assignment import Assignment
         
         # Create two courses
         course1 = Course(
