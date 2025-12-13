@@ -10,7 +10,7 @@ class Student_repo:
             SELECT 
                 u.id, u.name, u.email, u.password_hash, u.role,
                 u.created_at, u.updated_at, u.is_active,
-                s.student_number, s.program, s.YearLevel
+                s.student_number, s.program, s.year_level
             FROM users u
             INNER JOIN students s ON u.id = s.id
             WHERE u.id = :id
@@ -27,9 +27,9 @@ class Student_repo:
             created_at=row.created_at,
             updated_at=row.updated_at,
             student_number=row.student_number,
-            Program=row.program,  # Model still uses Program parameter
-            year_Level=row.YearLevel,
-            is_active=row.is_active  # Model still uses is_Active
+            program=row.program,
+            year_level=row.year_level,
+            is_active=row.is_active
         )
 
     def save_student(self, student: Student):
@@ -69,25 +69,25 @@ class Student_repo:
                     UPDATE students
                     SET student_number = :num,
                         program = :program,
-                        YearLevel = :year
+                        year_level = :year
                     WHERE id = :id
                 """
                 self.db.execute(update_student, {
                     "id": student.get_id(),
                     "num": student.student_number,
                     "program": student.program,
-                    "year": student.year_Level
+                    "year": student.year_level
                 })
             else:
                 insert_student = """
-                    INSERT INTO students (id, student_number, program, YearLevel)
+                    INSERT INTO students (id, student_number, program, year_level)
                     VALUES (:id, :num, :program, :year)
                 """
                 self.db.execute(insert_student, {
                     "id": student.get_id(),
                     "num": student.student_number,
                     "program": student.program,
-                    "year": student.year_Level
+                    "year": student.year_level
                 })
 
             self.db.commit()
@@ -103,7 +103,7 @@ class Student_repo:
             SELECT 
                 u.id, u.name, u.email, u.password_hash, u.role,
                 u.created_at, u.updated_at, u.is_active,
-                s.student_number, s.program, s.YearLevel
+                s.student_number, s.program, s.year_level
             FROM users u
             INNER JOIN students s ON u.id = s.id
             WHERE s.student_number = :num
@@ -120,7 +120,7 @@ class Student_repo:
             created_at=row.created_at,
             updated_at=row.updated_at,
             student_number=row.student_number,
-            Program=row.program,
-            year_Level=row.YearLevel,
+            program=row.program,
+            year_level=row.year_level,
             is_active=row.is_active
         )
