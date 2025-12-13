@@ -69,10 +69,10 @@ class StudentService:
             raise AuthError("You cannot submit — you are not enrolled in this course", code="not_enrolled")
 
 
-        last_submission = self.submission_repo.get_laste_submission(student_id, assignment_id)
+        last_submission = self.submission_repo.get_last_submission(student_id, assignment_id)
         new_version = last_submission.version + 1 if last_submission else 1
 
-        is_late = datetime.now() > assignment.dueDate
+        is_late = datetime.now() > assignment.due_date
 
         new_submission = Submission(
             id=None,
