@@ -5,11 +5,13 @@ from dotenv import load_dotenv
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
 load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
 
-DB_PATH = os.getenv("ACCL_DB_PATH", os.path.join(PROJECT_ROOT, "DB", "Accl_DB.db"))
+# Adjust DB path to be in /data or relative to root, ensuring consistency
+DB_PATH = os.getenv("ACCL_DB_PATH", os.path.join(PROJECT_ROOT, "Accl_DB.db"))
 if not os.path.isabs(DB_PATH):
     DB_PATH = os.path.join(PROJECT_ROOT, DB_PATH)
 
-TABLES_DIR = os.path.join(PROJECT_ROOT, "DB", "Tables")
+# Correct path to schema directory (src/infrastructure/database/schema)
+TABLES_DIR = os.path.join(os.path.dirname(__file__), "schema")
 
 def run_migrations(db_path=DB_PATH, tables_dir=TABLES_DIR):
     print(f"Using DB: {db_path}")
