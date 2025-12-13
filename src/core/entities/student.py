@@ -6,7 +6,7 @@ from core.entities.submission import Submission
 
 class Student(User):
     def __init__(self, id, name, email, password, created_at, updated_at, 
-                 student_number, Program, year_Level, is_active=True):
+                 student_number, program, year_level, is_active=True):
         super().__init__(
             id=id, 
             name=name, 
@@ -18,10 +18,10 @@ class Student(User):
             is_active=is_active
         )
         self.student_number = student_number
-        self.program = Program
-        self.year_Level = year_Level
+        self.program = program
+        self.year_level = year_level
     
-    def Enroll_course(self, course_id, Course_repo, Enrollment_repo):
+    def enroll_course(self, course_id, Course_repo, Enrollment_repo):
         # Verify course exists
         course = Course_repo.get_by_id(course_id)
         if not course:
@@ -44,7 +44,7 @@ class Student(User):
         
         return Enrollment_repo.enroll(enrollment)
     
-    def Submit_assignment(self, assignment_id, submission_text, 
+    def submit_assignment(self, assignment_id, submission_text, 
                          Assignment_repo, Submission_repo, Enrollment_repo):
 
         # Verify assignment exists
@@ -84,7 +84,7 @@ class Student(User):
         
         return Submission_repo.create(new_submission)
     
-    def View_GPA(self, Submission_repo, Course_repo):
+    def view_gpa(self, Submission_repo, Course_repo):
         submissions = Submission_repo.get_grades(self.get_id())
         if not submissions:
             return 0.0
@@ -108,7 +108,7 @@ class Student(User):
     def get_submissions(self, Submission_repo):
         return Submission_repo.list_by_student(self.get_id())
     
-    def Drop_course(self, course_id, Enrollment_repo):
+    def drop_course(self, course_id, Enrollment_repo):
         enrollment = Enrollment_repo.get(self.get_id(), course_id)
         if not enrollment:
             raise Exception("Cannot drop: student is not enrolled in this course")
