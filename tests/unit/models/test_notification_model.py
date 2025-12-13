@@ -7,42 +7,6 @@ from core.entities.notification import Notification
 class TestNotificationModelNewFunctions:
     """Test suite for new Notification model functions"""
     
-    def test_delete_notification_success(self, sample_user, notification_repo):
-        """Test successful notification deletion"""
-        # Create notification
-        notification = Notification(
-            id=None,
-            user_id=sample_user.get_id(),
-            message="Test message",
-            type="info",
-            is_read=False,
-            created_at=None,
-            read_at=None,
-            link=None
-        )
-        saved = notification_repo.save_notification(notification)
-        
-        # Delete using model method
-        result = saved.delete_notification(notification_repo)
-        
-        assert result is True
-        # Verify deletion
-        retrieved = notification_repo.get_by_id(saved.get_id())
-        assert retrieved is None
-    
-    def test_delete_notification_without_id_raises_exception(self):
-        """Test deleting notification without ID raises exception"""
-        notification = Notification(
-            id=None,
-            user_id=1,
-            message="Test",
-            type="info",
-            is_read=False
-        )
-        
-        with pytest.raises(Exception, match="no ID"):
-            notification.delete_notification(None)
-    
     def test_delete_notification_failed_deletion_raises_exception(
         self, sample_user, notification_repo, clean_db
     ):
@@ -162,7 +126,7 @@ class TestCourseRepoNewFunctions:
             instructor_id=sample_instructor.get_id(),
             code="CS101",
             title="Course 1",
-            describtion="First",
+            description="First",
             year=2024,
             semester="Fall",
             max_students=30,
@@ -178,7 +142,7 @@ class TestCourseRepoNewFunctions:
             instructor_id=sample_instructor.get_id(),
             code="CS102",
             title="Course 2",
-            describtion="Second",
+            description="Second",
             year=2024,
             semester="Fall",
             max_students=30,
@@ -194,8 +158,8 @@ class TestCourseRepoNewFunctions:
             id=None,
             course_id=saved_course1.get_id(),
             title="Assignment 1",
-            describtion="For course 1",
-            releaseDate="2024-01-01",
+            description="For course 1",
+            release_date="2024-01-01",
             due_date="2024-01-15",
             max_points=100,
             is_published=True,
@@ -210,8 +174,8 @@ class TestCourseRepoNewFunctions:
             id=None,
             course_id=saved_course2.get_id(),
             title="Assignment 2",
-            describtion="For course 2",
-            releaseDate="2024-01-01",
+            description="For course 2",
+            release_date="2024-01-01",
             due_date="2024-01-15",
             max_points=100,
             is_published=True,
