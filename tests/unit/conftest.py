@@ -254,8 +254,8 @@ def sample_student(user_repo, student_repo):
         created_at=saved_user.created_at,
         updated_at=saved_user.updated_at,
         student_number="S12345",
-        Program="Computer Science",
-        year_Level=2
+        program="Computer Science",
+        year_level=2
     )
     saved_student = student_repo.save_student(student)
     return saved_student
@@ -297,7 +297,7 @@ def sample_course(sample_instructor, course_repo):
         instructor_id=sample_instructor.get_id(),
         code="CS101",
         title="Intro to Programming",
-        describtion="Learn Python basics",
+        description="Learn Python basics",
         year=2024,
         semester="Fall",
         max_students=30,
@@ -317,8 +317,8 @@ def sample_assignment(sample_course, assignment_repo):
         id=None,
         course_id=sample_course.get_id(),
         title="Homework 1",
-        describtion="Write a Python function",
-        releaseDate="2024-01-01",
+        description="Write a Python function",
+        release_date="2024-01-01",
         due_date="2024-01-15",
         max_points=100,
         is_published=True,
