@@ -13,19 +13,19 @@ class SimilarityFlag:
             return self.__id
     def get_submission_id(self):
             return self.__submission_id    
-    def mark_reviewed(self, reviewd_by , reviewed_at ,review_notes = None  ):
-            self.is_reviewed = True
-            self.reviewd_by = reviewd_by
-            self.review_notes = review_notes
-            self.reviewed_at = reviewed_at
+#     def mark_reviewed(self, reviewd_by , reviewed_at ,review_notes = None  ):
+#             self.is_reviewed = True
+#             self.reviewd_by = reviewd_by
+#             self.review_notes = review_notes
+#             self.reviewed_at = reviewed_at
         
-    def dismiss (self , reviewd_by , reviewed_at , ):
-            self.is_reviewed = True
-            self.reviewd_by = reviewd_by
-            self.review_notes = "Dismissed"
-            self.reviewed_at = reviewed_at
-    def escalate(self,reviewed_by , reviewed_at ):
-        self.is_reviewed = True
-        self.reviewd_by = reviewed_by
-        self.reviewed_at = reviewed_at
-        self.review_notes = "Escalated for further investigation"
+#     def dismiss (self , reviewd_by , reviewed_at , ):
+#             self.is_reviewed = True
+#             self.reviewd_by = reviewd_by
+#             self.review_notes = "Dismissed"
+#             self.reviewed_at = reviewed_at
+#     def escalate(self,reviewed_by , reviewed_at ):
+#         self.is_reviewed = True
+#         self.reviewd_by = reviewed_by
+#         self.reviewed_at = reviewed_at
+#         self.review_notes = "Escalated for further investigation"
