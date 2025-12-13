@@ -31,7 +31,6 @@ class AuditLog_repo:
 
     def save(self, audit: AuditLog):
         try:
-            self.db.begin_transaction()
             query = """
                 INSERT INTO audit_logs (
                     actor_user_id, action, entity_type, entity_id,
@@ -52,7 +51,7 @@ class AuditLog_repo:
                 "user_agent": audit.userAgent,
                 "created_at": audit.created_at
             })
-            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone().id
+            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
             self.db.commit()
             return self.get_by_id(new_id)
         except SQLAlchemyError:
@@ -109,7 +108,6 @@ class AuditLog_repo:
 
     def delete(self, id: int):
         try:
-            self.db.begin_transaction()
             self.db.execute("DELETE FROM audit_logs WHERE id = :id", {"id": id})
             self.db.commit()
             return True

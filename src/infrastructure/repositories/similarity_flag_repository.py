@@ -2,7 +2,7 @@ import json
 from sqlalchemy.exc import SQLAlchemyError
 from core.entities.similarity_flag import SimilarityFlag
 
-class SimilarityFlag_repo:
+class SimilarityFlagRepository:
     def __init__(self, db):
         self.db = db
 
@@ -56,7 +56,6 @@ class SimilarityFlag_repo:
 
     def create(self, flag: SimilarityFlag):
         try:
-            self.db.begin_transaction()
             query = """
                 INSERT INTO similarity_flags (
                     submission_id, similarity_score, highlighted_spans,
@@ -77,7 +76,7 @@ class SimilarityFlag_repo:
                 "reviewed_at": flag.reviewed_at,
                 "created_at": flag.created_at
             })
-            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone().id
+            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
             self.db.commit()
             return self.get_by_id(new_id)
         except SQLAlchemyError:
@@ -86,7 +85,6 @@ class SimilarityFlag_repo:
 
     def update(self, flag: SimilarityFlag):
         try:
-            self.db.begin_transaction()
             query = """
                 UPDATE similarity_flags
                 SET
@@ -115,7 +113,6 @@ class SimilarityFlag_repo:
 
     def delete(self, id: int):
         try:
-            self.db.begin_transaction()
             self.db.execute("DELETE FROM similarity_flags WHERE id = :id", {"id": id})
             self.db.commit()
             return True
@@ -152,7 +149,6 @@ class SimilarityFlag_repo:
 
     def mark_reviewed(self, id: int, reviewer_id: int, review_notes: str = None, reviewed_at = None):
         try:
-            self.db.begin_transaction()
             self.db.execute("""
                 UPDATE similarity_flags
                 SET is_reviewed = 1, reviewed_by = :reviewer_id, review_notes = :review_notes, reviewed_at = :reviewed_at
@@ -166,7 +162,6 @@ class SimilarityFlag_repo:
 
     def dismiss(self, id: int, reviewer_id: int, reviewed_at = None):
         try:
-            self.db.begin_transaction()
             self.db.execute("""
                 UPDATE similarity_flags
                 SET is_reviewed = 1, reviewed_by = :reviewer_id, review_notes = :notes, reviewed_at = :reviewed_at
@@ -180,7 +175,6 @@ class SimilarityFlag_repo:
 
     def escalate(self, id: int, reviewer_id: int, reviewed_at = None):
         try:
-            self.db.begin_transaction()
             self.db.execute("""
                 UPDATE similarity_flags
                 SET is_reviewed = 1, reviewed_by = :reviewer_id, review_notes = :notes, reviewed_at = :reviewed_at

@@ -30,7 +30,6 @@ class Embedding_repo:
 
     def save_embedding(self, embedding: Embedding):
         try:
-            self.db.begin_transaction()
             query = """
                 INSERT INTO embeddings (
                     submission_id, vector_ref, model_version, dimension
@@ -45,7 +44,7 @@ class Embedding_repo:
                 "model_version": embedding.model_version,
                 "dimension": embedding.dimensions
             })
-            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone().id
+            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
             self.db.commit()
             return self.get_by_id(new_id)
         except Exception as e:

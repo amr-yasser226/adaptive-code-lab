@@ -1,7 +1,7 @@
 from sqlalchemy.exc import SQLAlchemyError
 from core.entities.enrollment import Enrollment
 
-class Enrollment_repo:
+class EnrollmentRepository:
     def __init__(self, db):
         self.db = db
 
@@ -28,7 +28,6 @@ class Enrollment_repo:
 
     def enroll(self, enrollment: Enrollment):
         try:
-            self.db.begin_transaction()
             query = """
                 INSERT INTO enrollments (
                     student_id, course_id, status,
@@ -55,7 +54,6 @@ class Enrollment_repo:
 
     def update(self, enrollment: Enrollment):
         try:
-            self.db.begin_transaction()
             query = """
                 UPDATE enrollments
                 SET
@@ -81,7 +79,6 @@ class Enrollment_repo:
 
     def delete(self, student_id: int, course_id: int):
         try:
-            self.db.begin_transaction()
             self.db.execute(
                 "DELETE FROM enrollments WHERE student_id = :sid AND course_id = :cid",
                 {"sid": student_id, "cid": course_id}

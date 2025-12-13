@@ -32,7 +32,6 @@ class Admin_repo:
 
     def save_admin(self, admin: Admin):
         try:
-            self.db.begin_transaction()
 
             if admin.get_id() is None:
                 raise Exception("Admin must have a user ID before saving admin record")

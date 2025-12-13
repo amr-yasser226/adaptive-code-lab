@@ -1,7 +1,7 @@
 from sqlalchemy.exc import SQLAlchemyError
 from core.entities.assignment import Assignment
 
-class Assignments_repo:
+class AssignmentRepository:
     def __init__(self, db):
         self.db = db
 
@@ -37,7 +37,6 @@ class Assignments_repo:
 
     def create(self, assignment: Assignment):
         try:
-            self.db.begin_transaction()
             query = """
                 INSERT INTO assignments (
                     course_id, title, description, release_date,
@@ -63,7 +62,7 @@ class Assignments_repo:
                 "allow_late_submissions": int(assignment.allow_late_submissions),
                 "late_submission_penalty": assignment.late_submission_penalty,
             })
-            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone().id
+            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
             self.db.commit()
             return self.get_by_id(new_id)
         except Exception as e:
@@ -73,7 +72,6 @@ class Assignments_repo:
 
     def update(self, assignment: Assignment):
         try:
-            self.db.begin_transaction()
             query = """
                 UPDATE assignments
                 SET 
@@ -108,7 +106,6 @@ class Assignments_repo:
 
     def publish(self, id: int):
         try:
-            self.db.begin_transaction()
             query = """
                 UPDATE assignments
                 SET is_published = 1, updated_at = CURRENT_TIMESTAMP
@@ -124,7 +121,6 @@ class Assignments_repo:
 
     def unpublish(self, id: int):
         try:
-            self.db.begin_transaction()
             query = """
                 UPDATE assignments
                 SET is_published = 0, updated_at = CURRENT_TIMESTAMP
@@ -140,7 +136,6 @@ class Assignments_repo:
 
     def extend_deadline(self, id: int, new_due_date):
         try:
-            self.db.begin_transaction()
             query = """
                 UPDATE assignments
                 SET due_date = :due, updated_at = CURRENT_TIMESTAMP
@@ -162,6 +157,32 @@ class Assignments_repo:
             ORDER BY release_date DESC
         """
         result = self.db.execute(query, {"course_id": course_id})
+        rows = result.fetchall()
+        return [
+            Assignment(
+                id=row.id,
+                course_id=row.course_id,
+                title=row.title,
+                description=row.description,
+                release_date=row.release_date,
+                due_date=row.due_date,
+                max_points=row.max_points,
+                is_published=row.is_published,
+                allow_late_submissions=row.allow_late_submissions,
+                late_submission_penalty=row.late_submission_penalty,
+                created_at=row.created_at,
+                updated_at=row.updated_at
+            )
+            for row in rows
+        ]
+
+    def get_all(self):
+        query = """
+            SELECT *
+            FROM assignments
+            ORDER BY release_date DESC
+        """
+        result = self.db.execute(query)
         rows = result.fetchall()
         return [
             Assignment(

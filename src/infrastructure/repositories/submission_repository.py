@@ -1,7 +1,7 @@
 from sqlalchemy.exc import SQLAlchemyError
 from core.entities.submission import Submission
 
-class Submission_repo:
+class SubmissionRepository:
     def __init__(self, db):
         self.db = db
 
@@ -34,7 +34,6 @@ class Submission_repo:
 
     def create(self, submission: Submission):
         try:
-            self.db.begin_transaction()
             query = """
                 INSERT INTO submissions (
                     assignment_id, student_id, version, language,
@@ -57,7 +56,7 @@ class Submission_repo:
                 "is_late": int(submission.is_late),
                 "grade_at": submission.grade_at
             })
-            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone().id
+            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
             self.db.commit()
             return self.get_by_id(new_id)
         except SQLAlchemyError:
@@ -66,7 +65,6 @@ class Submission_repo:
 
     def update(self, submission: Submission):
         try:
-            self.db.begin_transaction()
             query = """
                 UPDATE submissions
                 SET 
@@ -96,7 +94,6 @@ class Submission_repo:
 
     def delete(self, id: int):
         try:
-            self.db.begin_transaction()
             self.db.execute("DELETE FROM submissions WHERE id = :id", {"id": id})
             self.db.commit()
             return True

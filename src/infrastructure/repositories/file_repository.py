@@ -35,7 +35,6 @@ class File_repo:
         FIXED: getById() -> get_by_id()
         """
         try:
-            self.db.begin_transaction()
             query = """
                 INSERT INTO files (
                     submission_id, path, filename, content_type,
@@ -56,7 +55,7 @@ class File_repo:
                 "checksum": file.checksum,
                 "storage_url": file.storage_url
             })
-            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone().id
+            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
             self.db.commit()
             return self.get_by_id(new_id)  # FIXED: was getById(new_id)
         except Exception as e:
@@ -66,7 +65,6 @@ class File_repo:
 
     def delete(self, id: int):
         try:
-            self.db.begin_transaction()
             query = "DELETE FROM files WHERE id = :id"
             self.db.execute(query, {"id": id})
             self.db.commit()

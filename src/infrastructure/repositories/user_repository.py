@@ -1,7 +1,7 @@
 from core.entities.user import User 
 from sqlalchemy.exc import SQLAlchemyError
 
-class User_repo:
+class UserRepository:
     def __init__(self, db):
         self.db = db
     
@@ -57,7 +57,6 @@ class User_repo:
         3. Access is_active not _is_Active
         """
         try:
-            self.db.begin_transaction()  # FIXED: was begin_tansaction()
             
             if user.get_id() is None:
                 query = """
@@ -73,7 +72,7 @@ class User_repo:
                 })
                 
                 # FIXED: Use last_insert_rowid() like other repos
-                new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone().id
+                new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
                 self.db.commit()
                 return self.get_by_id(new_id)
         except SQLAlchemyError:
@@ -82,7 +81,6 @@ class User_repo:
     
     def delete(self, id: int):
         try:
-            self.db.begin_transaction()
             query = "DELETE FROM users WHERE id = :id"
             self.db.execute(query, {"id": id})
             self.db.commit()
@@ -120,7 +118,6 @@ class User_repo:
     
     def Update_data(self, user: User):
         try:
-            self.db.begin_transaction()
             query = """
                 UPDATE users
                 SET 

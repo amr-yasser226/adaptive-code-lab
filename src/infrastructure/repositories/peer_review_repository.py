@@ -31,7 +31,6 @@ class PeerReview_repo:
 
     def create(self, review: PeerReview):
         try:
-            self.db.begin_transaction()
             query = """
                 INSERT INTO peer_reviews (
                     submission_id, reviewer_student_id, rubric_scores, comments,
@@ -59,7 +58,6 @@ class PeerReview_repo:
 
     def update(self, review: PeerReview):
         try:
-            self.db.begin_transaction()
             query = """
                 UPDATE peer_reviews
                 SET
@@ -85,7 +83,6 @@ class PeerReview_repo:
 
     def delete(self, submission_id: int, reviewer_student_id: int):
         try:
-            self.db.begin_transaction()
             self.db.execute("DELETE FROM peer_reviews WHERE submission_id = :sid AND reviewer_student_id = :rid", {"sid": submission_id, "rid": reviewer_student_id})
             self.db.commit()
             return True

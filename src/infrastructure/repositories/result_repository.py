@@ -35,7 +35,6 @@ class Result_repo:
     
     def save_result(self, result: Result):
         try:
-            self.db.begin_transaction()
 
             query = """
                 INSERT INTO results (
@@ -58,7 +57,7 @@ class Result_repo:
                 "exit_code": result.exit_code,
                 "error_message": result.error_message
             })
-            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone().id
+            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
             self.db.commit()
             return self.get_by_id(new_id)
         except Exception as e : 

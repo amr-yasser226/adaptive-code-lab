@@ -1,7 +1,7 @@
 from sqlalchemy.exc import SQLAlchemyError
 from core.entities.course import Course
 
-class Course_repo:
+class CourseRepository:
     def __init__(self, db):
         self.db = db
 
@@ -35,7 +35,6 @@ class Course_repo:
 
     def create(self, course: Course):
         try:
-            self.db.begin_transaction()
             query = """
                 INSERT INTO courses (
                     instructor_id, code, title, description,
@@ -59,7 +58,7 @@ class Course_repo:
                 "status": course.status,
                 "credits": course.credits
             })
-            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone().id
+            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
             self.db.commit()
             return self.get_by_id(new_id)
         except Exception as e:
@@ -69,7 +68,6 @@ class Course_repo:
 
     def update(self, course: Course):
         try:
-            self.db.begin_transaction()
             query = """
                 UPDATE courses
                 SET 
@@ -106,7 +104,6 @@ class Course_repo:
 
     def publish(self, id: int):
         try:
-            self.db.begin_transaction()
             query = """
                 UPDATE courses
                 SET status = 'active', updated_at = CURRENT_TIMESTAMP
@@ -122,7 +119,6 @@ class Course_repo:
 
     def archive(self, id: int):
         try:
-            self.db.begin_transaction()
             query = """
                 UPDATE courses
                 SET status = 'inactive', updated_at = CURRENT_TIMESTAMP

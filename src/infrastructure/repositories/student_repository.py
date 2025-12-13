@@ -1,7 +1,7 @@
 from sqlalchemy.exc import SQLAlchemyError
 from core.entities.student import Student
 
-class Student_repo:
+class StudentRepository:
     def __init__(self, db):
         self.db = db
 
@@ -19,7 +19,7 @@ class Student_repo:
         row = result.fetchone()
         if not row:
             return None
-        return Student(
+        return Student( 
             id=row.id,
             name=row.name,
             email=row.email,
@@ -34,7 +34,6 @@ class Student_repo:
 
     def save_student(self, student: Student):
         try:
-            self.db.begin_transaction()
 
             if student.get_id() is None:
                 raise Exception("Student must have a user ID before saving student record")

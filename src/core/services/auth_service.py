@@ -52,7 +52,10 @@ class AuthService:
         if not user.is_active:
             raise AuthError("Account is deactivated")
 
-        if not self.verify_password(password, user.get_password_hash()):
+        stored_hash = user.get_password_hash()
+        is_valid = self.verify_password(password, stored_hash)
+
+        if not is_valid:
             raise AuthError("Invalid credentials")
 
         return user

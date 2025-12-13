@@ -1,7 +1,7 @@
 from sqlalchemy.exc import SQLAlchemyError
 from core.entities.instructor import Instructor
 
-class Instructor_repo:
+class InstructorRepository:
     def __init__(self, db):
         self.db = db
 
@@ -61,7 +61,6 @@ class Instructor_repo:
 
     def save(self, instructor: Instructor):
         try:
-            self.db.begin_transaction()
 
             # ROLE CHECK
             role_row = self.db.execute("SELECT role FROM users WHERE id = :id", {"id": instructor.get_id()}).fetchone()

@@ -35,7 +35,6 @@ class Testcase_repo:
 
     def create(self, testcase: Testcase):
         try:
-            self.db.begin_transaction()
             query = """
                 INSERT INTO test_cases (
                     assignment_id, name, stdin, descripion,
@@ -61,7 +60,7 @@ class Testcase_repo:
                 "sort_order": testcase.sort_order,
                 "created_at": testcase.created_at
             })
-            new_id = self.db.execute("SELECT last_insert_rowid() AS id").fetchone().id
+            new_id = self.db.execute("SELECT last_insert_rowid() AS id").fetchone()[0]
             self.db.commit()
             return self.get_by_id(new_id)
         except SQLAlchemyError:
@@ -70,7 +69,6 @@ class Testcase_repo:
 
     def update(self, testcase: Testcase):
         try:
-            self.db.begin_transaction()
             query = """
                 UPDATE test_cases
                 SET 
@@ -105,7 +103,6 @@ class Testcase_repo:
 
     def delete(self, id: int):
         try:
-            self.db.begin_transaction()
             self.db.execute("DELETE FROM test_cases WHERE id = :id", {"id": id})
             self.db.commit()
             return True

@@ -30,7 +30,6 @@ class Hint_repo:
 
     def create(self, hint: Hint):
         try:
-            self.db.begin_transaction()
             query = """
                 INSERT INTO hints (
                     submission_id, model_used, confidence, hint_text,
@@ -50,7 +49,7 @@ class Hint_repo:
                 "feedback_text": hint.feedback,
                 "created_at": hint.created_at
             })
-            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone().id
+            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
             self.db.commit()
             return self.get_by_id(new_id)
         except SQLAlchemyError:
@@ -59,7 +58,6 @@ class Hint_repo:
 
     def update(self, hint: Hint):
         try:
-            self.db.begin_transaction()
             query = """
                 UPDATE hints
                 SET
@@ -86,7 +84,6 @@ class Hint_repo:
 
     def delete(self, id: int):
         try:
-            self.db.begin_transaction()
             self.db.execute("DELETE FROM hints WHERE id = :id", {"id": id})
             self.db.commit()
             return True
@@ -119,7 +116,6 @@ class Hint_repo:
 
     def mark_helpful(self, id: int):
         try:
-            self.db.begin_transaction()
             self.db.execute("UPDATE hints SET is_helpful = 1 WHERE id = :id", {"id": id})
             self.db.commit()
             return self.get_by_id(id)
@@ -129,7 +125,6 @@ class Hint_repo:
 
     def mark_not_helpful(self, id: int):
         try:
-            self.db.begin_transaction()
             self.db.execute("UPDATE hints SET is_helpful = 0 WHERE id = :id", {"id": id})
             self.db.commit()
             return self.get_by_id(id)

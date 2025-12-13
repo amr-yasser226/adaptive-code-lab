@@ -32,7 +32,6 @@ class Flag_repo:
 
     def save_similarityflag(self, flag: SimilarityFlag):
         try:
-            self.db.begin_transaction()
             query = """
                 INSERT INTO similarity_flags (
                     submission_id, similarity_score, highlighted_spans,
@@ -52,7 +51,7 @@ class Flag_repo:
                 "review_notes": flag.review_notes,
                 "reviewed_at": flag.reviewed_at
             })
-            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone().id
+            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
             self.db.commit()
             return self.get_by_id(new_id)
         except Exception as e:

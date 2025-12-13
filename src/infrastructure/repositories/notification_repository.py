@@ -30,7 +30,6 @@ class Notification_repo:
 
     def save_notification(self, notification: Notification):
         try:
-            self.db.begin_transaction()
             query = """
                 INSERT INTO notifications (
                     user_id, message, type, is_read, read_at, link
@@ -47,7 +46,7 @@ class Notification_repo:
                 "read_at": notification.read_at,
                 "link": notification.link
             })
-            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone().id
+            new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
             self.db.commit()
             return self.get_by_id(new_id)
         except Exception as e:
@@ -79,7 +78,6 @@ class Notification_repo:
         return notifications
     def delete_by_id(self , id : int ):
         try : 
-            self.db.begin_transaction()
             query = "DELETE FROM notifications WHERE id =:id"
             self.db.execute(query, {"id": id})
             self.db.commit()

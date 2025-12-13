@@ -29,7 +29,6 @@ class SimilarityComparison_repo:
 
     def create(self, comp: SimilarityComparison):
         try:
-            self.db.begin_transaction()
             query = """
                 INSERT INTO similarity_comparisons (
                     similarity_id, compared_submission_id,
@@ -55,7 +54,6 @@ class SimilarityComparison_repo:
 
     def update(self, comp: SimilarityComparison):
         try:
-            self.db.begin_transaction()
             query = """
                 UPDATE similarity_comparisons
                 SET
@@ -80,7 +78,6 @@ class SimilarityComparison_repo:
 
     def delete(self, similarity_id: int, compared_submission_id: int):
         try:
-            self.db.begin_transaction()
             self.db.execute(
                 "DELETE FROM similarity_comparisons WHERE similarity_id = :sid AND compared_submission_id = :cid",
                 {"sid": similarity_id, "cid": compared_submission_id}
