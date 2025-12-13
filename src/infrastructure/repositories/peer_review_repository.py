@@ -2,7 +2,7 @@ import json
 import sqlite3
 from core.entities.peer_review import PeerReview
 
-class PeerReview_repo:
+class PeerReviewRepository:
     def __init__(self, db):
         self.db = db
 
@@ -86,7 +86,7 @@ class PeerReview_repo:
             self.db.execute("DELETE FROM peer_reviews WHERE submission_id = :sid AND reviewer_student_id = :rid", {"sid": submission_id, "rid": reviewer_student_id})
             self.db.commit()
             return True
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return False
 

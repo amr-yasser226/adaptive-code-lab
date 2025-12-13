@@ -43,8 +43,31 @@ class DatabaseManager:
     def get_connection(self):
         """Returns a NEW connection object. SQLite connections cannot be shared across threads."""
         conn = sqlite3.connect(self.db_path, check_same_thread=False)
+        conn.row_factory = self._custom_row_factory
         conn.execute("PRAGMA foreign_keys = ON;")
         return conn
+
+    def _custom_row_factory(self, cursor, row):
+        return CustomRow(cursor, row)
+
+class CustomRow:
+    """Row wrapper that supports index (row[0]), key (row['id']), and attribute (row.id) access."""
+    def __init__(self, cursor, row):
+        self._data = row
+        self._keys = {col[0]: i for i, col in enumerate(cursor.description)}
+    
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return self._data[key]
+        if key in self._keys:
+            return self._data[self._keys[key]]
+        raise IndexError(f"Key/Index '{key}' not found in row")
+
+    def __getattr__(self, name):
+        try:
+            return self[name]
+        except IndexError:
+            raise AttributeError(f"Row has no attribute '{name}'")
 
 # Backward compatibility helper
 def connect_db(db_path=None):

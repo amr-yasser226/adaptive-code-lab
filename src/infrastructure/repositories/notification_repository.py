@@ -2,7 +2,7 @@ import sqlite3
 from core.entities.notification import Notification
 
 
-class Notification_repo:
+class NotificationRepository:
     def __init__(self, db):
         self.db = db
 

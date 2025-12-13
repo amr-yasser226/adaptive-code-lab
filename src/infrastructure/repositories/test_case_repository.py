@@ -1,7 +1,7 @@
 import sqlite3
 from core.entities.test_case import Testcase
 
-class Testcase_repo:
+class TestCaseRepository:
     def __init__(self, db):
         self.db = db
 

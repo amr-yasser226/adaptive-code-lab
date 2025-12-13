@@ -18,10 +18,17 @@ from infrastructure.repositories.submission_repository import SubmissionReposito
 from infrastructure.repositories.course_repository import CourseRepository
 from infrastructure.repositories.enrollment_repository import EnrollmentRepository
 from infrastructure.repositories.similarity_flag_repository import SimilarityFlagRepository
+from infrastructure.repositories.test_case_repository import TestCaseRepository
+from infrastructure.repositories.notification_repository import NotificationRepository
+from infrastructure.repositories.peer_review_repository import PeerReviewRepository
 
 from core.services.auth_service import AuthService
 from core.services.student_service import StudentService
 from core.services.instructor_service import InstructorService
+from core.services.test_case_service import TestCaseService
+from core.services.assignment_service import AssignmentService
+from core.services.notification_service import NotificationService
+from core.services.peer_review_service import PeerReviewService
 
 from web.routes.auth import auth_bp
 from web.routes.student import student_bp
@@ -55,6 +62,9 @@ def create_app(test_config=None):
     course_repo = CourseRepository(db_connection)
     enrollment_repo = EnrollmentRepository(db_connection)
     flag_repo = SimilarityFlagRepository(db_connection)
+    test_case_repo = TestCaseRepository(db_connection)
+    notification_repo = NotificationRepository(db_connection)
+    peer_review_repo = PeerReviewRepository(db_connection)
 
     # 2. Initialize Services with Dependencies
     auth_service = AuthService(user_repo)
@@ -76,16 +86,45 @@ def create_app(test_config=None):
         flag_repo=flag_repo
     )
 
+    test_case_service = TestCaseService(
+        testcase_repo=test_case_repo,
+        assignment_repo=assignment_repo,
+        course_repo=course_repo
+    )
+
+    assignment_service = AssignmentService(
+        assignment_repo=assignment_repo,
+        course_repo=course_repo,
+        submission_repo=submission_repo
+    )
+
+    notification_service = NotificationService(notification_repo)
+
+    peer_review_service = PeerReviewService(
+        peer_review_repo=peer_review_repo,
+        submission_repo=submission_repo,
+        enrollment_repo=enrollment_repo,
+        assignment_repo=assignment_repo,
+        course_repo=course_repo
+    )
+
     # 3. Store Services in App Context
     app.extensions['services'] = {
         'auth_service': auth_service,
         'student_service': student_service,
         'instructor_service': instructor_service,
+        'test_case_service': test_case_service,
+        'assignment_service': assignment_service,
         'user_repo': user_repo,
         'assignment_repo': assignment_repo, # Exposed for direct read access
         'submission_repo': submission_repo,
         'course_repo': course_repo,
-        'enrollment_repo': enrollment_repo
+        'enrollment_repo': enrollment_repo,
+        'test_case_repo': test_case_repo,
+        'notification_service': notification_service,
+        'peer_review_service': peer_review_service,
+        'notification_repo': notification_repo,
+        'peer_review_repo': peer_review_repo
     }
 
     # --- Register Blueprints (Bonus #1) ---
