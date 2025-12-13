@@ -14,13 +14,13 @@ class File :
             return self.__id
     def get_submission_id(self):
             return self.__submission_id
-    def save_file(self):
-        pass
-    def delete_file(self):
-        pass
-    def get_stream(self):
-        pass
-    def generate_singned_url(self , expiration_time):
-        pass
-    def validate(self):
-        pass
+    # def save_file(self):
+    #     pass
+    # def delete_file(self):
+    #     pass
+    # def get_stream(self):
+    #     pass
+    # def generate_singned_url(self , expiration_time):
+    #     pass
+    # def validate(self):
+    #     pass
