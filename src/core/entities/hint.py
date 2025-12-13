@@ -14,8 +14,8 @@ class Hint :
             return self.__submission_id
     
     
-    def genrate_hint(self):
-            pass
+#     def genrate_hint(self):
+#             pass
     def mark_helpful(self):
             self.is_helpful = True
             
