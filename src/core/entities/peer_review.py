@@ -12,15 +12,15 @@ class PeerReview :
             return self.__submission_id
     def get_reviewer_student_id(self):
             return self.__reviewer_student_id
-    def submit_review(self): 
-        self.is_submitted = True
-        self.submitted_at = datetime.datetime.now()
+    # def submit_review(self): 
+    #     self.is_submitted = True
+    #     self.submitted_at = datetime.datetime.now()
     
-    def update_review(self, rubric_score, comments):
-        if rubric_score is not None:
-            self.rubric_score = rubric_score
-        if comments is not None:
-            self.comments = comments
+    # def update_review(self, rubric_score, comments):
+    #     if rubric_score is not None:
+    #         self.rubric_score = rubric_score
+    #     if comments is not None:
+    #         self.comments = comments
     def calculate_rubric_score(self):
         if not self.rubric_score : 
              return 0 
