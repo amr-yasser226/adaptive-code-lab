@@ -11,7 +11,7 @@ def temp_db_path():
 
 def test_connect_db(temp_db_path, monkeypatch):
     # Monkeypatch connect_db to use temporary DB
-    monkeypatch.setattr("DB.connection.connect_db", lambda db_path=temp_db_path: sqlite3.connect(db_path))
+    monkeypatch.setattr("infrastructure.database.connection.connect_db", lambda db_path=temp_db_path: sqlite3.connect(db_path))
 
     conn = connect_db()
     assert isinstance(conn, sqlite3.Connection)

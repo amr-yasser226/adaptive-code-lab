@@ -1,5 +1,5 @@
-import hashlib
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 from core.entities.user import User
 from core.exceptions.auth_error import AuthError
 
@@ -7,14 +7,15 @@ class AuthService:
     def __init__(self, user_repo):
         self.user_repo = user_repo
 
-  
     @staticmethod
     def hash_password(plain_password: str) -> str:
-        return hashlib.sha256(plain_password.encode()).hexdigest()
+        """Hash a password using Werkzeug's secure hashing (pbkdf2:sha256 with salt)."""
+        return generate_password_hash(plain_password)
 
     @staticmethod
     def verify_password(plain_password: str, stored_hash: str) -> bool:
-        return stored_hash == hashlib.sha256(plain_password.encode()).hexdigest()
+        """Verify a plain password against a stored hash."""
+        return check_password_hash(stored_hash, plain_password)
 
    
     def register(self, name: str, email: str, password: str, role="student"):

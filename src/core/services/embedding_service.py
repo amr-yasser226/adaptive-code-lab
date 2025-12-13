@@ -4,14 +4,10 @@ from typing import Optional, List
 
 from core.exceptions.validation_error import ValidationError
 from core.entities.embedding import Embedding
-# from Backend.Model import Embedding_model as EmbModel  # only if needed; safe to ignore
 
-# Note: your embedding generation function lives elsewhere (you provided it).
-# We'll import the helper that calls Gemini if available.
 try:
     from infrastructure.ai.embeddings import generate_embedding  # your module that calls genai
 except Exception:
-    # Fall back: generate_embedding may be in another path; user already has it in project root.
     def generate_embedding(_text):
         raise RuntimeError("generate_embedding not available; please import your generator module")
 
@@ -38,7 +34,6 @@ class EmbeddingService:
         if not emb:
             return None
 
-        # emb.vector_ref is stored as pickled bytes by your embedding pipeline
         try:
             vec = pickle.loads(emb.vector_ref) if emb.vector_ref is not None else None
         except Exception as e:
@@ -62,12 +57,10 @@ class EmbeddingService:
         if not code_text:
             raise ValidationError("Embedding missing and no code_text provided to generate it")
 
-        # call the actual generator (Gemini)
         generated = generate_embedding(code_text)
         if generated is None:
             raise ValidationError("Embedding generation failed")
-
-        # Save embedding via repo: repo.save_embedding expects an Embedding object whose vector_ref is pickled bytes
+        
         pickled = pickle.dumps(generated)
         emb_obj = Embedding(
             id=None,
@@ -77,18 +70,13 @@ class EmbeddingService:
             dimensions=len(generated),
             created_at=datetime.utcnow()
         )
-
+        
         saved = self.embedding_repo.save_embedding(emb_obj)
         if not saved:
-            # If repo returns None on error
             raise ValidationError("Failed to save generated embedding")
         return generated
 
     def compute_similarity(self, vec_a: List[float], vec_b: List[float]) -> float:
-        """
-        Compute cosine similarity safely. Uses pure Python math to avoid an explicit numpy dependency here.
-        If you prefer, replace with numpy for speed.
-        """
         if vec_a is None or vec_b is None:
             raise ValidationError("One or both vectors are None")
         if len(vec_a) != len(vec_b):

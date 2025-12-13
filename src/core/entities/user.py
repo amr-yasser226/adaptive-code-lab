@@ -1,8 +1,9 @@
-import hashlib
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class User:
     """
-    FIXED: Changed _is_Active to is_active for consistency with database
+    User entity representing authenticated users in the system.
+    Uses Werkzeug's secure password hashing (pbkdf2_sha256 with salt).
     """
     def __init__(self, id, name, email, password, role, created_at=None, updated_at=None, is_active=True):
         self.__id = id
@@ -12,23 +13,26 @@ class User:
         self.role = role
         self.created_at = created_at
         self.updated_at = updated_at
-        self.is_active = bool(is_active)  # FIXED: was _is_Active
+        self.is_active = bool(is_active)
 
     def get_id(self):
         return self.__id
     
     @staticmethod
-    def hash_password(password):
-        return hashlib.sha256(password.encode()).hexdigest()
+    def hash_password(password: str) -> str:
+        """Hash a password using Werkzeug's secure hashing (pbkdf2:sha256 with salt)."""
+        return generate_password_hash(password)
 
-    def set_password(self, password):
+    def set_password(self, password: str):
+        """Set a new password (will be securely hashed)."""
         self.__password_hash = User.hash_password(password)
     
-    def get_password_hash(self):
+    def get_password_hash(self) -> str:
         return self.__password_hash
     
-    def authenticate_password(self, password):
-        return self.get_password_hash() == User.hash_password(password)
+    def authenticate_password(self, password: str) -> bool:
+        """Verify a password against the stored hash."""
+        return check_password_hash(self.get_password_hash(), password)
     
     def Update_profile(self, name=None, email=None, role=None, password=None):
         if name:

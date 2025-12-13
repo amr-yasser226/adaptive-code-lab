@@ -1,8 +1,3 @@
-"""
-Centralized configuration settings for Adaptive Code Lab.
-All environment variables are loaded here to provide a single source of truth.
-"""
-
 import os
 from pathlib import Path
 from dotenv import load_dotenv
