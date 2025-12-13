@@ -12,24 +12,24 @@ src_path = project_root / "src"
 sys.path.insert(0, str(src_path))
 
 from infrastructure.repositories.database import Database
-from infrastructure.repositories.user_repository import User_repo
-from infrastructure.repositories.student_repository import Student_repo
-from infrastructure.repositories.instructor_repository import Instructor_repo
-from infrastructure.repositories.admin_repository import Admin_repo
-from infrastructure.repositories.course_repository import Course_repo
-from infrastructure.repositories.assignment_repository import Assignments_repo
-from infrastructure.repositories.submission_repository import Submission_repo
-from infrastructure.repositories.test_case_repository import Testcase_repo
-from infrastructure.repositories.result_repository import Result_repo
-from infrastructure.repositories.enrollment_repository import Enrollment_repo
-from infrastructure.repositories.notification_repository import Notification_repo
-from infrastructure.repositories.hint_repository import Hint_repo
-from infrastructure.repositories.file_repository import File_repo
-from infrastructure.repositories.embedding_repository import Embedding_repo
-from infrastructure.repositories.peer_review_repository import PeerReview_repo
-from infrastructure.repositories.similarity_flag_repository import SimilarityFlag_repo
-from infrastructure.repositories.similarity_comparison_repository import SimilarityComparison_repo
-from infrastructure.repositories.audit_log_repository import AuditLog_repo
+from infrastructure.repositories.user_repository import UserRepository as User_repo
+from infrastructure.repositories.student_repository import StudentRepository as Student_repo
+from infrastructure.repositories.instructor_repository import InstructorRepository as Instructor_repo
+from infrastructure.repositories.admin_repository import AdminRepository
+from infrastructure.repositories.course_repository import CourseRepository as Course_repo
+from infrastructure.repositories.assignment_repository import AssignmentRepository as Assignments_repo
+from infrastructure.repositories.submission_repository import SubmissionRepository as Submission_repo
+from infrastructure.repositories.test_case_repository import TestCaseRepository as Testcase_repo
+from infrastructure.repositories.result_repository import ResultRepository
+from infrastructure.repositories.enrollment_repository import EnrollmentRepository as Enrollment_repo
+from infrastructure.repositories.notification_repository import NotificationRepository as Notification_repo
+from infrastructure.repositories.hint_repository import HintRepository
+from infrastructure.repositories.file_repository import FileRepository
+from infrastructure.repositories.embedding_repository import EmbeddingRepository
+from infrastructure.repositories.peer_review_repository import PeerReviewRepository as PeerReview_repo
+from infrastructure.repositories.similarity_flag_repository import SimilarityFlagRepository as SimilarityFlag_repo
+from infrastructure.repositories.similarity_comparison_repository import SimilarityComparisonRepository
+from infrastructure.repositories.audit_log_repository import AuditLogRepository
 
 from core.entities.user import User
 from core.entities.student import Student
@@ -144,7 +144,7 @@ def instructor_repo(clean_db):
 
 @pytest.fixture
 def admin_repo(clean_db):
-    return Admin_repo(clean_db)
+    return AdminRepository(clean_db)
 
 
 @pytest.fixture
@@ -169,7 +169,7 @@ def testcase_repo(clean_db):
 
 @pytest.fixture
 def result_repo(clean_db):
-    return Result_repo(clean_db)
+    return ResultRepository(clean_db)
 
 
 @pytest.fixture
@@ -184,17 +184,17 @@ def notification_repo(clean_db):
 
 @pytest.fixture
 def hint_repo(clean_db):
-    return Hint_repo(clean_db)
+    return HintRepository(clean_db)
 
 
 @pytest.fixture
 def file_repo(clean_db):
-    return File_repo(clean_db)
+    return FileRepository(clean_db)
 
 
 @pytest.fixture
 def embedding_repo(clean_db):
-    return Embedding_repo(clean_db)
+    return EmbeddingRepository(clean_db)
 
 
 @pytest.fixture
@@ -209,12 +209,12 @@ def similarity_flag_repo(clean_db):
 
 @pytest.fixture
 def similarity_comparison_repo(clean_db):
-    return SimilarityComparison_repo(clean_db)
+    return SimilarityComparisonRepository(clean_db)
 
 
 @pytest.fixture
 def audit_log_repo(clean_db):
-    return AuditLog_repo(clean_db)
+    return AuditLogRepository(clean_db)
 
 
 # Sample data fixtures
