@@ -1,10 +1,6 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 
 class User:
-    """
-    User entity representing authenticated users in the system.
-    Uses Werkzeug's secure password hashing (pbkdf2_sha256 with salt).
-    """
     def __init__(self, id, name, email, password, role, created_at=None, updated_at=None, is_active=True):
         self.__id = id
         self.name = name
@@ -34,7 +30,7 @@ class User:
         """Verify a password against the stored hash."""
         return check_password_hash(self.get_password_hash(), password)
     
-    def Update_profile(self, name=None, email=None, role=None, password=None):
+    def update_profile(self, name=None, email=None, role=None, password=None):
         if name:
             self.name = name
         if email:
@@ -44,8 +40,8 @@ class User:
         if password:
             self.set_password(password)
 
-    def Deactivate_account(self):
+    def deactivate_account(self):
         self.is_active = False  # FIXED: was self.is_Active
     
-    def Activate_account(self):
+    def activate_account(self):
         self.is_active = True  # FIXED: was self.is_Active
