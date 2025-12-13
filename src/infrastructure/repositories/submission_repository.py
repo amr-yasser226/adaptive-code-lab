@@ -181,7 +181,7 @@ class Submission_repo:
 
         return  submission_list
     
-    def get_laste_submission (self ,student_id:int , assignment_id : int ): 
+    def get_last_submission(self, student_id: int, assignment_id: int): 
         query="""
             SELECT *
             FROM submissions
