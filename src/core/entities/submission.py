@@ -33,28 +33,28 @@ class Submission :
     def get_student_id(self):
             return self.__student_id
     
-    def enqueue_for_grading(self):
-            self.status = 'queued'
-    def attach_file(self , file_repo, path ,file_name ,content_type , size_bytes , uploader_id  , checksum =None , storage_url=None ):
-        file =File(
-        id=None,
-        submission_id=self.get_id(),
-        uploader_id=uploader_id,
-        path=path,
-        file_name=file_name,
-        content_type=content_type,
-        size_bytes=size_bytes,
-        checksum=checksum,
-        storage_url=storage_url,
-        created_at=datetime.now()
-    )
-        return file_repo.save_file(file)
+    # def enqueue_for_grading(self):
+    #         self.status = 'queued'
+    # def attach_file(self , file_repo, path ,file_name ,content_type , size_bytes , uploader_id  , checksum =None , storage_url=None ):
+    #     file =File(
+    #     id=None,
+    #     submission_id=self.get_id(),
+    #     uploader_id=uploader_id,
+    #     path=path,
+    #     file_name=file_name,
+    #     content_type=content_type,
+    #     size_bytes=size_bytes,
+    #     checksum=checksum,
+    #     storage_url=storage_url,
+    #     created_at=datetime.now()
+    # )
+    #     return file_repo.save_file(file)
         
-    def get_results(self):
-            pass
-    def regrade(self):
-            pass 
-    def calculated_score(self):
-            pass
-    def get_files(self ,file_repo):
-        return file_repo.find_by_submission(self.get_id())
+    # def get_results(self):
+    #         pass
+    # def regrade(self):
+    #         pass 
+    # def calculated_score(self):
+    #         pass
+    # def get_files(self ,file_repo):
+    #     return file_repo.find_by_submission(self.get_id())
