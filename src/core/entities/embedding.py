@@ -16,8 +16,8 @@ class Embedding:
     def get_submission_id(self):  # FIXED: Added this method
         return self.__submission_id
     
-    def refresh(self):
-        pass
+    # def refresh(self):
+    #     pass
     
-    def computer_similarity(self):
-        pass
+    # def computer_similarity(self):
+    #     pass
