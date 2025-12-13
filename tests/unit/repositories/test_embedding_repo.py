@@ -1,5 +1,5 @@
 import pytest
-from Backend.Model.Embedding_model import Embedding
+from core.entities.embedding import Embedding
 
 
 @pytest.mark.repo

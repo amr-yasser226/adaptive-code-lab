@@ -1,5 +1,5 @@
 import pytest
-from Backend.Model.Hint_model import Hint
+from core.entities.hint import Hint
 
 
 @pytest.mark.repo

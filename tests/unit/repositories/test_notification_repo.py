@@ -1,5 +1,5 @@
 import pytest
-from Backend.Model.Notification_model import Notification
+from core.entities.notification import Notification
 
 
 @pytest.mark.repo

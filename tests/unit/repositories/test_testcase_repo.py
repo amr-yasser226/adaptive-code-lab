@@ -1,5 +1,5 @@
 import pytest
-from Backend.Model.TestCase_model import Testcase
+from core.entities.test_case import Testcase
 
 
 @pytest.mark.repo

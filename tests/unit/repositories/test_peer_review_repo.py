@@ -1,5 +1,5 @@
 import pytest
-from Backend.Model.Peer_review_model import PeerReview
+from core.entities.peer_review import PeerReview
 
 
 @pytest.mark.repo
