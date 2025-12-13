@@ -19,11 +19,11 @@ class Testcase:
     def get_assignment_id(self):
         return self.__assignment_id
 
-    def run_on(self, submission_id):
-        pass
+    # def run_on(self, submission_id):
+    #     pass
 
-    def validate(self):
-        pass
+    # def validate(self):
+    #     pass
 
-    def clone(self):
-        pass
+    # def clone(self):
+    #     pass
