@@ -154,7 +154,7 @@ class TestCourseRepoNewFunctions:
                                                       assignment_repo):
         """Test get_by_assignment distinguishes between courses"""
         from Backend.Model.Course_model import Course
-        from Backend.Model.Assignmnets_model import Assignmnets
+        from Backend.Model.Assignment_model import Assignment
         
         # Create two courses
         course1 = Course(
@@ -190,7 +190,7 @@ class TestCourseRepoNewFunctions:
         saved_course2 = course_repo.create(course2)
         
         # Create assignments for each course
-        assignment1 = Assignmnets(
+        assignment1 = Assignment(
             id=None,
             course_id=saved_course1.get_id(),
             title="Assignment 1",
@@ -206,7 +206,7 @@ class TestCourseRepoNewFunctions:
         )
         saved_assignment1 = assignment_repo.create(assignment1)
         
-        assignment2 = Assignmnets(
+        assignment2 = Assignment(
             id=None,
             course_id=saved_course2.get_id(),
             title="Assignment 2",

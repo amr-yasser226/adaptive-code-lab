@@ -1,4 +1,4 @@
-class Assignmnets : 
+class Assignment:
     def __init__(self, id , course_id , title , describtion , releaseDate, due_date , max_points , is_published, allow_late_submissions,late_submission_penalty , created_at , updated_at):
         self.__id =id 
         self.__course_id =course_id

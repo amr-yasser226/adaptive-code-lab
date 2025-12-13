@@ -2,7 +2,7 @@ import pytest
 from datetime import datetime
 from Backend.Model.Student_model import Student
 from Backend.Model.Course_model import Course
-from Backend.Model.Assignmnets_model import Assignmnets
+from Backend.Model.Assignment_model import Assignment
 from Backend.Model.Enrollment_model import Enrollment
 from Backend.Model.Submission_model import Submission
 

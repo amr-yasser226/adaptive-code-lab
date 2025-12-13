@@ -1,4 +1,3 @@
-from Repository.Notification_repo import Notification_repo
 class Notification:
     Allowed_Types = ('info', 'warning', 'alert')
     def __init__(self,id,user_id,message,type,is_read=False,created_at=None,read_at=None,link=None):

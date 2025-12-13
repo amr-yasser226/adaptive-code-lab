@@ -2,7 +2,7 @@ from datetime import datetime
 from Backend.Exceptions.ValidationError import ValidationError
 from Backend.Exceptions.AuthError import AuthError
 from Backend.Model.Course_model import Course
-from Backend.Model.Assignmnets_model import Assignmnets
+from Backend.Model.Assignment_model import Assignment
 
 
 class InstructorService:
@@ -67,7 +67,7 @@ class InstructorService:
             raise AuthError("You can only create assignments for your own courses", code="not_owner")
 
  
-        new_assignment = Assignmnets(
+        new_assignment = Assignment(
             id=None,
             course_id=course_id,
             title=title,

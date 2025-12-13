@@ -1,6 +1,6 @@
 from Backend.Model.Enrollment_model import Enrollment
 from datetime import datetime
-from Backend.Model.Assignmnets_model import Assignmnets
+from Backend.Model.Assignment_model import Assignment
 
 class Course:
     def __init__(self, id, instructor_id, code , title ,describtion,year,semester,max_students,created_at,status,updated_at,credits):
@@ -29,7 +29,7 @@ class Course:
         Course_status = self.status
         if Course_status != "active":
                raise Exception("Cannot add assignment in inactive course")
-        assingment=Assignmnets(
+        assingment=Assignment(
         id=None,
         course_id=self.get_id(),
         title=title,

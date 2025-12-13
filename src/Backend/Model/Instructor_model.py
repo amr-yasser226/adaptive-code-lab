@@ -1,6 +1,6 @@
 from Backend.Model.User_model import User
 from Backend.Model.Course_model import Course
-from Backend.Model.Assignmnets_model import Assignmnets
+from Backend.Model.Assignment_model import Assignment
 from datetime import datetime
 
 class Instructor(User):
@@ -43,7 +43,7 @@ class Instructor(User):
     #         raise Exception("You can only create assignments for your own courses")
         
     #     # Create new assignment
-    #     new_assignment = Assignmnets(
+    #     new_assignment = Assignment(
     #         id=None,
     #         course_id=course_id,
     #         title=title,

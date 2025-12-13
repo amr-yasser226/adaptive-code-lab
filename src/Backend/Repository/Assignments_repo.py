@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Backend.Model.Assignmnets_model import Assignmnets
+from Backend.Model.Assignment_model import Assignment
 
 class Assignments_repo:
     def __init__(self, db):
@@ -20,7 +20,7 @@ class Assignments_repo:
         row = result.fetchone()
         if not row:
             return None
-        return Assignmnets(
+        return Assignment(
             id=row.id,
             course_id=row.course_id,
             title=row.title,
@@ -35,7 +35,7 @@ class Assignments_repo:
             updated_at=row.updated_at
         )
 
-    def create(self, assignment: Assignmnets):
+    def create(self, assignment: Assignment):
         try:
             self.db.begin_transaction()
             query = """
@@ -71,7 +71,7 @@ class Assignments_repo:
             print("Error creating assignment:", e)
             return None
 
-    def update(self, assignment: Assignmnets):
+    def update(self, assignment: Assignment):
         try:
             self.db.begin_transaction()
             query = """
@@ -164,7 +164,7 @@ class Assignments_repo:
         result = self.db.execute(query, {"course_id": course_id})
         rows = result.fetchall()
         return [
-            Assignmnets(
+            Assignment(
                 id=row.id,
                 course_id=row.course_id,
                 title=row.title,

@@ -35,7 +35,7 @@ from Backend.Model.Student_model import Student
 from Backend.Model.Instructor_model import Instructor
 from Backend.Model.Admin_model import Admin
 from Backend.Model.Course_model import Course
-from Backend.Model.Assignmnets_model import Assignmnets
+from Backend.Model.Assignment_model import Assignment
 from Backend.Model.Submission_model import Submission
 from Backend.Model.TestCase_model import Testcase
 from Backend.Model.Results_model import Result
@@ -312,7 +312,7 @@ def sample_course(sample_instructor, course_repo):
 @pytest.fixture
 def sample_assignment(sample_course, assignment_repo):
     """Create and return a sample assignment"""
-    assignment = Assignmnets(
+    assignment = Assignment(
         id=None,
         course_id=sample_course.get_id(),
         title="Homework 1",
