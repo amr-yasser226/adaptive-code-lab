@@ -14,8 +14,8 @@ class AuditLog:
         return self.__id
     def get_actor_user_ID(self):
         return self.__actor_user_ID
-    def getActor(self) :  #return User object
-        pass
-    def get_Entity(self): #return Entity object
-        pass  
+    # def getActor(self) :  #return User object
+    #     pass
+    # def get_Entity(self): #return Entity object
+    #     pass  
     
