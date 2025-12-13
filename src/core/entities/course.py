@@ -1,6 +1,6 @@
-from Backend.Model.Enrollment_model import Enrollment
+from core.entities.enrollment import Enrollment
 from datetime import datetime
-from Backend.Model.Assignment_model import Assignment
+from core.entities.assignment import Assignment
 
 class Course:
     def __init__(self, id, instructor_id, code , title ,describtion,year,semester,max_students,created_at,status,updated_at,credits):

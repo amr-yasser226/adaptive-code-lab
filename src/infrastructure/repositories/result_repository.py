@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Backend.Model.Results_model import Result
+from core.entities.result import Result
 
 
 class Result_repo:

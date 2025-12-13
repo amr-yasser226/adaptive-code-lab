@@ -1,6 +1,6 @@
 import json
 from sqlalchemy.exc import SQLAlchemyError
-from Backend.Model.Similarity_flag import SimilarityFlag
+from core.entities.similarity_flag import SimilarityFlag
 
 class SimilarityFlag_repo:
     def __init__(self, db):

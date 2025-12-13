@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Backend.Model.Embedding_model import Embedding
+from core.entities.embedding import Embedding
 
 class Embedding_repo:
     def __init__(self, db):

@@ -1,6 +1,6 @@
 import json
 from sqlalchemy.exc import SQLAlchemyError
-from Backend.Model.Peer_review_model import PeerReview
+from core.entities.peer_review import PeerReview
 
 class PeerReview_repo:
     def __init__(self, db):

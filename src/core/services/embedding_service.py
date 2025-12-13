@@ -2,14 +2,14 @@ import pickle
 from datetime import datetime
 from typing import Optional, List
 
-from Backend.Exceptions.ValidationError import ValidationError
-from Backend.Model.Embedding_model import Embedding
+from core.exceptions.validation_error import ValidationError
+from core.entities.embedding import Embedding
 # from Backend.Model import Embedding_model as EmbModel  # only if needed; safe to ignore
 
 # Note: your embedding generation function lives elsewhere (you provided it).
 # We'll import the helper that calls Gemini if available.
 try:
-    from src.Backend.AI.embeddings import generate_embedding  # your module that calls genai
+    from infrastructure.ai.embeddings import generate_embedding  # your module that calls genai
 except Exception:
     # Fall back: generate_embedding may be in another path; user already has it in project root.
     def generate_embedding(_text):

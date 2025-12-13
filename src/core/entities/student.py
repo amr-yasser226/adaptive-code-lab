@@ -1,7 +1,7 @@
 from datetime import datetime
-from Backend.Model.User_model import User
-from Backend.Model.Enrollment_model import Enrollment
-from Backend.Model.Submission_model import Submission
+from core.entities.user import User
+from core.entities.enrollment import Enrollment
+from core.entities.submission import Submission
 
 
 class Student(User):

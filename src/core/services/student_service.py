@@ -1,8 +1,8 @@
 from datetime import datetime
-from Backend.Exceptions.AuthError import AuthError
-from Backend.Exceptions.ValidationError import ValidationError
-from Backend.Model.Enrollment_model import Enrollment
-from Backend.Model.Submission_model import Submission
+from core.exceptions.auth_error import AuthError
+from core.exceptions.validation_error import ValidationError
+from core.entities.enrollment import Enrollment
+from core.entities.submission import Submission
 
 class StudentService:
     def __init__(self, student_repo, course_repo, enrollment_repo, assignment_repo, submission_repo):

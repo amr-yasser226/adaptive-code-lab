@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Backend.Model.Admin_model import Admin
+from core.entities.admin import Admin
 
 class Admin_repo:
     def __init__(self, db):

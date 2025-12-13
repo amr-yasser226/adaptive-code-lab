@@ -1,8 +1,8 @@
 from datetime import datetime
-from Backend.Exceptions.ValidationError import ValidationError
-from Backend.Exceptions.AuthError import AuthError
-from Backend.Model.Similarity_flag import SimilarityFlag
-from Backend.Model.Similarity_Comparison_model import SimilarityComparison
+from core.exceptions.validation_error import ValidationError
+from core.exceptions.auth_error import AuthError
+from core.entities.similarity_flag import SimilarityFlag
+from core.entities.similarity_comparison import SimilarityComparison
 
 
 class Similarity_flag_Service:

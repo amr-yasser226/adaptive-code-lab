@@ -1,8 +1,8 @@
 from datetime import datetime
-from Backend.Exceptions.ValidationError import ValidationError
-from Backend.Exceptions.AuthError import AuthError
-from Backend.Model.Course_model import Course
-from Backend.Model.Assignment_model import Assignment
+from core.exceptions.validation_error import ValidationError
+from core.exceptions.auth_error import AuthError
+from core.entities.course import Course
+from core.entities.assignment import Assignment
 
 
 class InstructorService:

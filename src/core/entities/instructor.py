@@ -1,6 +1,6 @@
-from Backend.Model.User_model import User
-from Backend.Model.Course_model import Course
-from Backend.Model.Assignment_model import Assignment
+from core.entities.user import User
+from core.entities.course import Course
+from core.entities.assignment import Assignment
 from datetime import datetime
 
 class Instructor(User):

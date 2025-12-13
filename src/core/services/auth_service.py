@@ -1,7 +1,7 @@
 import hashlib
 from datetime import datetime
-from Backend.Model.User_model import User
-from Backend.Exceptions.AuthError import AuthError
+from core.entities.user import User
+from core.exceptions.auth_error import AuthError
 
 class AuthService:
     def __init__(self, user_repo):

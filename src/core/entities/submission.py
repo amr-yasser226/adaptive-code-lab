@@ -1,4 +1,4 @@
-from Backend.Model.Files_model import File
+from core.entities.file import File
 from datetime import datetime
 class Submission :
     valid_languages =('python', 'java', 'cpp', 'javascript') 

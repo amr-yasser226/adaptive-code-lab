@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Backend.Model.TestCase_model import Testcase
+from core.entities.test_case import Testcase
 
 class Testcase_repo:
     def __init__(self, db):

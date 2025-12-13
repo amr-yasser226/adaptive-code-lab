@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Backend.Model.Enrollment_model import Enrollment
+from core.entities.enrollment import Enrollment
 
 class Enrollment_repo:
     def __init__(self, db):

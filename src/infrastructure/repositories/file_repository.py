@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Backend.Model.Files_model import File
+from core.entities.file import File
 
 class File_repo:
     def __init__(self, db):

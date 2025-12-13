@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Backend.Model.Submission_model import Submission
+from core.entities.submission import Submission
 
 class Submission_repo:
     def __init__(self, db):

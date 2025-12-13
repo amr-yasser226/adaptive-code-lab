@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Backend.Model.Instructor_model import Instructor
+from core.entities.instructor import Instructor
 
 class Instructor_repo:
     def __init__(self, db):

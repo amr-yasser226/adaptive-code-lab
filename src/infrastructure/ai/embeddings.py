@@ -4,7 +4,7 @@ import numpy as np
 from datetime import datetime
 from dotenv import load_dotenv
 import google.generativeai as genai
-from DB.connection import DB_PATH, connect_db
+from infrastructure.database.connection import DB_PATH, connect_db
 
 load_dotenv()
 

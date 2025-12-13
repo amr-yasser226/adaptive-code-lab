@@ -1,5 +1,5 @@
 from sqlalchemy.exc import SQLAlchemyError
-from Backend.Model.Student_model import Student
+from core.entities.student import Student
 
 class Student_repo:
     def __init__(self, db):
