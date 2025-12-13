@@ -16,8 +16,8 @@ class Assignment:
         return self.__id
     def get_course_id(self):
         return self.__course_id
-    def add_test_case(self, testcase):
-        pass
+    # def add_test_case(self, testcase): Not implemeted in the Assignment service ---> (Testcases_service)
+    #     pass
     def publish(self):
         self.is_published = True
     
@@ -26,8 +26,8 @@ class Assignment:
     
     def extend_deadline(self, new_due_date):
         self.due_date = new_due_date
-        pass
-    def get_submissions(self):
-        pass
-    def calculate_statistics(self):
-        pass
+        
+    # def get_submissions(self):
+    #     pass
+    # def calculate_statistics(self):
+    #     pass
