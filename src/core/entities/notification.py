@@ -21,16 +21,16 @@ class Notification:
     def mark_as_unread(self):
         self.is_read = False
         self.read_at = None
-    def delete_notification(self, notification_repo):
-        id =self.get_id() 
-        if id is None :
-            raise Exception("Cannot delete: notification has no ID")
+    # def delete_notification(self, notification_repo):
+    #     id =self.get_id() 
+    #     if id is None :
+    #         raise Exception("Cannot delete: notification has no ID")
         
-        success = notification_repo.delete_by_id(id)
-        if not success : 
-            raise Exception("Failed to delete notification")
+    #     success = notification_repo.delete_by_id(id)
+    #     if not success : 
+    #         raise Exception("Failed to delete notification")
         
-        return True
+    #     return True
 
 
         
