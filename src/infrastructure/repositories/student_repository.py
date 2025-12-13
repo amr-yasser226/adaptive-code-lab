@@ -1,4 +1,4 @@
-from sqlalchemy.exc import SQLAlchemyError
+import sqlite3
 from core.entities.student import Student
 
 class StudentRepository:
@@ -92,7 +92,7 @@ class StudentRepository:
             self.db.commit()
             return self.get_by_id(student.get_id())
 
-        except Exception as e:
+        except sqlite3.Error as e:
             self.db.rollback()
             print("Error saving student:", e)
             raise # Re-raise the exception instead of returning None

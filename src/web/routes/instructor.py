@@ -12,6 +12,9 @@ instructor_bp = Blueprint('instructor', __name__)
 def dashboard():
     user_id = session['user_id']
     instructor_service = get_service('instructor_service')
+    user_repo = get_service('user_repo')
+    
+    current_user = user_repo.get_by_id(user_id)
     
     # Get stats using service methods (assumed to be implemented)
     # For now, using placeholders if methods don't exist
@@ -31,7 +34,7 @@ def dashboard():
     flagged_submissions = [] # instructor_service.get_flagged_submissions(limit=5)
     
     return render_template('dashboard.html',
-        user={'role': 'instructor', 'id': user_id, 'name': 'Instructor'},
+        user=current_user,
         stats=stats,
         recent_submissions=recent_submissions,
         flagged_submissions=flagged_submissions)

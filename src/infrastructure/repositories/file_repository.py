@@ -1,4 +1,4 @@
-from sqlalchemy.exc import SQLAlchemyError
+import sqlite3
 from core.entities.file import File
 
 class File_repo:
@@ -68,7 +68,7 @@ class File_repo:
             query = "DELETE FROM files WHERE id = :id"
             self.db.execute(query, {"id": id})
             self.db.commit()
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             raise
 

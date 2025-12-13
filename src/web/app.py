@@ -81,6 +81,7 @@ def create_app(test_config=None):
         'auth_service': auth_service,
         'student_service': student_service,
         'instructor_service': instructor_service,
+        'user_repo': user_repo,
         'assignment_repo': assignment_repo, # Exposed for direct read access
         'submission_repo': submission_repo,
         'course_repo': course_repo,

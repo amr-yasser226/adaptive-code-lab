@@ -1,4 +1,4 @@
-from sqlalchemy.exc import SQLAlchemyError
+import sqlite3
 from core.entities.instructor import Instructor
 
 class InstructorRepository:
@@ -116,7 +116,7 @@ class InstructorRepository:
             self.db.commit()
             return self.get_by_id(instructor.get_id())
 
-        except Exception as e:
+        except sqlite3.Error as e:
             self.db.rollback()
             print("Error saving instructor:", e)
             return None

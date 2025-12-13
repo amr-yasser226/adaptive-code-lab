@@ -1,4 +1,4 @@
-from sqlalchemy.exc import SQLAlchemyError
+import sqlite3
 from core.entities.assignment import Assignment
 
 class AssignmentRepository:
@@ -65,7 +65,7 @@ class AssignmentRepository:
             new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
             self.db.commit()
             return self.get_by_id(new_id)
-        except Exception as e:
+        except sqlite3.Error as e:
             self.db.rollback()
             print("Error creating assignment:", e)
             return None
@@ -99,7 +99,7 @@ class AssignmentRepository:
             })
             self.db.commit()
             return self.get_by_id(assignment.get_id())
-        except Exception as e:
+        except sqlite3.Error as e:
             self.db.rollback()
             print("Error updating assignment:", e)
             return None
@@ -114,7 +114,7 @@ class AssignmentRepository:
             self.db.execute(query, {"id": id})
             self.db.commit()
             return self.get_by_id(id)
-        except Exception as e:
+        except sqlite3.Error as e:
             self.db.rollback()
             print("Error publishing assignment:", e)
             return None
@@ -129,7 +129,7 @@ class AssignmentRepository:
             self.db.execute(query, {"id": id})
             self.db.commit()
             return self.get_by_id(id)
-        except Exception as e:
+        except sqlite3.Error as e:
             self.db.rollback()
             print("Error unpublishing assignment:", e)
             return None
@@ -144,7 +144,7 @@ class AssignmentRepository:
             self.db.execute(query, {"id": id, "due": new_due_date})
             self.db.commit()
             return self.get_by_id(id)
-        except Exception as e:
+        except sqlite3.Error as e:
             self.db.rollback()
             print("Error extending deadline:", e)
             return None

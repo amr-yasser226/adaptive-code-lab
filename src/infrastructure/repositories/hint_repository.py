@@ -1,4 +1,4 @@
-from sqlalchemy.exc import SQLAlchemyError
+import sqlite3
 from core.entities.hint import Hint
 
 class Hint_repo:
@@ -52,7 +52,7 @@ class Hint_repo:
             new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
             self.db.commit()
             return self.get_by_id(new_id)
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return None
 
@@ -78,7 +78,7 @@ class Hint_repo:
             })
             self.db.commit()
             return self.get_by_id(hint.get_id())
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return None
 
@@ -87,7 +87,7 @@ class Hint_repo:
             self.db.execute("DELETE FROM hints WHERE id = :id", {"id": id})
             self.db.commit()
             return True
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return False
 
@@ -119,7 +119,7 @@ class Hint_repo:
             self.db.execute("UPDATE hints SET is_helpful = 1 WHERE id = :id", {"id": id})
             self.db.commit()
             return self.get_by_id(id)
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return None
 

@@ -1,4 +1,4 @@
-from sqlalchemy.exc import SQLAlchemyError
+import sqlite3
 from core.entities.notification import Notification
 
 
@@ -82,7 +82,7 @@ class Notification_repo:
             self.db.execute(query, {"id": id})
             self.db.commit()
             return True 
-        except SQLAlchemyError : 
+        except sqlite3.Error: 
             self.db.rollback()
             return False
             

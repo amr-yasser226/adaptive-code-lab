@@ -499,6 +499,7 @@ if __name__ == "__main__":
         const input = document.getElementById('codeInput').value;
         const language = document.getElementById('language').value;
         const output = document.getElementById('codeOutput');
+        const assignmentId = '{{ assignment.id }}'; // Injected by Jinja
 
         if (!code.trim()) {
             showError(output, 'Please enter some code first');
@@ -508,16 +509,37 @@ if __name__ == "__main__":
         // Show loading state
         showLoading(output);
 
-        // Simulate API call to run code
-        setTimeout(() => {
-            try {
-                // Mock execution for demonstration
-                const result = simulateCodeExecution(code, input, language);
-                displayOutput(output, result);
-            } catch (error) {
-                showError(output, `Error: ${error.message}`);
-            }
-        }, 800);
+        fetch('/api/test-code', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() if csrf_token else "" }}'
+            },
+            body: JSON.stringify({
+                code: code,
+                language: language,
+                assignment_id: assignmentId,
+                input: input
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Formatting results for display
+                    let resultText = "Execution Successful\n\n";
+                    if (data.test_results && data.test_results.length > 0) {
+                        resultText += data.test_results.map(r => `Test: ${r.status}`).join('\n');
+                    } else {
+                        resultText += "No specific test results returned (Mock environment).";
+                    }
+                    displayOutput(output, resultText);
+                } else {
+                    showError(output, data.error || 'Unknown execution error');
+                }
+            })
+            .catch(error => {
+                showError(output, `Network Error: ${error.message}`);
+            });
     }
 
     function runAllTests() {

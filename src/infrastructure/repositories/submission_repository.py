@@ -1,4 +1,4 @@
-from sqlalchemy.exc import SQLAlchemyError
+import sqlite3
 from core.entities.submission import Submission
 
 class SubmissionRepository:
@@ -59,7 +59,7 @@ class SubmissionRepository:
             new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
             self.db.commit()
             return self.get_by_id(new_id)
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return None
 
@@ -88,7 +88,7 @@ class SubmissionRepository:
             })
             self.db.commit()
             return self.get_by_id(submission.get_id())
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return None
 
@@ -97,7 +97,7 @@ class SubmissionRepository:
             self.db.execute("DELETE FROM submissions WHERE id = :id", {"id": id})
             self.db.commit()
             return True
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return False
 

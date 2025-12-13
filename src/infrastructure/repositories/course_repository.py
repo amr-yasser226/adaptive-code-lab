@@ -1,4 +1,4 @@
-from sqlalchemy.exc import SQLAlchemyError
+import sqlite3
 from core.entities.course import Course
 
 class CourseRepository:
@@ -61,7 +61,7 @@ class CourseRepository:
             new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
             self.db.commit()
             return self.get_by_id(new_id)
-        except Exception as e:
+        except sqlite3.Error as e:
             self.db.rollback()
             print("Error creating course:", e)
             return None
@@ -97,7 +97,7 @@ class CourseRepository:
             })
             self.db.commit()
             return self.get_by_id(course.get_id())
-        except Exception as e:
+        except sqlite3.Error as e:
             self.db.rollback()
             print("Error updating course:", e)
             return None
@@ -112,7 +112,7 @@ class CourseRepository:
             self.db.execute(query, {"id": id})
             self.db.commit()
             return self.get_by_id(id)
-        except Exception as e:
+        except sqlite3.Error as e:
             self.db.rollback()
             print("Error publishing course:", e)
             return None
@@ -127,7 +127,7 @@ class CourseRepository:
             self.db.execute(query, {"id": id})
             self.db.commit()
             return self.get_by_id(id)
-        except Exception as e:
+        except sqlite3.Error as e:
             self.db.rollback()
             print("Error archiving course:", e)
             return None

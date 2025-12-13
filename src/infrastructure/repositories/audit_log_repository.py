@@ -1,4 +1,4 @@
-from sqlalchemy.exc import SQLAlchemyError
+import sqlite3
 from core.entities.audit_log import AuditLog
 
 class AuditLog_repo:
@@ -54,7 +54,7 @@ class AuditLog_repo:
             new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
             self.db.commit()
             return self.get_by_id(new_id)
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return None
 
@@ -111,7 +111,7 @@ class AuditLog_repo:
             self.db.execute("DELETE FROM audit_logs WHERE id = :id", {"id": id})
             self.db.commit()
             return True
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return False
 

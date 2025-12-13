@@ -11,6 +11,9 @@ def dashboard():
     user_id = session['user_id']
     student_service = get_service('student_service')
     assignment_repo = get_service('assignment_repo')
+    user_repo = get_service('user_repo')
+    
+    current_user = user_repo.get_by_id(user_id)
     
     submissions = student_service.get_student_submissions(user_id)
     
@@ -34,10 +37,10 @@ def dashboard():
     }
     
     return render_template('dashboard.html',
-        user={'role': 'student', 'id': user_id, 'name': 'Student'}, # TODO: Fetch real user object
+        user=current_user,
         assignments=active_assignments,
         submissions=submissions,
-        current_user={'role': 'student', 'id': user_id, 'name': 'Student'},
+        current_user=current_user,
         stats=stats)
 
 @student_bp.route('/assignments')

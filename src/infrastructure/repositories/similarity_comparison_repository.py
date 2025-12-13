@@ -1,5 +1,5 @@
 import json
-from sqlalchemy.exc import SQLAlchemyError
+import sqlite3
 from core.entities.similarity_comparison import SimilarityComparison
 
 class SimilarityComparison_repo:
@@ -48,7 +48,7 @@ class SimilarityComparison_repo:
             })
             self.db.commit()
             return self.get(comp.get_similarity_id(), comp.get_compared_submission_id())
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return None
 
@@ -72,7 +72,7 @@ class SimilarityComparison_repo:
             })
             self.db.commit()
             return self.get(comp.get_similarity_id(), comp.get_compared_submission_id())
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return None
 

@@ -1,4 +1,4 @@
-from sqlalchemy.exc import SQLAlchemyError
+import sqlite3
 from core.entities.enrollment import Enrollment
 
 class EnrollmentRepository:
@@ -48,7 +48,7 @@ class EnrollmentRepository:
             })
             self.db.commit()
             return self.get(enrollment.get_student_id(), enrollment.get_course_id())
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return None
 
@@ -73,7 +73,7 @@ class EnrollmentRepository:
             })
             self.db.commit()
             return self.get(enrollment.get_student_id(), enrollment.get_course_id())
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return None
 

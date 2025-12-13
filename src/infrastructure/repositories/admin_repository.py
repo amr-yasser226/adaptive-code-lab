@@ -1,4 +1,4 @@
-from sqlalchemy.exc import SQLAlchemyError
+import sqlite3
 from core.entities.admin import Admin
 
 class Admin_repo:
@@ -72,7 +72,7 @@ class Admin_repo:
             self.db.commit()
             return self.get_by_id(admin.get_id())
 
-        except SQLAlchemyError as e:
+        except sqlite3.Error as e:
             self.db.rollback()
             print("Error saving admin:", e)
             return None

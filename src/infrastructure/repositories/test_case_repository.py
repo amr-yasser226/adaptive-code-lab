@@ -1,4 +1,4 @@
-from sqlalchemy.exc import SQLAlchemyError
+import sqlite3
 from core.entities.test_case import Testcase
 
 class Testcase_repo:
@@ -63,7 +63,7 @@ class Testcase_repo:
             new_id = self.db.execute("SELECT last_insert_rowid() AS id").fetchone()[0]
             self.db.commit()
             return self.get_by_id(new_id)
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return None
 
@@ -97,7 +97,7 @@ class Testcase_repo:
             })
             self.db.commit()
             return self.get_by_id(testcase.get_id())
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return None
 
@@ -106,7 +106,7 @@ class Testcase_repo:
             self.db.execute("DELETE FROM test_cases WHERE id = :id", {"id": id})
             self.db.commit()
             return True
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return False
 

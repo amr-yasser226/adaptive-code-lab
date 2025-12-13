@@ -1,4 +1,4 @@
-from sqlalchemy.exc import SQLAlchemyError
+import sqlite3
 from core.entities.embedding import Embedding
 
 class Embedding_repo:
@@ -47,7 +47,7 @@ class Embedding_repo:
             new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
             self.db.commit()
             return self.get_by_id(new_id)
-        except Exception as e:
+        except sqlite3.Error as e:
             self.db.rollback()
             print("Error saving embedding:", e)
             return None

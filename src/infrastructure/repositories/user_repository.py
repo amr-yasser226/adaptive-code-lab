@@ -1,5 +1,5 @@
 from core.entities.user import User 
-from sqlalchemy.exc import SQLAlchemyError
+import sqlite3
 
 class UserRepository:
     def __init__(self, db):
@@ -75,7 +75,7 @@ class UserRepository:
                 new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
                 self.db.commit()
                 return self.get_by_id(new_id)
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             raise
     

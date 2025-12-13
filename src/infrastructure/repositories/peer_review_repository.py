@@ -1,5 +1,5 @@
 import json
-from sqlalchemy.exc import SQLAlchemyError
+import sqlite3
 from core.entities.peer_review import PeerReview
 
 class PeerReview_repo:
@@ -52,7 +52,7 @@ class PeerReview_repo:
             })
             self.db.commit()
             return self.get(review.get_submission_id(), review.get_reviewer_student_id())
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return None
 
@@ -77,7 +77,7 @@ class PeerReview_repo:
             })
             self.db.commit()
             return self.get(review.get_submission_id(), review.get_reviewer_student_id())
-        except SQLAlchemyError:
+        except sqlite3.Error:
             self.db.rollback()
             return None
 
