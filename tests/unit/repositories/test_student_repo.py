@@ -30,8 +30,8 @@ class TestStudentRepo:
             created_at=saved_user.created_at,
             updated_at=saved_user.updated_at,
             student_number="S67890",
-            Program="Data Science",
-            year_Level=3
+            program="Data Science",
+            year_level=3
         )
         
         saved_student = student_repo.save_student(student)
@@ -39,7 +39,7 @@ class TestStudentRepo:
         assert saved_student is not None
         assert saved_student.student_number == "S67890"
         assert saved_student.program == "Data Science"
-        assert saved_student.year_Level == 3
+        assert saved_student.year_level == 3
     
     def test_get_by_id_returns_student(self, sample_student, student_repo):
         """Test retrieving student by ID"""
@@ -59,12 +59,12 @@ class TestStudentRepo:
     def test_update_student_data(self, sample_student, student_repo):
         """Test updating student data"""
         sample_student.program = "Software Engineering"
-        sample_student.year_Level = 4
+        sample_student.year_level = 4
         
         updated = student_repo.save_student(sample_student)
         
         assert updated.program == "Software Engineering"
-        assert updated.year_Level == 4
+        assert updated.year_level == 4
     
     def test_save_student_without_user_fails(self, student_repo):
         """Test that saving student without user record fails"""
@@ -76,8 +76,8 @@ class TestStudentRepo:
             created_at=None,
             updated_at=None,
             student_number="S99999",
-            Program="CS",
-            year_Level=1
+            program="CS",
+            year_level=1
         )
         
         with pytest.raises(Exception):
