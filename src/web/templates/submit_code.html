@@ -1,0 +1,661 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Code - {{ assignment.title }} - ACCL{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb Navigation -->
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('student.assignments') }}"><i class="fas fa-list"></i>
+                Assignments</a>
+        </li>
+        <li class="breadcrumb-item"><a href="{{ url_for('student.assignment_detail', assignment_id=assignment.id) }}">{{
+                assignment.title }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Submit Code</li>
+    </ol>
+</nav>
+
+<!-- Submit Header -->
+<div class="submit-header mb-4">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="mb-1">
+                <i class="fas fa-code-branch"></i> Submit Code
+            </h1>
+            <p class="lead text-muted mb-0">{{ assignment.title }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <span class="badge bg-primary" style="font-size: 0.95rem; padding: 0.6rem 1.2rem;">
+                <i class="fas fa-flask"></i> Testing Available
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Code Editor Area (Main) -->
+    <div class="col-lg-8">
+        <!-- Editor Card -->
+        <div class="submission-editor-card">
+            <div class="editor-header">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h5 class="mb-0">
+                            <i class="fas fa-keyboard"></i> Code Editor
+                        </h5>
+                    </div>
+                    <div class="col-auto">
+                        <small class="text-muted">
+                            <i class="fas fa-history"></i> Version
+                            <span id="versionNumber">1</span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="editor-body">
+                <form method="POST" action="{{ url_for('student.submit_code', assignment_id=assignment.id) }}"
+                    novalidate id="codeForm">
+
+                    <!-- Language & Options Bar -->
+                    <div class="editor-toolbar">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-6">
+                                <label for="language" class="form-label">
+                                    <i class="fas fa-code"></i> Language
+                                </label>
+                                <select name="language" class="form-select" id="language" required
+                                    onchange="updateLanguageHint()">
+                                    <option value="">Select language...</option>
+                                    <option value="python" selected>Python 3.11</option>
+                                    <option value="java">Java 17</option>
+                                    <option value="cpp">C++ 17</option>
+                                    <option value="javascript">JavaScript (Node.js)</option>
+                                    <option value="csharp">C# (.NET)</option>
+                                </select>
+                                <small class="form-text text-muted">
+                                    Allowed: {{ assignment.languages|join(', ') }}
+                                </small>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="editor-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">Lines:</span>
+                                        <span class="stat-value" id="lineCount">1</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Chars:</span>
+                                        <span class="stat-value" id="charCount">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Code Textarea -->
+                    <div class="code-input-wrapper">
+                        <textarea name="code" id="code" class="code-editor form-control"
+                            placeholder="Paste or write your code here...&#10;&#10;Tips:&#10;- Use Tab to indent&#10;- Ctrl+Z to undo&#10;- Make sure to handle all edge cases"
+                            required spellcheck="false"></textarea>
+                    </div>
+
+                    <!-- File Upload Section -->
+                    <div class="file-upload-section">
+                        <div class="divider">or</div>
+                        <label for="file_upload" class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Upload Code File</span>
+                        </label>
+                        <input type="file" class="form-control d-none" id="file_upload"
+                            accept=".py,.java,.cpp,.c,.js,.go,.rb,.cs">
+                        <small class="form-text text-muted d-block mt-2">
+                            Supported formats: .py, .java, .cpp, .js, .cs (Max: 2MB)
+                        </small>
+                    </div>
+
+                    <!-- Submission Actions -->
+                    <div class="submission-actions">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-paper-plane"></i> Submit Code
+                        </button>
+                        <a href="{{ url_for('student.assignment_detail', assignment_id=assignment.id) }}"
+                            class="btn btn-outline-secondary btn-lg">
+                            Cancel
+                        </a>
+                        <button type="button" class="btn btn-outline-info btn-lg" onclick="formatCode()">
+                            <i class="fas fa-align-left"></i> Format
+                        </button>
+                    </div>
+
+                    <!-- Submission Info -->
+                    <div class="submission-info">
+                        <div class="info-item">
+                            <strong><i class="fas fa-check-circle text-success"></i> Submissions</strong>
+                            <span class="badge bg-light text-dark">Unlimited</span>
+                        </div>
+                        <div class="info-item">
+                            <strong><i class="fas fa-clock text-warning"></i> Timeout</strong>
+                            <span class="badge bg-light text-dark">5 seconds</span>
+                        </div>
+                        <div class="info-item">
+                            <strong><i class="fas fa-shield-alt text-info"></i> Sandbox</strong>
+                            <span class="badge bg-light text-dark">Secure</span>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <!-- Tips Card -->
+        <div class="tips-card mt-4">
+            <div class="tips-header">
+                <h5><i class="fas fa-lightbulb"></i> Submission Tips</h5>
+            </div>
+            <div class="tips-body">
+                <div class="tip-row">
+                    <span class="tip-icon"><i class="fas fa-check"></i></span>
+                    <span>Test your code locally before submitting</span>
+                </div>
+                <div class="tip-row">
+                    <span class="tip-icon"><i class="fas fa-arrows-alt"></i></span>
+                    <span>You can submit unlimited times - only the latest counts</span>
+                </div>
+                <div class="tip-row">
+                    <span class="tip-icon"><i class="fas fa-bug"></i></span>
+                    <span>Check all edge cases and test cases before final submission</span>
+                </div>
+                <div class="tip-row">
+                    <span class="tip-icon"><i class="fas fa-lock"></i></span>
+                    <span>Your code runs in a secure, isolated sandbox environment</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Execution Panel -->
+        <div class="execution-panel mt-4">
+            <div class="execution-header">
+                <h5><i class="fas fa-play"></i> Live Code Execution</h5>
+                <small class="text-muted">Test your code before submission</small>
+            </div>
+
+            <div class="execution-body">
+                <!-- Input/Output Tabs -->
+                <ul class="nav nav-tabs execution-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="input-tab" data-bs-toggle="tab"
+                            data-bs-target="#input-panel" type="button" role="tab">
+                            <i class="fas fa-keyboard"></i> Input
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="output-tab" data-bs-toggle="tab" data-bs-target="#output-panel"
+                            type="button" role="tab">
+                            <i class="fas fa-terminal"></i> Output
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tests-tab" data-bs-toggle="tab" data-bs-target="#tests-panel"
+                            type="button" role="tab">
+                            <i class="fas fa-flask"></i> Test Cases
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content execution-content">
+                    <!-- Input Panel -->
+                    <div class="tab-pane fade show active" id="input-panel" role="tabpanel">
+                        <label class="input-label"><i class="fas fa-comment"></i> Standard Input</label>
+                        <textarea id="codeInput" class="code-input-area"
+                            placeholder="Enter input for your program (if needed)&#10;Example:&#10;5&#10;3"></textarea>
+                    </div>
+
+                    <!-- Output Panel -->
+                    <div class="tab-pane fade" id="output-panel" role="tabpanel">
+                        <div class="output-header">
+                            <span class="output-label"><i class="fas fa-terminal"></i> Standard Output</span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearOutput()">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                        </div>
+                        <div id="codeOutput" class="code-output-area">
+                            <div class="output-placeholder">
+                                <i class="fas fa-play-circle"></i>
+                                <p>Run your code to see output here</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Test Cases Panel -->
+                    <div class="tab-pane fade" id="tests-panel" role="tabpanel">
+                        <div class="test-cases-container">
+                            <div class="test-case-item">
+                                <div class="test-case-header">
+                                    <span class="test-number">Test Case 1</span>
+                                    <span class="test-status pending"><i class="fas fa-hourglass-half"></i>
+                                        Pending</span>
+                                </div>
+                                <div class="test-case-body">
+                                    <div class="test-row">
+                                        <strong>Input:</strong>
+                                        <code>5 3</code>
+                                    </div>
+                                    <div class="test-row">
+                                        <strong>Expected:</strong>
+                                        <code>8</code>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="test-case-item">
+                                <div class="test-case-header">
+                                    <span class="test-number">Test Case 2</span>
+                                    <span class="test-status pending"><i class="fas fa-hourglass-half"></i>
+                                        Pending</span>
+                                </div>
+                                <div class="test-case-body">
+                                    <div class="test-row">
+                                        <strong>Input:</strong>
+                                        <code>10 20</code>
+                                    </div>
+                                    <div class="test-row">
+                                        <strong>Expected:</strong>
+                                        <code>30</code>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="test-case-item">
+                                <div class="test-case-header">
+                                    <span class="test-number">Test Case 3</span>
+                                    <span class="test-status pending"><i class="fas fa-hourglass-half"></i>
+                                        Pending</span>
+                                </div>
+                                <div class="test-case-body">
+                                    <div class="test-row">
+                                        <strong>Input:</strong>
+                                        <code>-5 -3</code>
+                                    </div>
+                                    <div class="test-row">
+                                        <strong>Expected:</strong>
+                                        <code>-8</code>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Execution Actions -->
+                <div class="execution-actions">
+                    <button type="button" class="btn btn-success btn-lg" onclick="runCode()">
+                        <i class="fas fa-play"></i> Run Code
+                    </button>
+                    <button type="button" class="btn btn-outline-info btn-lg" onclick="runAllTests()">
+                        <i class="fas fa-flask"></i> Run Tests
+                    </button>
+                    <div class="execution-stats">
+                        <span id="executionTime" class="stat">
+                            <i class="fas fa-clock"></i> Time: -- ms
+                        </span>
+                        <span id="executionMemory" class="stat">
+                            <i class="fas fa-memory"></i> Memory: -- KB
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Execution Info -->
+                <div class="execution-info">
+                    <div class="info-message info-info">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Code runs in a secure sandbox with 5-second timeout</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Assignment Details Card -->
+        <div class="detail-sidebar-card">
+            <div class="sidebar-header">
+                <h5><i class="fas fa-info-circle"></i> Assignment Details</h5>
+            </div>
+            <div class="sidebar-body">
+                <div class="detail-row">
+                    <span class="detail-label">Due Date</span>
+                    <span class="detail-value">
+                        {{ assignment.due_date|format_date('%b %d, %Y') }}
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Time</span>
+                    <span class="detail-value">
+                        {{ assignment.due_date|format_date('%I:%M %p') }}
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Points</span>
+                    <span class="detail-value font-weight-bold">
+                        {{ assignment.points }} pts
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Languages</span>
+                    <div class="detail-badges">
+                        {% for lang in assignment.languages %}
+                        <span class="badge bg-success">{{ lang }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Previous Submissions -->
+        {% if previous_submissions %}
+        <div class="submissions-sidebar-card mt-4">
+            <div class="sidebar-header">
+                <h5><i class="fas fa-history"></i> Previous Submissions</h5>
+            </div>
+            <div class="submissions-list">
+                {% for prev in previous_submissions %}
+                <div class="submission-item">
+                    <div class="submission-header">
+                        <strong>Version {{ prev.version_number }}</strong>
+                        <small class="text-muted">{{ prev.submitted_at|format_date('%m/%d %H:%M') }}</small>
+                    </div>
+                    <div class="submission-details">
+                        <span class="badge bg-secondary">{{ prev.language }}</span>
+                        {% if prev.score %}
+                        <span class="score-badge">
+                            {{ prev.score }}/100
+                        </span>
+                        {% endif %}
+                    </div>
+                    <a href="{{ url_for('student.submission_results', submission_id=prev.id) }}" class="view-link">
+                        <i class="fas fa-eye"></i> View
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state-card mt-4">
+            <div class="empty-icon">
+                <i class="fas fa-inbox"></i>
+            </div>
+            <p class="text-muted text-center">No previous submissions</p>
+        </div>
+        {% endif %}
+
+        <!-- Quick Template -->
+        <div class="template-card mt-4">
+            <div class="sidebar-header">
+                <h5><i class="fas fa-file-code"></i> Code Template</h5>
+            </div>
+            <div class="template-body">
+                <pre id="templateCode" class="template-preview">def solve():
+    # Write your solution here
+    pass
+
+if __name__ == "__main__":
+    result = solve()
+    print(result)</pre>
+                <button type="button" class="btn btn-sm btn-outline-primary w-100 mt-2" onclick="insertTemplate()">
+                    <i class="fas fa-copy"></i> Insert Template
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Code Editor Enhancements
+    const codeInput = document.getElementById('code');
+    const charCount = document.getElementById('charCount');
+    const lineCount = document.getElementById('lineCount');
+    const fileInput = document.getElementById('file_upload');
+    const versionNumber = document.getElementById('versionNumber');
+
+    // Update character and line count
+    if (codeInput) {
+        codeInput.addEventListener('input', function () {
+            charCount.textContent = this.value.length;
+            lineCount.textContent = this.value.split('\n').length;
+        });
+
+        // Tab support in textarea
+        codeInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                this.value = this.value.substring(0, start) + '\t' + this.value.substring(end);
+                this.selectionStart = this.selectionEnd = start + 1;
+                charCount.textContent = this.value.length;
+                lineCount.textContent = this.value.split('\n').length;
+            }
+        });
+    }
+
+    // File upload handling
+    if (fileInput && codeInput) {
+        fileInput.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('File size exceeds 2MB limit');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    codeInput.value = event.target.result;
+                    charCount.textContent = codeInput.value.length;
+                    lineCount.textContent = codeInput.value.split('\n').length;
+                    codeInput.focus();
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // Click to upload
+        document.querySelector('.file-upload-label')?.addEventListener('click', () => {
+            fileInput.click();
+        });
+    }
+
+    // Format code (basic indent)
+    function formatCode() {
+        if (codeInput) {
+            const lines = codeInput.value.split('\n');
+            const formatted = lines.map(line => line.replace(/^\s+/, '')).join('\n');
+            codeInput.value = formatted;
+            charCount.textContent = codeInput.value.length;
+            lineCount.textContent = codeInput.value.split('\n').length;
+        }
+    }
+
+    // Insert template
+    function insertTemplate() {
+        if (codeInput) {
+            codeInput.value = document.getElementById('templateCode').textContent;
+            charCount.textContent = codeInput.value.length;
+            lineCount.textContent = codeInput.value.split('\n').length;
+            codeInput.focus();
+        }
+    }
+
+    // Update language hint
+    function updateLanguageHint() {
+        const language = document.getElementById('language').value;
+        // Could add language-specific hints here
+    }
+
+    // Live Code Execution Functions
+    function runCode() {
+        const code = codeInput.value;
+        const input = document.getElementById('codeInput').value;
+        const language = document.getElementById('language').value;
+        const output = document.getElementById('codeOutput');
+        const assignmentId = '{{ assignment.id }}'; // Injected by Jinja
+
+        if (!code.trim()) {
+            showError(output, 'Please enter some code first');
+            return;
+        }
+
+        // Show loading state
+        showLoading(output);
+
+        fetch('/api/test-code', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() if csrf_token else "" }}'
+            },
+            body: JSON.stringify({
+                code: code,
+                language: language,
+                assignment_id: assignmentId,
+                input: input
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Formatting results for display
+                    let resultText = "Execution Successful\n\n";
+                    if (data.test_results && data.test_results.length > 0) {
+                        resultText += data.test_results.map(r => `Test: ${r.status}`).join('\n');
+                    } else {
+                        resultText += "No specific test results returned (Mock environment).";
+                    }
+                    displayOutput(output, resultText);
+                } else {
+                    showError(output, data.error || 'Unknown execution error');
+                }
+            })
+            .catch(error => {
+                showError(output, `Network Error: ${error.message}`);
+            });
+    }
+
+    function runAllTests() {
+        const code = codeInput.value;
+        const language = document.getElementById('language').value;
+
+        if (!code.trim()) {
+            alert('Please enter some code first');
+            return;
+        }
+
+        const testCases = document.querySelectorAll('.test-case-item');
+        let passedCount = 0;
+
+        testCases.forEach((testCase, index) => {
+            const status = testCase.querySelector('.test-status');
+            status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running...';
+            status.className = 'test-status running';
+
+            setTimeout(() => {
+                // Mock test execution
+                const isPassed = Math.random() > 0.3; // 70% pass rate for demo
+
+                if (isPassed) {
+                    passedCount++;
+                    status.innerHTML = '<i class="fas fa-check-circle"></i> Passed';
+                    status.className = 'test-status passed';
+                    testCase.style.borderLeftColor = '#28a745';
+                } else {
+                    status.innerHTML = '<i class="fas fa-times-circle"></i> Failed';
+                    status.className = 'test-status failed';
+                    testCase.style.borderLeftColor = '#dc3545';
+                }
+            }, 600 + index * 400);
+        });
+
+        // Show summary after all tests
+        setTimeout(() => {
+            const summary = document.createElement('div');
+            summary.className = 'test-summary';
+            summary.innerHTML = `
+                <strong>Summary:</strong> ${passedCount}/${testCases.length} tests passed
+                ${passedCount === testCases.length ?
+                    '<span class="badge bg-success ms-2">All Passed!</span>' :
+                    '<span class="badge bg-warning ms-2">Some Failed</span>'}
+            `;
+            document.querySelector('.test-cases-container').appendChild(summary);
+        }, 600 + testCases.length * 400);
+    }
+
+    function simulateCodeExecution(code, input, language) {
+        // Mock execution - in production, this would call backend API
+        const lines = code.split('\n').filter(l => l.trim());
+
+        if (language === 'python') {
+            // Simple Python simulation
+            if (code.includes('print')) {
+                return `Hello, World!\n[Output simulated for ${language}]`;
+            }
+            return `Program executed successfully\nExecution time: 45 ms`;
+        }
+
+        return `Program executed successfully\nLanguage: ${language}\nExecution time: 125 ms\nMemory: 2.3 MB`;
+    }
+
+    function displayOutput(outputDiv, result) {
+        outputDiv.innerHTML = `
+            <div class="output-content">
+                <pre>${escapeHtml(result)}</pre>
+                <div class="output-footer">
+                    <span class="output-success"><i class="fas fa-check-circle"></i> Execution successful</span>
+                    <span class="output-time">Time: 125 ms | Memory: 2.3 MB</span>
+                </div>
+            </div>
+        `;
+    }
+
+    function showLoading(outputDiv) {
+        outputDiv.innerHTML = `
+            <div class="output-loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Running code...</p>
+            </div>
+        `;
+    }
+
+    function showError(outputDiv, error) {
+        outputDiv.innerHTML = `
+            <div class="output-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <pre>${escapeHtml(error)}</pre>
+            </div>
+        `;
+    }
+
+    function clearOutput() {
+        const output = document.getElementById('codeOutput');
+        output.innerHTML = `
+            <div class="output-placeholder">
+                <i class="fas fa-play-circle"></i>
+                <p>Run your code to see output here</p>
+            </div>
+        `;
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Version tracking (mock)
+    let submissionCount = 0;
+    document.getElementById('codeForm').addEventListener('submit', function () {
+        submissionCount++;
+        versionNumber.textContent = submissionCount + 1;
+    });
+</script>
+{% endblock %}

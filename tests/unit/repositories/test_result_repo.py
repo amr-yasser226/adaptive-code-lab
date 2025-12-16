@@ -1,11 +1,11 @@
 import pytest
-from Backend.Model.Results_model import Result
-from Backend.Model.TestCase_model import Testcase
+from core.entities.result import Result
+from core.entities.test_case import Testcase
 
 @pytest.mark.repo
 @pytest.mark.unit
 class TestResultRepo:
-    """Test suite for Result_repo"""
+    """Test suite for ResultRepository"""
     
     def test_save_result(self, sample_submission, sample_assignment, testcase_repo, result_repo):
         """Test saving a new result"""

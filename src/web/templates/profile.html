@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - ACCL{% endblock %}
+
+{% block content %}
+<!-- Profile Header -->
+<div class="profile-header mb-5">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="mb-0">
+                <i class="fas fa-user-circle"></i> My Profile
+            </h1>
+            <p class="text-muted mb-0 mt-2">Manage your account settings and preferences</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="badge bg-primary" style="font-size: 1rem; padding: 0.5rem 1rem;">
+                {% if current_user.role == 'instructor' %}
+                <i class="fas fa-chalkboard-user"></i> Instructor
+                {% elif current_user.role == 'admin' %}
+                <i class="fas fa-crown"></i> Administrator
+                {% else %}
+                <i class="fas fa-graduation-cap"></i> Student
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- Profile Information -->
+        <div class="card mb-4 profile-card">
+            <div class="card-header bg-gradient">
+                <h5 class="mb-0"><i class="fas fa-id-card"></i> Account Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('student.update_profile') }}" novalidate>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="name" value="{{ current_user.name }}" readonly
+                                style="background-color: #f8f9fa;">
+                            <small class="form-text text-muted"><i class="fas fa-lock"></i> Contact admin to
+                                change</small>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="role" class="form-label">Account Type</label>
+                            <input type="text" class="form-control" id="role"
+                                value="{% if current_user.role == 'instructor' %}Instructor{% elif current_user.role == 'admin' %}Administrator{% else %}Student{% endif %}"
+                                readonly style="background-color: #f8f9fa;">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" value="{{ current_user.email }}" readonly
+                            style="background-color: #f8f9fa;">
+                        <small class="form-text text-muted"><i class="fas fa-lock"></i> Contact admin to change
+                            email</small>
+                    </div>
+
+                    <hr>
+
+                    <h6>Change Password</h6>
+                    <div class="mb-3">
+                        <label for="current_password" class="form-label">Current Password</label>
+                        {{ form.current_password(class="form-control" + (" is-invalid" if form.current_password.errors
+                        else ""),
+                        id="current_password", placeholder="Enter your current password") }}
+                        {% if form.current_password.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.current_password.errors[0] }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="new_password" class="form-label">New Password</label>
+                        {{ form.new_password(class="form-control" + (" is-invalid" if form.new_password.errors else ""),
+                        id="new_password", placeholder="Enter a new password") }}
+                        {% if form.new_password.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.new_password.errors[0] }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Confirm New Password</label>
+                        {{ form.confirm_password(class="form-control" + (" is-invalid" if form.confirm_password.errors
+                        else ""),
+                        id="confirm_password", placeholder="Re-enter your new password") }}
+                        {% if form.confirm_password.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.confirm_password.errors[0] }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Notification Preferences -->
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Notification Preferences</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="#">
+                    {{ notification_form.csrf_token }}
+
+                    <div class="form-check mb-3">
+                        {{ notification_form.email_on_grade(class="form-check-input", id="email_grade") }}
+                        <label class="form-check-label" for="email_grade">
+                            Email me when my assignment is graded
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        {{ notification_form.email_on_hint(class="form-check-input", id="email_hint") }}
+                        <label class="form-check-label" for="email_hint">
+                            Email me when AI hints are available
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        {{ notification_form.email_on_deadline(class="form-check-input", id="email_deadline") }}
+                        <label class="form-check-label" for="email_deadline">
+                            Email me 24 hours before assignment deadline
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Preferences
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-md-4">
+        <!-- Account Stats -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Account Statistics</h5>
+            </div>
+            <div class="card-body">
+                {% if current_user.role == 'student' %}
+                <div class="mb-3">
+                    <small class="text-muted">Total Assignments</small>
+                    <p class="h6 mb-0">{{ stats.total_assignments }}</p>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Submissions</small>
+                    <p class="h6 mb-0">{{ stats.total_submissions }}</p>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Average Score</small>
+                    <p class="h6 mb-0">{{ "%.1f"|format(stats.average_score) }}%</p>
+                </div>
+                {% elif current_user.role == 'instructor' %}
+                <div class="mb-3">
+                    <small class="text-muted">Assignments Created</small>
+                    <p class="h6 mb-0">{{ stats.assignments_created }}</p>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Submissions Received</small>
+                    <p class="h6 mb-0">{{ stats.submissions_received }}</p>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted">Class Average</small>
+                    <p class="h6 mb-0">{{ "%.1f"|format(stats.class_average) }}%</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Account Actions -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-home"></i> Go to Dashboard
+                    </a>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

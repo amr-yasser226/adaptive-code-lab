@@ -1,11 +1,11 @@
 import pytest
-from Backend.Model.Admin_model import Admin, User
+from core.entities.admin import Admin, User
 
 
 @pytest.mark.repo
 @pytest.mark.unit
 class TestAdminRepo:
-    """Test suite for Admin_repo"""
+    """Test suite for AdminRepository"""
     
     def test_save_admin_creates_record(self, user_repo, admin_repo):
         """Test creating a new admin"""

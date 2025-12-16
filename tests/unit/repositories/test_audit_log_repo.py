@@ -1,11 +1,11 @@
 import pytest
-from Backend.Model.AuditLog_model import AuditLog
+from core.entities.audit_log import AuditLog
 
 
 @pytest.mark.repo
 @pytest.mark.unit
 class TestAuditLogRepo:
-    """Test suite for AuditLog_repo"""
+    """Test suite for AuditLogRepository"""
     
     def test_save_audit_log(self, sample_user, audit_log_repo):
         """Test saving a new audit log"""

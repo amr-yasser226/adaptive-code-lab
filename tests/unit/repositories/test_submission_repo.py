@@ -1,5 +1,5 @@
 import pytest
-from Backend.Model.Submission_model import Submission
+from core.entities.submission import Submission
 
 
 @pytest.mark.repo

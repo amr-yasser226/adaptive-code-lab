@@ -1,11 +1,11 @@
 import pytest
-from Backend.Model.Files_model import File
+from core.entities.file import File
 
 
 @pytest.mark.repo
 @pytest.mark.unit
 class TestFileRepo:
-    """Test suite for File_repo"""
+    """Test suite for FileRepository"""
     
     def test_save_file(self, sample_submission, sample_student, file_repo):
         """Test saving a new file"""

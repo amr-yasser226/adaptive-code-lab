@@ -1,7 +1,0 @@
-CREATE TABLE IF NOT EXISTS students (
-    id INTEGER PRIMARY KEY,
-    student_number TEXT NOT NULL UNIQUE,
-    program TEXT NOT NULL,
-    YearLevel INTEGER NOT NULL,
-    FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
-);

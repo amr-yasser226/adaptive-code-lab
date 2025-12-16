@@ -1,5 +1,5 @@
 import pytest
-from Backend.Model.Assignmnets_model import Assignmnets
+from core.entities.assignment import Assignment
 
 
 @pytest.mark.repo
@@ -9,12 +9,12 @@ class TestAssignmentRepo:
     
     def test_create_assignment(self, sample_course, assignment_repo):
         """Test creating a new assignment"""
-        assignment = Assignmnets(
+        assignment = Assignment(
             id=None,
             course_id=sample_course.get_id(),
             title="Lab 2",
-            describtion="Implement sorting algorithms",
-            releaseDate="2024-02-01",
+            description="Implement sorting algorithms",
+            release_date="2024-02-01",
             due_date="2024-02-14",
             max_points=50,
             is_published=False,
@@ -40,24 +40,24 @@ class TestAssignmentRepo:
     def test_update_assignment(self, sample_assignment, assignment_repo):
         """Test updating assignment"""
         sample_assignment.title = "Updated Assignment"
-        sample_assignment.maxpoints = 150
+        sample_assignment.max_points = 150
         
         updated = assignment_repo.update(sample_assignment)
         
         assert updated.title == "Updated Assignment"
-        assert updated.maxpoints == 150
+        assert updated.max_points == 150
     
     def test_publish_assignment(self, sample_assignment, assignment_repo):
         """Test publishing an assignment"""
         published = assignment_repo.publish(sample_assignment.get_id())
         
-        assert published.ispublished is True
+        assert published.is_published is True
     
     def test_unpublish_assignment(self, sample_assignment, assignment_repo):
         """Test unpublishing an assignment"""
         unpublished = assignment_repo.unpublish(sample_assignment.get_id())
         
-        assert unpublished.ispublished is False
+        assert unpublished.is_published is False
     
     def test_extend_deadline(self, sample_assignment, assignment_repo):
         """Test extending deadline"""
@@ -67,18 +67,18 @@ class TestAssignmentRepo:
             new_date
         )
         
-        assert extended.dueDate == new_date
+        assert extended.due_date == new_date
     
     def test_list_by_course(self, sample_course, assignment_repo):
         """Test listing assignments by course"""
         # Create multiple assignments
         for i in range(3):
-            assignment = Assignmnets(
+            assignment = Assignment(
                 id=None,
                 course_id=sample_course.get_id(),
                 title=f"Assignment {i}",
-                describtion="Description",
-                releaseDate="2024-01-01",
+                description="Description",
+                release_date="2024-01-01",
                 due_date="2024-01-15",
                 max_points=100,
                 is_published=True,

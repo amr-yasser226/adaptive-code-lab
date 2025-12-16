@@ -1,7 +1,7 @@
 import sqlite3
 import tempfile
 import pytest
-from DB import Creating_DB
+from infrastructure.database import create_db
 
 @pytest.fixture
 def temp_db_path():
@@ -10,11 +10,11 @@ def temp_db_path():
         yield tmp_db.name
 
 def test_create_and_list_tables(temp_db_path, monkeypatch):
-    # Monkeypatch the DB_PATH in Creating_DB
-    monkeypatch.setattr("DB.Creating_DB.DB_PATH", temp_db_path)
+    # Monkeypatch the DB_PATH in create_db
+    monkeypatch.setattr("infrastructure.database.create_db.DB_PATH", temp_db_path)
 
     # Create DB
-    Creating_DB.create_database()
+    create_db.create_database()
 
     # Connect and create a test table
     conn = sqlite3.connect(temp_db_path)
@@ -24,5 +24,5 @@ def test_create_and_list_tables(temp_db_path, monkeypatch):
     conn.close()
 
     # Check that the table exists
-    tables = Creating_DB.get_tables_names()
+    tables = create_db.get_tables_names()
     assert ("test_table",) in tables
