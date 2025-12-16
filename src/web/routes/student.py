@@ -81,7 +81,7 @@ def assignment_detail(assignment_id):
         return redirect(url_for('student.assignments'))
         
     submissions = student_service.get_student_submissions(user_id)
-    user_submission = next((s for s in submissions if str(s.assignment_id) == str(assignment_id)), None)
+    user_submission = next((s for s in submissions if str(s.get_assignment_id()) == str(assignment_id)), None)
     
     return render_template('assignment_detail.html',
         user={'role': 'student'},
@@ -132,14 +132,14 @@ def submission_results(submission_id):
         flash('Submission not found', 'error')
         return redirect(url_for('student.dashboard'))
     
-    if str(submission.student_id) != str(user_id):
+    if str(submission.get_student_id()) != str(user_id):
         flash('Unauthorized access', 'error')
         return redirect(url_for('student.dashboard'))
         
-    assignment = assignment_repo.get_by_id(submission.assignment_id)
+    assignment = assignment_repo.get_by_id(submission.get_assignment_id())
     
     # Fetch test results for this submission
-    test_results = result_repo.list_by_submission(submission_id) if result_repo else []
+    test_results = result_repo.find_by_submission(submission_id) if result_repo else []
     
     return render_template('submission_results.html',
         user={'role': 'student'},
