@@ -1,7 +1,13 @@
-﻿Flask==3.0.0
+Flask==3.0.0
 Werkzeug==3.0.0
 Jinja2==3.1.2
 SQLAlchemy==2.0.23
 PyYAML==6.0
 python-dotenv==1.0.0
+greenlet==3.2.4
+typing_extensions==4.15.0
 
+# AI dependencies
+groq>=0.4.0
+google-generativeai>=0.3.0
+numpy>=1.24.0

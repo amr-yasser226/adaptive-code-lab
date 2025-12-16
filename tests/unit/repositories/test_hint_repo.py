@@ -1,11 +1,11 @@
 import pytest
-from Backend.Model.Hint_model import Hint
+from core.entities.hint import Hint
 
 
 @pytest.mark.repo
 @pytest.mark.unit
 class TestHintRepo:
-    """Test suite for Hint_repo"""
+    """Test suite for HintRepository"""
     
     def test_create_hint(self, sample_submission, hint_repo):
         """Test creating a new hint"""
