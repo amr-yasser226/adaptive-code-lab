@@ -1,9 +1,3 @@
-# ============================================================================
-# ACCL - Adaptive Collaborative Code Learning Lab
-# Dockerfile for Flask Application
-# ============================================================================
-
-# Use Python 3.12 slim image to match existing .venv
 FROM python:3.12-slim
 
 # Set environment variables
