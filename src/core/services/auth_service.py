@@ -64,3 +64,21 @@ class AuthService:
     def require_role(self, user: User, allowed_roles):
         if user.role not in allowed_roles:
             raise AuthError("Permission denied")
+
+    def change_password(self, user_id: int, current_password: str, new_password: str):
+        """Change user password after verifying current password."""
+        user = self.user_repo.get_by_id(user_id)
+        if not user:
+            raise AuthError("User not found")
+        
+        # Verify current password
+        stored_hash = user.get_password_hash()
+        if not self.verify_password(current_password, stored_hash):
+            raise AuthError("Current password is incorrect")
+        
+        # Hash new password and update
+        new_hash = self.hash_password(new_password)
+        user.password = new_hash
+        user.updated_at = datetime.utcnow()
+        
+        return self.user_repo.update(user)
