@@ -39,6 +39,7 @@ from web.routes.student import student_bp
 from web.routes.instructor import instructor_bp
 from web.routes.api import api_bp
 from web.routes.admin import admin_bp
+from web.routes.peer_review import peer_review_bp
 
 def create_app(test_config=None):
     """Application Factory (Bonus #2)"""
@@ -123,7 +124,7 @@ def create_app(test_config=None):
         submission_repo=submission_repo
     )
 
-    notification_service = NotificationService(notification_repo)
+    notification_service = NotificationService(notification_repo=notification_repo)
 
     peer_review_service = PeerReviewService(
         peer_review_repo=peer_review_repo,
@@ -150,6 +151,7 @@ def create_app(test_config=None):
         'test_case_service': test_case_service,
         'assignment_service': assignment_service,
         'admin_service': admin_service,
+        'peer_review_service':peer_review_service,
         'user_repo': user_repo,
         'assignment_repo': assignment_repo, # Exposed for direct read access
         'submission_repo': submission_repo,
@@ -169,6 +171,7 @@ def create_app(test_config=None):
     app.register_blueprint(instructor_bp)
     app.register_blueprint(api_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(peer_review_bp)
 
     # --- Routes ---
     @app.route('/')
@@ -180,6 +183,8 @@ def create_app(test_config=None):
                 return redirect(url_for('student.dashboard'))
             elif role == 'instructor':
                 return redirect(url_for('instructor.dashboard'))
+            elif role == 'admin' :
+                return redirect(url_for('admin.dashboard'))
         return render_template('index.html', user=None)
 
     # Error Handlers
