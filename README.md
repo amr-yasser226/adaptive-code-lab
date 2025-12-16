@@ -49,3 +49,32 @@ Run the full test suite with:
 ```bash
 pytest tests/
 ```
+
+---
+
+## Docker Deployment
+
+### Using Docker Compose (Recommended)
+```bash
+# Build and run
+docker-compose up --build
+
+# Run in background
+docker-compose up -d --build
+
+# Stop
+docker-compose down
+```
+
+### Using Docker Directly
+```bash
+docker build -t accl-app .
+docker run -p 5000:5000 -v ./data:/app/data accl-app
+```
+
+---
+
+## Documentation
+
+- [Phase 5 Final Delivery](docs/CSAI203_Final_Delivery_Team18_202301043.md)
+- [SRS Document](docs/CSAI203_SRS_Team18_202301043.pdf)
