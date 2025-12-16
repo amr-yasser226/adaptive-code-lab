@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}
+Admin Dashboard
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h1 class="mb-4">Admin Dashboard</h1>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- ===================== -->
+    <!-- User Management -->
+    <!-- ===================== -->
+    <section class="card mb-4">
+        <div class="card-header">
+            <h5>User Management</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" action="">
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-3">
+                        <input
+                            type="number"
+                            name="user_id"
+                            class="form-control"
+                            placeholder="User ID"
+                            required
+                        >
+                    </div>
+                    <div class="col-md-3">
+                        <select name="action" class="form-select" required>
+                            <option value="">Select Action</option>
+                            <option value="activate">Activate</option>
+                            <option value="deactivate">Deactivate</option>
+                            <option value="delete">Delete</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button
+                            type="submit"
+                            formaction="/admin/users/{{ '' }}/manage"
+                            class="btn btn-primary"
+                            disabled
+                        >
+                            Apply Action
+                        </button>
+                    </div>
+                </div>
+                <small class="text-muted mt-2 d-block">
+                    Enter a User ID and choose an action.
+                </small>
+            </form>
+        </div>
+    </section>
+
+    <!-- ===================== -->
+    <!-- Reports -->
+    <!-- ===================== -->
+    <section class="card mb-4">
+        <div class="card-header">
+            <h5>System Reports</h5>
+        </div>
+        <div class="card-body">
+            <a href="{{ url_for('admin.generate_report', report_type='users') }}"
+               class="btn btn-outline-secondary me-2 mb-2">
+                Users Report
+            </a>
+            <a href="{{ url_for('admin.generate_report', report_type='courses') }}"
+               class="btn btn-outline-secondary me-2 mb-2">
+                Courses Report
+            </a>
+            <a href="{{ url_for('admin.generate_report', report_type='enrollments') }}"
+               class="btn btn-outline-secondary me-2 mb-2">
+                Enrollments Report
+            </a>
+            <a href="{{ url_for('admin.generate_report', report_type='submissions') }}"
+               class="btn btn-outline-secondary mb-2">
+                Submissions Report
+            </a>
+        </div>
+    </section>
+
+    <!-- ===================== -->
+    <!-- System Settings -->
+    <!-- ===================== -->
+    <section class="card mb-4">
+        <div class="card-header">
+            <h5>System Settings</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('admin.configure_system_setting') }}">
+                <div class="row g-2">
+                    <div class="col-md-4">
+                        <input
+                            type="text"
+                            name="key"
+                            class="form-control"
+                            placeholder="Setting Key"
+                            required
+                        >
+                    </div>
+                    <div class="col-md-4">
+                        <input
+                            type="text"
+                            name="value"
+                            class="form-control"
+                            placeholder="Setting Value"
+                            required
+                        >
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-warning">
+                            Update Setting
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- ===================== -->
+    <!-- Database Export -->
+    <!-- ===================== -->
+    <section class="card mb-4">
+        <div class="card-header">
+            <h5>Database Maintenance</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('admin.export_db_dump') }}">
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <input
+                            type="text"
+                            name="output_path"
+                            class="form-control"
+                            placeholder="backups/db_backup.sqlite"
+                            required
+                        >
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-danger">
+                            Export Database
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+</div>
+{% endblock %}
