@@ -73,14 +73,11 @@ def main():
     sys.path.insert(0, str(web_dir))
     
     try:
-        # Import and run app
+        # Import and run app using factory pattern
         import app as app_module
         
-        # Get the Flask app
-        app = app_module.app
-        
-        # Initialize demo data
-        app_module.init_demo_data()
+        # Create the Flask app using factory
+        app = app_module.create_app()
         
         # Run development server
         app.run(debug=True, host='127.0.0.1', port=5000, use_reloader=False)
