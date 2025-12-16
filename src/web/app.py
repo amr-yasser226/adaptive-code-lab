@@ -158,6 +158,7 @@ def create_app(test_config=None):
         'course_repo': course_repo,
         'enrollment_repo': enrollment_repo,
         'test_case_repo': test_case_repo,
+        'flag_repo': flag_repo,  # For plagiarism detection
         'notification_service': notification_service,
         'peer_review_service': peer_review_service,
         'notification_repo': notification_repo,
