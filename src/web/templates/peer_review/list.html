@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Peer Reviews{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2>Peer Reviews for Submission {{ submission_id }}</h2>
+
+    {% if reviews %}
+        {% for review in reviews %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <p><strong>Score:</strong> {{ review.rubric_score }}</p>
+                    <p><strong>Comments:</strong> {{ review.comments }}</p>
+                    <p class="text-muted">
+                        Submitted: {{ review.submitted_at or "Draft" }}
+                    </p>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-muted">No peer reviews available.</p>
+    {% endif %}
+
+</div>
+{% endblock %}
