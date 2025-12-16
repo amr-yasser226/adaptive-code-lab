@@ -24,3 +24,20 @@ def instructor_required(f):
             return redirect(url_for('index'))
         return f(*args, **kwargs)
     return decorated_function
+
+
+def admin_required(f):
+    """Decorator to require admin role"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get('user_role') != 'admin':
+            flash('Admin access required', 'error')
+            return redirect(url_for('index'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+
+def get_current_user():
+    user_repo = get_service("user_repo")
+    return user_repo.get_by_id(session.get("user_id"))
