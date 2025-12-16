@@ -1,0 +1,461 @@
+{
+    "info": {
+        "name": "ACCL API Tests",
+        "_postman_id": "accl-api-tests-001",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:5000"
+        },
+        {
+            "key": "studentEmail",
+            "value": "postman2@test.com"
+        },
+        {
+            "key": "studentPassword",
+            "value": "test1234"
+        },
+        {
+            "key": "instructorEmail",
+            "value": "instructor@test.com"
+        },
+        {
+            "key": "instructorPassword",
+            "value": "test1234"
+        }
+    ],
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "1. Homepage",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Homepage loads', function() {",
+                                    "  pm.response.to.have.status(200);",
+                                    "});",
+                                    "pm.test('Contains ACCL title', function() {",
+                                    "  pm.expect(pm.response.text()).to.include('ACCL');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "2. Login Page GET",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/login"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Login page loads', function() {",
+                                    "  pm.response.to.have.status(200);",
+                                    "});",
+                                    "pm.test('Contains login form', function() {",
+                                    "  pm.expect(pm.response.text()).to.include('Login');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "3. Login POST - Student",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{baseUrl}}/login",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/x-www-form-urlencoded"
+                            }
+                        ],
+                        "body": {
+                            "mode": "urlencoded",
+                            "urlencoded": [
+                                {
+                                    "key": "email",
+                                    "value": "{{studentEmail}}"
+                                },
+                                {
+                                    "key": "password",
+                                    "value": "{{studentPassword}}"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Login successful or redirected', function() {",
+                                    "  pm.expect([200, 302]).to.include(pm.response.code);",
+                                    "});",
+                                    "pm.test('Contains dashboard or welcome', function() {",
+                                    "  pm.expect(pm.response.text()).to.include('Dashboard').or.include('Welcome');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "4. Register Page GET",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/register"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Register page loads', function() {",
+                                    "  pm.response.to.have.status(200);",
+                                    "});",
+                                    "pm.test('Contains register form', function() {",
+                                    "  pm.expect(pm.response.text()).to.include('Register');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "5. Logout",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/logout"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Logout works', function() {",
+                                    "  pm.expect([200, 302]).to.include(pm.response.code);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Student Routes",
+            "item": [
+                {
+                    "name": "6. Student Dashboard",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/dashboard"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Dashboard accessible', function() {",
+                                    "  pm.expect([200, 302]).to.include(pm.response.code);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "7. Assignments List",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/assignments"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Assignments page accessible', function() {",
+                                    "  pm.expect([200, 302]).to.include(pm.response.code);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "8. Assignment Detail",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/assignment/1"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Assignment detail accessible', function() {",
+                                    "  pm.expect([200, 302, 404]).to.include(pm.response.code);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "9. Submit Code Page",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/submit/1"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Submit page accessible', function() {",
+                                    "  pm.expect([200, 302, 404]).to.include(pm.response.code);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "10. Profile Page",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/profile"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Profile page accessible', function() {",
+                                    "  pm.expect([200, 302]).to.include(pm.response.code);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Instructor Routes",
+            "item": [
+                {
+                    "name": "11. Login as Instructor",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{baseUrl}}/login",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/x-www-form-urlencoded"
+                            }
+                        ],
+                        "body": {
+                            "mode": "urlencoded",
+                            "urlencoded": [
+                                {
+                                    "key": "email",
+                                    "value": "{{instructorEmail}}"
+                                },
+                                {
+                                    "key": "password",
+                                    "value": "{{instructorPassword}}"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Instructor login works', function() {",
+                                    "  pm.expect([200, 302]).to.include(pm.response.code);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "12. Instructor Dashboard",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/dashboard"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Instructor dashboard accessible', function() {",
+                                    "  pm.expect([200, 302]).to.include(pm.response.code);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "13. Analytics Page",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/analytics"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Analytics page accessible', function() {",
+                                    "  pm.expect([200, 302]).to.include(pm.response.code);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "14. Analytics Export CSV",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/analytics/export"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Export works', function() {",
+                                    "  pm.expect([200, 302]).to.include(pm.response.code);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "15. Plagiarism Dashboard",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/plagiarism"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Plagiarism page accessible', function() {",
+                                    "  pm.expect([200, 302]).to.include(pm.response.code);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "API Routes",
+            "item": [
+                {
+                    "name": "16. Test Code API",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{baseUrl}}/api/test-code",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"code\": \"print('hello')\", \"language\": \"python\", \"assignment_id\": \"1\"}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Test code API responds', function() {",
+                                    "  pm.expect([200, 400, 401]).to.include(pm.response.code);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "17. Get Test Cases API",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/api/assignment/1/test-cases"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Test cases API responds', function() {",
+                                    "  pm.expect([200, 401, 404]).to.include(pm.response.code);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Error Handling",
+            "item": [
+                {
+                    "name": "18. 404 Page",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{baseUrl}}/nonexistent-page-12345"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('404 page works', function() {",
+                                    "  pm.response.to.have.status(404);",
+                                    "});",
+                                    "pm.test('Shows 404 message', function() {",
+                                    "  pm.expect(pm.response.text()).to.include('404').or.include('Not Found');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
