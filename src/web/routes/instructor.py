@@ -103,7 +103,7 @@ def analytics():
         pass_rate = (pass_count / len(sub_scores) * 100) if sub_scores else 0.0
         
         assignment_stats.append({
-            'id': assignment.id,
+            'id': assignment.get_id(),
             'title': assignment.title,
             'due_date': assignment.due_date,
             'submission_count': len(assignment_submissions),
