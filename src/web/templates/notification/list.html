@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}
+Notifications
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2 class="mb-3">
+        Notifications
+        {% if only_unread %}
+            <small class="text-muted">(Unread)</small>
+        {% endif %}
+    </h2>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Filter Links -->
+    <div class="mb-3">
+        <a href="{{ url_for('notification.list_notifications') }}"
+           class="btn btn-sm btn-outline-secondary">
+            All
+        </a>
+        <a href="{{ url_for('notification.list_notifications', unread=1) }}"
+           class="btn btn-sm btn-outline-primary">
+            Unread only
+        </a>
+    </div>
+
+    <!-- Notifications List -->
+    {% if notifications %}
+        <ul class="list-group">
+            {% for notification in notifications %}
+                <li class="list-group-item d-flex justify-content-between align-items-start
+                    {% if not notification.is_read %}list-group-item-warning{% endif %}">
+                    
+                    <div class="ms-2 me-auto">
+                        <div class="fw-bold">
+                            {{ notification.type|capitalize }}
+                        </div>
+
+                        <p class="mb-1">
+                            {{ notification.message }}
+                        </p>
+
+                        {% if notification.link %}
+                            <a href="{{ notification.link }}" class="small">
+                                View related item
+                            </a>
+                        {% endif %}
+
+                        <div class="text-muted small">
+                            {{ notification.created_at | format_date }}
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="btn-group btn-group-sm">
+                        {% if notification.is_read %}
+                            <form method="post"
+                                  action="{{ url_for('notification.mark_as_unread', notification_id=notification.id) }}">
+                                <button type="submit" class="btn btn-outline-secondary">
+                                    Mark unread
+                                </button>
+                            </form>
+                        {% else %}
+                            <form method="post"
+                                  action="{{ url_for('notification.mark_as_read', notification_id=notification.id) }}">
+                                <button type="submit" class="btn btn-outline-success">
+                                    Mark read
+                                </button>
+                            </form>
+                        {% endif %}
+
+                        <form method="post"
+                              action="{{ url_for('notification.delete_notification', notification_id=notification.id) }}"
+                              onsubmit="return confirm('Delete this notification?');">
+                            <button type="submit" class="btn btn-outline-danger">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-muted mt-4">
+            No notifications found.
+        </p>
+    {% endif %}
+
+</div>
+{% endblock %}
