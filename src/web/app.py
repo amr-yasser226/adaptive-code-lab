@@ -21,6 +21,9 @@ from infrastructure.repositories.similarity_flag_repository import SimilarityFla
 from infrastructure.repositories.test_case_repository import TestCaseRepository
 from infrastructure.repositories.notification_repository import NotificationRepository
 from infrastructure.repositories.peer_review_repository import PeerReviewRepository
+from infrastructure.repositories.admin_repository import AdminRepository
+
+
 
 from core.services.auth_service import AuthService
 from core.services.student_service import StudentService
@@ -29,11 +32,13 @@ from core.services.test_case_service import TestCaseService
 from core.services.assignment_service import AssignmentService
 from core.services.notification_service import NotificationService
 from core.services.peer_review_service import PeerReviewService
+from core.services.admin_service import AdminService
 
 from web.routes.auth import auth_bp
 from web.routes.student import student_bp
 from web.routes.instructor import instructor_bp
 from web.routes.api import api_bp
+from web.routes.admin import admin_bp
 
 def create_app(test_config=None):
     """Application Factory (Bonus #2)"""
@@ -85,7 +90,7 @@ def create_app(test_config=None):
     test_case_repo = TestCaseRepository(db_connection)
     notification_repo = NotificationRepository(db_connection)
     peer_review_repo = PeerReviewRepository(db_connection)
-
+    admin_repo = AdminRepository(db_connection)
     # 2. Initialize Services with Dependencies
     auth_service = AuthService(user_repo)
     
@@ -128,6 +133,15 @@ def create_app(test_config=None):
         course_repo=course_repo
     )
 
+
+    admin_service = AdminService(
+        user_repo=user_repo,
+        admin_repo=admin_repo,
+        course_repo=course_repo,
+        enrollment_repo=enrollment_repo,
+        submission_repo=submission_repo,    
+    )
+
     # 3. Store Services in App Context
     app.extensions['services'] = {
         'auth_service': auth_service,
@@ -135,6 +149,7 @@ def create_app(test_config=None):
         'instructor_service': instructor_service,
         'test_case_service': test_case_service,
         'assignment_service': assignment_service,
+        'admin_service': admin_service,
         'user_repo': user_repo,
         'assignment_repo': assignment_repo, # Exposed for direct read access
         'submission_repo': submission_repo,
@@ -144,7 +159,8 @@ def create_app(test_config=None):
         'notification_service': notification_service,
         'peer_review_service': peer_review_service,
         'notification_repo': notification_repo,
-        'peer_review_repo': peer_review_repo
+        'peer_review_repo': peer_review_repo,
+        'admin_repo': admin_repo
     }
 
     # --- Register Blueprints (Bonus #1) ---
@@ -152,6 +168,7 @@ def create_app(test_config=None):
     app.register_blueprint(student_bp)
     app.register_blueprint(instructor_bp)
     app.register_blueprint(api_bp)
+    app.register_blueprint(admin_bp)
 
     # --- Routes ---
     @app.route('/')
