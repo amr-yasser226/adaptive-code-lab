@@ -22,6 +22,7 @@ from infrastructure.repositories.test_case_repository import TestCaseRepository
 from infrastructure.repositories.notification_repository import NotificationRepository
 from infrastructure.repositories.peer_review_repository import PeerReviewRepository
 from infrastructure.repositories.admin_repository import AdminRepository
+from infrastructure.repositories.result_repository import ResultRepository
 
 
 
@@ -95,6 +96,7 @@ def create_app(test_config=None):
     notification_repo = NotificationRepository(db_connection)
     peer_review_repo = PeerReviewRepository(db_connection)
     admin_repo = AdminRepository(db_connection)
+    result_repo = ResultRepository(db_connection)
     # 2. Initialize Services with Dependencies
     auth_service = AuthService(user_repo)
     
@@ -167,7 +169,8 @@ def create_app(test_config=None):
         'peer_review_service': peer_review_service,
         'notification_repo': notification_repo,
         'peer_review_repo': peer_review_repo,
-        'admin_repo': admin_repo
+        'admin_repo': admin_repo,
+        'result_repo': result_repo
     }
 
     # --- Register Blueprints (Bonus #1) ---
