@@ -40,6 +40,9 @@ from web.routes.instructor import instructor_bp
 from web.routes.api import api_bp
 from web.routes.admin import admin_bp
 from web.routes.peer_review import peer_review_bp
+from web.routes.notification import notification_bp
+
+
 
 def create_app(test_config=None):
     """Application Factory (Bonus #2)"""
@@ -150,6 +153,7 @@ def create_app(test_config=None):
         'instructor_service': instructor_service,
         'test_case_service': test_case_service,
         'assignment_service': assignment_service,
+        'notification_service': notification_service,
         'admin_service': admin_service,
         'peer_review_service':peer_review_service,
         'user_repo': user_repo,
@@ -173,6 +177,7 @@ def create_app(test_config=None):
     app.register_blueprint(api_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(peer_review_bp)
+    app.register_blueprint(notification_bp)
 
     # --- Routes ---
     @app.route('/')
