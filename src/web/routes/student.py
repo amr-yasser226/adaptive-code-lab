@@ -123,8 +123,10 @@ def submission_results(submission_id):
     user_id = session['user_id']
     submission_repo = get_service('submission_repo')
     assignment_repo = get_service('assignment_repo')
+    result_repo = get_service('result_repo')
     
-    submission = None 
+    # Actually fetch the submission from repository
+    submission = submission_repo.get_by_id(submission_id)
     
     if not submission:
         flash('Submission not found', 'error')
@@ -136,12 +138,14 @@ def submission_results(submission_id):
         
     assignment = assignment_repo.get_by_id(submission.assignment_id)
     
-    test_results = [] # submission.test_results
+    # Fetch test results for this submission
+    test_results = result_repo.list_by_submission(submission_id) if result_repo else []
     
     return render_template('submission_results.html',
         user={'role': 'student'},
         submission=submission,
         assignment=assignment,
+        test_results=test_results,
         current_user={'role': 'student'})
 
 @student_bp.route('/profile')
@@ -164,6 +168,30 @@ def profile():
 @student_bp.route('/profile/update', methods=['POST'])
 @login_required
 def update_profile():
-    # Placeholder for profile update
-    flash('Profile update not implemented in this refactor phase', 'warning')
+    user_id = session['user_id']
+    auth_service = get_service('auth_service')
+    
+    current_password = request.form.get('current_password', '').strip()
+    new_password = request.form.get('new_password', '').strip()
+    confirm_password = request.form.get('confirm_password', '').strip()
+    
+    # Validate input
+    if not current_password or not new_password:
+        flash('Please fill in all password fields', 'warning')
+        return redirect(url_for('student.profile'))
+    
+    if new_password != confirm_password:
+        flash('New passwords do not match', 'error')
+        return redirect(url_for('student.profile'))
+    
+    if len(new_password) < 8:
+        flash('New password must be at least 8 characters', 'error')
+        return redirect(url_for('student.profile'))
+    
+    try:
+        auth_service.change_password(user_id, current_password, new_password)
+        flash('Password updated successfully!', 'success')
+    except Exception as e:
+        flash(str(e), 'error')
+    
     return redirect(url_for('student.profile'))
