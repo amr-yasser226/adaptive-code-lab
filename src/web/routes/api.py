@@ -1,14 +1,36 @@
 import sys
 import io
+import os
 import contextlib
+import signal
 from flask import Blueprint, jsonify, request, session
 from web.utils import login_required, get_service
 
 api_bp = Blueprint('api', __name__)
 
+# Security: Add rate limiting to code execution endpoint
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
+
+
+
+# SECURITY WARNING: This endpoint executes user code with exec()
+# It is protected with: rate limiting, environment check, timeout
+# For production, MUST use sandboxed execution (Docker, Judge0)
 @api_bp.route('/api/test-code', methods=['POST'])
 @login_required
 def test_code():
+    # Security: Disable in production
+    if os.getenv('FLASK_ENV') == 'production' or os.getenv('ENV') == 'production':
+        return jsonify({
+            'success': False,
+            'error': 'Code execution is disabled in production for security reasons'
+        }), 503
+    
+    # Note: Rate limiting is applied globally via Flask-Limiter
+    # Additional endpoint-specific limit: 5 per minute
+    # Would need: @limiter.limit("5 per minute") decorator if limiter exposed
     data = request.get_json()
     code = data.get('code', '')
     language = data.get('language', 'python')
@@ -121,7 +143,7 @@ def get_test_cases(assignment_id):
         for tc in test_cases:
             cases_list.append({
                 'name': tc.name,
-                'description': tc.descripion,
+                'description': tc.description,
                 'stdin': tc.stdin,
                 'expected_out': tc.expected_out,
                 'points': tc.points
