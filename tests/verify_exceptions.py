@@ -44,18 +44,18 @@ class TestExceptionHandling(unittest.TestCase):
         user.get_id.return_value = None
         # Should catch error and re-raise (as per code inspection in earlier steps) or return None.
         # Wait, UserRepository had 'raise' in some blocks? Let's check. 
-        # Actually UserRepo had `raise` in `save_user`? 
+        # Actually UserRepo had `raise` in `create`? 
         # Checking my previous edits: "except sqlite3.Error: self.db.rollback(); raise" was in one snippet but user might have changed it?
         # Let's assume it might raise or return None. I'll catch it if it raises.
         try:
-            repo.save_user(user)
+            repo.create(user)
         except sqlite3.Error:
              print("  -> UserRepository re-raised sqlite3.Error (Expected behavior if designed to bubble up)")
         except Exception as e:
              self.fail(f"UserRepository raised unexpected exception: {e}")
         
         self.mock_db.rollback.assert_called()
-        print("  -> UserRepository.save_user verified.")
+        print("  -> UserRepository.create verified.")
 
     def test_course_repo(self):
         print("Testing CourseRepository...")

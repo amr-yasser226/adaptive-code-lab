@@ -7,7 +7,7 @@ from core.entities.user import User
 class TestUserRepo:
     """Test suite for User_repo"""
     
-    def test_save_user_creates_new_user(self, user_repo):
+    def test_create_creates_new_user(self, user_repo):
         """Test creating a new user"""
         user = User(
             id=None,
@@ -18,7 +18,7 @@ class TestUserRepo:
             is_active=True
         )
         
-        saved_user = user_repo.save_user(user)
+        saved_user = user_repo.create(user)
         
         assert saved_user is not None
         assert saved_user.get_id() is not None
@@ -57,7 +57,7 @@ class TestUserRepo:
         sample_user.name = "Updated Name"
         sample_user.email = "updated@example.com"
         
-        updated = user_repo.Update_data(sample_user)
+        updated = user_repo.update(sample_user)
         
         assert updated is not None
         assert updated.name == "Updated Name"
@@ -83,9 +83,9 @@ class TestUserRepo:
                 role="student",
                 is_active=True
             )
-            user_repo.save_user(user)
+            user_repo.create(user)
         
-        all_users = user_repo.findALL()
+        all_users = user_repo.list_all()
         assert len(all_users) >= 3
     
     def test_find_all_with_filters(self, user_repo):
@@ -100,7 +100,7 @@ class TestUserRepo:
                 role=role,
                 is_active=True
             )
-            user_repo.save_user(user)
+            user_repo.create(user)
         
-        students = user_repo.findALL({"role": "student"})
+        students = user_repo.list_all({"role": "student"})
         assert all(u.role == "student" for u in students)

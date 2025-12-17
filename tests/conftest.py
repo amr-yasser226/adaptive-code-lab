@@ -250,7 +250,7 @@ def sample_student(user_repo, student_repo):
         role="student",
         is_active=True
     )
-    saved_user = user_repo.save_user(user)
+    saved_user = user_repo.create(user)
     
     student = Student(
         id=saved_user.get_id(),
@@ -277,7 +277,7 @@ def sample_instructor(user_repo, instructor_repo):
         role="instructor",
         is_active=True
     )
-    saved_user = user_repo.save_user(user)
+    saved_user = user_repo.create(user)
     
     instructor = Instructor(
         id=saved_user.get_id(),

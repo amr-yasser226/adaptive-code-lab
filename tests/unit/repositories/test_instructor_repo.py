@@ -18,7 +18,7 @@ class TestInstructorRepo:
             role="instructor",
             is_active=True
         )
-        saved_user = user_repo.save_user(user)
+        saved_user = user_repo.create(user)
         
         instructor = Instructor(
             id=saved_user.get_id(),

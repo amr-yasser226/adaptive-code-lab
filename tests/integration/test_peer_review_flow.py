@@ -22,7 +22,7 @@ class TestPeerReviewFlow:
             role="student",
             is_active=True
         )
-        saved_reviewer_user = user_repo.save_user(reviewer_user)
+        saved_reviewer_user = user_repo.create(reviewer_user)
         
         reviewer = Student(
             id=saved_reviewer_user.get_id(),
@@ -83,7 +83,7 @@ class TestPeerReviewFlow:
         # Helper function to create student with User
         def create_student(name, email, student_num):
             user = User(id=None, name=name, email=email, password="pwd", role="student", is_active=True)
-            saved_user = user_repo.save_user(user)
+            saved_user = user_repo.create(user)
             student = Student(
                 id=saved_user.get_id(), name=saved_user.name, email=saved_user.email,
                 password=saved_user.get_password_hash(), created_at=saved_user.created_at,
