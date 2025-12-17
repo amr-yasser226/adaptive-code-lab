@@ -37,7 +37,7 @@ class AuthService:
             is_active=True
         )
 
-        created = self.user_repo.save_user(user)
+        created = self.user_repo.create(user)
         if not created:
             raise AuthError("Failed to create user")
 

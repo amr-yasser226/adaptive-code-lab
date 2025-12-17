@@ -38,11 +38,13 @@ class AdminService:
 
         if action == "activate":
             user.activate_account()
-            return self.user_repo.Update_data(user)
+            return self.user_repo.update(user)
+
 
         if action == "deactivate":
             user.deactivate_account()
-            return self.user_repo.Update_data(user)
+            return self.user_repo.update(user)
+
 
         if action == "delete":
             self.user_repo.delete(target_user_id)
@@ -58,7 +60,8 @@ class AdminService:
         self._ensure_admin(admin_user)
 
         if report_type == "users":
-            return self.user_repo.findALL()
+            return self.user_repo.list_all()
+
 
         if report_type == "courses" and self.course_repo:
             return self.course_repo.list_all()
