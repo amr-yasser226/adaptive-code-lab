@@ -5019,4 +5019,220 @@ textarea:focus-visible {
     .btn {
         border: 2px solid currentColor;
     }
+}/* ==============================================
+   PHASE 4: LOADING STATES & MICRO-INTERACTIONS
+   ============================================== */
+
+/* Loading Spinner */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--gray-200);
+    border-radius: 50%;
+    border-top-color: var(--brand-primary);
+    animation: spin 0.8s linear infinite;
+}
+
+.loading-spinner-lg {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Loading Button State */
+.btn.is-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.btn.is-loading::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 16px;
+    height: 16px;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    border-top-color: currentColor;
+    animation: spin 0.8s linear infinite;
+}
+
+.btn-primary.is-loading::after {
+    border-top-color: var(--white);
+}
+
+/* Skeleton Loading */
+.skeleton {
+    background: linear-gradient(90deg, var(--gray-200) 25%, var(--gray-100) 50%, var(--gray-200) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s infinite;
+    border-radius: var(--radius-sm);
+}
+
+.skeleton-text {
+    height: 1rem;
+    margin-bottom: var(--space-sm);
+}
+
+.skeleton-title {
+    height: 1.5rem;
+    width: 60%;
+    margin-bottom: var(--space-md);
+}
+
+.skeleton-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: var(--space-3xl) var(--space-xl);
+    color: var(--gray-500);
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    color: var(--gray-300);
+    margin-bottom: var(--space-lg);
+}
+
+.empty-state-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--gray-700);
+    margin-bottom: var(--space-sm);
+}
+
+.empty-state-description {
+    font-size: var(--font-size-base);
+    color: var(--gray-500);
+    max-width: 400px;
+    margin: 0 auto var(--space-lg);
+}
+
+/* Success Feedback */
+.success-feedback {
+    background: var(--color-success-light);
+    border-left: 4px solid var(--color-success);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.success-feedback-icon {
+    color: var(--color-success);
+    font-size: 1.25rem;
+}
+
+/* Error Feedback */
+.error-feedback {
+    background: var(--color-error-light);
+    border-left: 4px solid var(--color-error);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.error-feedback-icon {
+    color: var(--color-error);
+    font-size: 1.25rem;
+}
+
+/* Pulse Animation for Notifications */
+.pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Fade In Animation */
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Slide Up Animation */
+.slide-up {
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Focus Ring - Accessibility */
+.focus-ring:focus {
+    outline: 2px solid var(--brand-primary);
+    outline-offset: 2px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+
+    .loading-spinner,
+    .skeleton,
+    .pulse,
+    .fade-in,
+    .slide-up {
+        animation: none;
+    }
+
+    .btn.is-loading::after {
+        animation: none;
+    }
 }
