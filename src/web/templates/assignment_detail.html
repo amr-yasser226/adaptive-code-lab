@@ -115,7 +115,8 @@
             </div>
             <div class="assignment-card-body">
                 <div class="assignment-content">
-                    {{ assignment.full_description | safe }}
+                    <!-- Removed | safe filter to prevent XSS -->
+                    {{ assignment.full_description }}
                 </div>
             </div>
         </div>
