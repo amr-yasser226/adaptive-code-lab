@@ -3,141 +3,110 @@
 {% block title %}Register - ACCL{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
-        <div class="card shadow-lg">
-            <div class="card-body p-5">
-                <h2 class="text-center mb-4">
-                    <i class="fas fa-user-plus"></i> Create Account
-                </h2>
-
-                <!-- Display Errors -->
-                {% if error %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
-                </div>
-                {% endif %}
-
-                <form method="POST" action="{{ url_for('auth.register') }}" id="registerForm" novalidate>
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                    <!-- Name Field -->
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Full Name</label>
-                        <input type="text" name="name" class="form-control" placeholder="Enter your full name" id="name"
-                            minlength="3" maxlength="100" required>
-                        <small class="form-text text-muted">3-100 characters</small>
-                    </div>
-
-                    <!-- Role Selection -->
-                    <div class="mb-3">
-                        <label for="role" class="form-label">Account Type</label>
-                        <select name="role" class="form-select" id="role" required>
-                            <option value="">Select your role...</option>
-                            <option value="student">Student</option>
-                            <option value="instructor">Instructor (requires approval)</option>
-                        </select>
-                        <small class="form-text text-muted">
-                            Choose your role. Instructor accounts require approval.
-                        </small>
-                    </div>
-
-                    <!-- Email Field -->
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email Address</label>
-                        <input type="email" name="email" class="form-control" placeholder="example@university.edu"
-                            id="email" required autocomplete="email" pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$">
-                        <small class="form-text text-muted">Must be a valid email address</small>
-                    </div>
-
-                    <!-- Password Field -->
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control"
-                            placeholder="Enter a strong password" id="password" minlength="8" required
-                            autocomplete="new-password">
-                        <div class="password-strength mt-2">
-                            <small class="form-text text-muted">
-                                Requirements: At least 8 characters, with uppercase, lowercase, and numbers
-                            </small>
-                            <div class="progress" style="height: 5px; display:none;" id="passwordStrength">
-                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Confirm Password Field -->
-                    <div class="mb-3">
-                        <label for="confirm_password" class="form-label">Confirm Password</label>
-                        <input type="password" name="confirm_password" class="form-control"
-                            placeholder="Re-enter your password" id="confirm_password" minlength="8" required
-                            autocomplete="new-password">
-                        <small class="form-text text-danger" id="passwordMatch" style="display:none;">Passwords do not
-                            match</small>
-                    </div>
-
-                    <!-- Terms Agreement -->
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" name="agree_terms" class="form-check-input" id="agree_terms" required>
-                        <label class="form-check-label" for="agree_terms">
-                            I agree to the <a href="#" target="_blank">Terms and Conditions</a>
-                        </label>
-                    </div>
-
-                    <!-- Submit Button -->
-                    <button type="submit" class="btn btn-primary w-100 mb-3">
-                        <i class="fas fa-user-plus"></i> Create Account
-                    </button>
-                </form>
-
-                <!-- Divider -->
-                <div class="text-center my-3">
-                    <small class="text-muted">or</small>
-                </div>
-
-                <!-- Login Link -->
-                <div class="text-center">
-                    <p class="mb-0">
-                        Already have an account?
-                        <a href="{{ url_for('auth.login') }}" class="btn btn-link">Already have an account?</a>
+<div class="container">
+    <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+        <div class="col-md-6 col-lg-5">
+            <!-- Register Card -->
+            <div class="card shadow-lg border-0" style="border-radius: 16px;">
+                <!-- Card Header with Educational Theme -->
+                <div class="card-header text-center py-4"
+                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px 16px 0 0; border: none;">
+                    <i class="fas fa-user-graduate fa-3x text-white mb-2"></i>
+                    <h3 class="text-white mb-0 fw-bold">Join ACCL</h3>
+                    <p class="text-white mb-0" style="opacity: 0.9; font-size: 0.9rem;">Start your coding journey today
                     </p>
                 </div>
+
+                <div class="card-body p-4">
+                    <!-- Flash Messages -->
+                    {% if error %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        {{ error }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Register Form -->
+                    <form method="POST" action="{{ url_for('auth.register') }}" novalidate>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                        <!-- Name Field -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label fw-semibold">
+                                <i class="fas fa-user me-2 text-muted"></i>Full Name
+                            </label>
+                            <input type="text" class="form-control" id="name" name="name"
+                                placeholder="Enter your full name" required minlength="2" autofocus>
+                        </div>
+
+                        <!-- Email Field -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-semibold">
+                                <i class="fas fa-envelope me-2 text-muted"></i>Email Address
+                            </label>
+                            <input type="email" class="form-control" id="email" name="email"
+                                placeholder="your.email@example.com" required>
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="mb-3">
+                            <label for="password" class="form-label fw-semibold">
+                                <i class="fas fa-lock me-2 text-muted"></i>Password
+                            </label>
+                            <input type="password" class="form-control" id="password" name="password"
+                                placeholder="Create a strong password" required minlength="8">
+                            <small class="text-muted">Minimum 8 characters</small>
+                        </div>
+
+                        <!-- Role Selection -->
+                        <div class="mb-4">
+                            <label for="role" class="form-label fw-semibold">
+                                <i class="fas fa-user-tag me-2 text-muted"></i>I am a
+                            </label>
+                            <select class="form-select" id="role" name="role" required>
+                                <option value="">Choose your role...</option>
+                                <option value="student">Student - Learning to code</option>
+                                <option value="instructor">Instructor - Teaching coding</option>
+                            </select>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                            <i class="fas fa-rocket me-2"></i>Create Account
+                        </button>
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="text-center my-3">
+                        <span class="text-muted">or</span>
+                    </div>
+
+                    <!-- Login Link -->
+                    <div class="text-center">
+                        <p class="mb-0 text-muted">Already have an account?</p>
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary w-100 mt-2">
+                            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Card Footer -->
+                <div class="card-footer text-center py-3"
+                    style="background-color: #f8f9fa; border-radius: 0 0 16px 16px; border: none;">
+                    <small class="text-muted">
+                        <i class="fas fa-code me-1"></i>
+                        Adaptive Collaborative Code Learning Lab
+                    </small>
+                </div>
+            </div>
+
+            <!-- Back to Home -->
+            <div class="text-center mt-3">
+                <a href="{{ url_for('index') }}" class="text-muted text-decoration-none">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Home
+                </a>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    // Form validation
-    (function () {
-        'use strict';
-        window.addEventListener('load', function () {
-            var forms = document.querySelectorAll('form[novalidate]');
-            Array.prototype.slice.call(forms).forEach(function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (form.checkValidity() === false) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
-            });
-        }, false);
-    })();
-
-    // Password strength indicator
-    document.getElementById('password').addEventListener('input', function () {
-        var password = this.value;
-        var strength = 0;
-
-        if (password.length >= 8) strength++;
-        if (/[a-z]/.test(password)) strength++;
-        if (/[A-Z]/.test(password)) strength++;
-        if (/[0-9]/.test(password)) strength++;
-        if (/[^a-zA-Z0-9]/.test(password)) strength++;
-
-        // Visual feedback can be added here
-    });
-</script>
 {% endblock %}
