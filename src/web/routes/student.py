@@ -177,21 +177,29 @@ def profile():
         'role': session.get('user_role', 'student')
     }
     
-    # Stub form class for template (avoids WTForms dependency)
+    from markupsafe import Markup
+    
     class StubField:
-        def __init__(self):
+        def __init__(self, name, type="text"):
+            self.name = name
+            self.type = type
             self.errors = []
+            
         def __call__(self, **kwargs):
-            return ''
+            attrs = [f'type="{self.type}"', f'name="{self.name}"']
+            for k, v in kwargs.items():
+                if k == "class_": k = "class"
+                attrs.append(f'{k}="{v}"')
+            return Markup(f'<input {" ".join(attrs)}>')
     
     class StubForm:
-        current_password = StubField()
-        new_password = StubField()
-        confirm_password = StubField()
-        csrf_token = ''
-        email_on_grade = StubField()
-        email_on_hint = StubField()
-        email_on_deadline = StubField()
+        current_password = StubField("current_password", "password")
+        new_password = StubField("new_password", "password")
+        confirm_password = StubField("confirm_password", "password")
+        csrf_token = Markup('<input type="hidden" name="csrf_token" value="">')
+        email_on_grade = StubField("email_on_grade", "checkbox")
+        email_on_hint = StubField("email_on_hint", "checkbox")
+        email_on_deadline = StubField("email_on_deadline", "checkbox")
     
     stats = {
         'average_score': avg_score,
