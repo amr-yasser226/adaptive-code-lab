@@ -3,6 +3,9 @@ import sys
 from datetime import timedelta
 from pathlib import Path
 from flask import Flask, render_template
+from flask_wtf.csrf import CSRFProtect
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 # Add src folder to sys.path to ensure 'core' and 'infrastructure' are importable as top-level modules
 # This aligns with how repositories and services import each other.
@@ -51,8 +54,21 @@ def create_app(test_config=None):
         template_folder=os.path.join(os.path.dirname(__file__), 'templates'),
         static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'adaptive-code-lab-secret-key-2024')
+    # Security: Enforce SECRET_KEY is set
+    secret_key = os.getenv('SECRET_KEY')
+    if not secret_key:
+        raise RuntimeError(
+            "SECRET_KEY environment variable must be set! "
+            "Generate one with: python -c 'import secrets; print(secrets.token_hex(32))'"
+        )
+    app.config['SECRET_KEY'] = secret_key
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
+    
+    # Session security flags
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+    # Uncomment in production with HTTPS:
+    # app.config['SESSION_COOKIE_SECURE'] = True
 
     if test_config:
         app.config.update(test_config)
@@ -76,6 +92,17 @@ def create_app(test_config=None):
         return value.strftime(fmt)
     
     app.jinja_env.filters['format_date'] = format_date
+
+    # Initialize CSRF Protection
+    csrf = CSRFProtect(app)
+    
+    # Initialize Rate Limiter
+    limiter = Limiter(
+        app=app,
+        key_func=get_remote_address,
+        default_limits=["200 per day", "50 per hour"],
+        storage_uri="memory://"
+    )
 
     # Initialize Database Singleton (Bonus #4)
     # This ensures the DB connection logic is ready
@@ -165,8 +192,7 @@ def create_app(test_config=None):
         'enrollment_repo': enrollment_repo,
         'test_case_repo': test_case_repo,
         'flag_repo': flag_repo,  # For plagiarism detection
-        'notification_service': notification_service,
-        'peer_review_service': peer_review_service,
+        # Removed duplicate registrations (were also on lines 158, 160)
         'notification_repo': notification_repo,
         'peer_review_repo': peer_review_repo,
         'admin_repo': admin_repo,
