@@ -14,18 +14,19 @@ def auth_service(mock_user_repo):
 
 def test_register_success(auth_service, mock_user_repo):
     mock_user_repo.get_by_email.return_value = None
-    mock_user_repo.save_user.return_value = True
+    mock_user_repo.create.return_value = True
     
     result = auth_service.register("Test User", "test@example.com", "password")
     
     assert result is True
-    mock_user_repo.save_user.assert_called_once()
-    args, _ = mock_user_repo.save_user.call_args
+    mock_user_repo.create.assert_called_once()
+    args, _ = mock_user_repo.create.call_args
     user = args[0]
     assert user.name == "Test User"
     assert user.email == "test@example.com"
     assert user.role == "student"
     assert user.get_password_hash() != "password" # Should be hashed
+
 
 def test_register_duplicate_email(auth_service, mock_user_repo):
     existing_user = Mock(spec=User)
@@ -34,7 +35,7 @@ def test_register_duplicate_email(auth_service, mock_user_repo):
     with pytest.raises(AuthError, match="Email already registered"):
         auth_service.register("Test User", "test@example.com", "password")
         
-    mock_user_repo.save_user.assert_not_called()
+    mock_user_repo.create.assert_not_called()
 
 def test_login_success(auth_service, mock_user_repo):
     user = MagicMock(spec=User)

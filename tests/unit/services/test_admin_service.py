@@ -76,18 +76,18 @@ class TestAdminService:
         """Test activating a user account"""
         target_user = Mock()
         mock_user_repo.get_by_id.return_value = target_user
-        mock_user_repo.Update_data.return_value = target_user
+        mock_user_repo.update.return_value = target_user
 
         result = admin_service.manage_user_account(admin_user, 2, "activate")
 
         target_user.activate_account.assert_called_once()
-        mock_user_repo.Update_data.assert_called_once_with(target_user)
+        mock_user_repo.update.assert_called_once_with(target_user)
 
     def test_manage_user_account_deactivate(self, admin_service, admin_user, mock_user_repo):
         """Test deactivating a user account"""
         target_user = Mock()
         mock_user_repo.get_by_id.return_value = target_user
-        mock_user_repo.Update_data.return_value = target_user
+        mock_user_repo.update.return_value = target_user
 
         result = admin_service.manage_user_account(admin_user, 2, "deactivate")
 
@@ -126,7 +126,7 @@ class TestAdminService:
     def test_generate_report_users(self, admin_service, admin_user, mock_user_repo):
         """Test generating users report"""
         users = [Mock(), Mock()]
-        mock_user_repo.findALL.return_value = users
+        mock_user_repo.list_all.return_value = users
 
         result = admin_service.generate_report(admin_user, "users")
 

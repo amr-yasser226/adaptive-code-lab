@@ -165,3 +165,28 @@ class TestSimilarityService:
         result = similarity_service.analyze_submission(1, threshold=0.95)
 
         assert result["threshold_used"] == 0.95
+
+    def test_analyze_submission_handles_computation_error(self, similarity_service, mock_submission_repo, 
+                                                              mock_embedding_service):
+        """Test that errors in similarity computation are logged and iteration continues"""
+        submission = Mock()
+        submission.get_id.return_value = 1
+        submission.get_assignment_id.return_value = 1
+        mock_submission_repo.get_by_id.return_value = submission
+        
+        other = Mock()
+        other.get_id.return_value = 2
+        mock_submission_repo.list_by_assignment.return_value = [submission, other]
+        
+        mock_embedding_service.get_embedding_vector.return_value = [1.0, 0.0, 0.0]
+        
+        # Mock _compute_cosine_similarity to raise exception
+        # We need to patch it on the instance or class, but since we have the instance:
+        original_method = similarity_service._compute_cosine_similarity
+        similarity_service._compute_cosine_similarity = Mock(side_effect=Exception("Math Error"))
+        
+        try:
+            result = similarity_service.analyze_submission(1)
+            assert result["comparisons"] == []
+        finally:
+            similarity_service._compute_cosine_similarity = original_method

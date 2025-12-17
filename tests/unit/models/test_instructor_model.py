@@ -137,3 +137,39 @@ class TestInstructor:
 
         mock_repo.list_by_instructor.assert_called_once_with(1)
         assert result == courses
+
+    def test_review_similarity_confirm(self):
+        """Test review_similarity with confirm action"""
+        instructor = Instructor(
+            id=1, name="Test", email="test@test.com",
+            password="pwd", created_at=datetime.now(),
+            updated_at=datetime.now(), instructor_code="INS",
+            bio="", office_hours=""
+        )
+
+        mock_repo = Mock()
+        mock_flag = Mock()
+        mock_repo.get_by_id.return_value = mock_flag
+
+        instructor.review_similarity(99, 'confirm', 'Cheating detected', mock_repo)
+
+        mock_repo.get_by_id.assert_called_with(99)
+        mock_flag.mark_reviewed.assert_called_once()
+        args, _ = mock_flag.mark_reviewed.call_args
+        assert args[0] == 1  # instructor_id
+        assert args[2] == 'Cheating detected'
+        mock_repo.update.assert_called_once_with(mock_flag)
+
+    def test_review_similarity_invalid_action(self):
+        """Test review_similarity raises error on invalid action"""
+        instructor = Instructor(
+            id=1, name="Test", email="test@test.com",
+            password="pwd", created_at=datetime.now(),
+            updated_at=datetime.now(), instructor_code="INS",
+            bio="", office_hours=""
+        )
+        mock_repo = Mock()
+        mock_repo.get_by_id.return_value = Mock()
+
+        with pytest.raises(Exception, match="Invalid action"):
+            instructor.review_similarity(99, 'invalid', None, mock_repo)
