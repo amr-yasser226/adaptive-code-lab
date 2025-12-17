@@ -1,5 +1,8 @@
 from datetime import datetime
 from typing import Optional, List, Dict
+import logging
+
+logger = logging.getLogger(__name__)
 
 from core.exceptions.validation_error import ValidationError
 from core.entities.similarity_flag import SimilarityFlag
@@ -83,7 +86,8 @@ class SimilarityService:
             # Compute cosine similarity using helper
             try:
                 score = self._compute_cosine_similarity(vec_a, vec_b)
-            except Exception:
+            except Exception as e:
+                logger.error(f"Error computing similarity: {e}")
                 continue
 
             # create Comparison model and persist
@@ -140,16 +144,11 @@ class SimilarityService:
                                     if hasattr(rec, "similarity_id"):
                                         rec.similarity_id = sim_id
                                 # call update (if exists)
-                                try:
-                                    self.comparison_repo.update(rec)
-                                except Exception:
-                                    # best-effort only; not fatal if update fails
-                                    pass
-                            except Exception:
-                                pass
-            except Exception:
-                # linking is best-effort
-                pass
+                                self.comparison_repo.update(rec)
+                            except Exception as e:
+                                logger.warning(f"Failed to link comparison record: {e}")
+            except Exception as e:
+                logger.error(f"Error linking comparison records to flag: {e}")
 
         return {
             "submission_id": submission_id,
