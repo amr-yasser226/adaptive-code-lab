@@ -67,8 +67,9 @@ def create_app(test_config=None):
     # Session security flags
     app.config['SESSION_COOKIE_HTTPONLY'] = True
     app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-    # Uncomment in production with HTTPS:
-    # app.config['SESSION_COOKIE_SECURE'] = True
+    # Enable in production with HTTPS
+    if os.getenv('ENV') == 'production' or os.getenv('FLASK_ENV') == 'production':
+        app.config['SESSION_COOKIE_SECURE'] = True
 
     if test_config:
         app.config.update(test_config)
