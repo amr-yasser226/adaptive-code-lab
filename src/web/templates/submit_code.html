@@ -57,6 +57,7 @@
             <div class="editor-body">
                 <form method="POST" action="{{ url_for('student.submit_code', assignment_id=assignment.id) }}"
                     novalidate id="codeForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
                     <!-- Language & Options Bar -->
                     <div class="editor-toolbar">
