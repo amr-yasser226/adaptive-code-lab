@@ -29,43 +29,56 @@
         Skip to Main Content
     </a>
 
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top" aria-label="Main Navigation">
+    <!-- Navigation Bar - Modern Light Theme -->
+    <nav class="navbar navbar-expand-lg sticky-top"
+        style="background: white; box-shadow: 0 2px 15px rgba(0,0,0,0.08); padding: 0.75rem 0;"
+        aria-label="Main Navigation">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('index') }}" aria-label="ACCL Home">
-                <i class="fas fa-code" aria-hidden="true"></i> ACCL
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('index') }}" aria-label="ACCL Home"
+                style="font-weight: 700; font-size: 1.3rem;">
+                <span
+                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    <i class="fas fa-code" aria-hidden="true"
+                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                    ACCL
+                </span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"
+                style="border-color: #667eea;">
+                <i class="fas fa-bars" style="color: #667eea;"></i>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     {% if current_user %}
                     <li class="nav-item">
                         {% if current_user.role == 'instructor' %}
-                        <a class="nav-link" href="{{ url_for('instructor.dashboard') }}">
-                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        <a class="nav-link" href="{{ url_for('instructor.dashboard') }}"
+                            style="color: #374151; font-weight: 500;">
+                            <i class="fas fa-tachometer-alt" style="color: #667eea;"></i> Dashboard
                         </a>
                         {% else %}
-                        <a class="nav-link" href="{{ url_for('student.dashboard') }}">
-                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        <a class="nav-link" href="{{ url_for('student.dashboard') }}"
+                            style="color: #374151; font-weight: 500;">
+                            <i class="fas fa-tachometer-alt" style="color: #667eea;"></i> Dashboard
                         </a>
                         {% endif %}
                     </li>
 
                     {% if current_user.role == 'instructor' or current_user.role == 'admin' %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('instructor.analytics') }}">
-                            <i class="fas fa-chart-bar"></i> Analytics
+                        <a class="nav-link" href="{{ url_for('instructor.analytics') }}"
+                            style="color: #374151; font-weight: 500;">
+                            <i class="fas fa-chart-bar" style="color: #667eea;"></i> Analytics
                         </a>
                     </li>
                     {% endif %}
 
                     {% if current_user.role == 'student' %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('student.assignments') }}">
-                            <i class="fas fa-file-upload"></i> Assignments
+                        <a class="nav-link" href="{{ url_for('student.assignments') }}"
+                            style="color: #374151; font-weight: 500;">
+                            <i class="fas fa-file-upload" style="color: #667eea;"></i> Assignments
                         </a>
                     </li>
                     {% endif %}
@@ -85,12 +98,14 @@
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.login') }}">
-                            <i class="fas fa-sign-in-alt"></i> Login
+                        <a class="nav-link" href="{{ url_for('auth.login') }}"
+                            style="color: #374151; font-weight: 500;">
+                            <i class="fas fa-sign-in-alt" style="color: #667eea;"></i> Login
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.register') }}">
+                        <a class="nav-link px-3 py-2 ms-2" href="{{ url_for('auth.register') }}"
+                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 600; border-radius: 8px;">
                             <i class="fas fa-user-plus"></i> Register
                         </a>
                     </li>
