@@ -60,8 +60,24 @@ class Instructor(User):
         
         return course.add_assignment(new_assignment, assignment_repo)
     
-    def review_similarity(self, flag_id, action, notes):
-        pass
+    def review_similarity(self, flag_id, action, notes, similarity_flag_repo):
+        flag = similarity_flag_repo.get_by_id(flag_id)
+        if not flag:
+            raise Exception("Similarity flag not found")
+            
+        now = datetime.now()
+        instructor_id = self.get_id()
+        
+        if action == 'confirm':
+            flag.mark_reviewed(instructor_id, now, notes)
+        elif action == 'dismiss':
+            flag.dismiss(instructor_id, now)
+        elif action == 'escalate':
+            flag.escalate(instructor_id, now)
+        else:
+            raise Exception(f"Invalid action: {action}")
+            
+        return similarity_flag_repo.update(flag)
     
     def export_grades(self, course_id, course_repo, enrollment_repo):
         course = course_repo.get_by_id(course_id)
