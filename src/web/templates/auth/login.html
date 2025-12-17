@@ -19,6 +19,7 @@
                 {% endif %}
 
                 <form method="POST" action="{{ url_for('auth.login') }}" id="loginForm" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <!-- Email Field -->
                     <div class="mb-3">
                         <label for="email" class="form-label">Email Address</label>
