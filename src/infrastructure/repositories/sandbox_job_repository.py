@@ -4,11 +4,8 @@ from core.entities.sandbox_job import SandboxJob
 
 
 class SandboxJobRepository:
-    def __init__(self, db_path):
-        self.db_path = db_path
-    
-    def _get_connection(self):
-        return sqlite3.connect(self.db_path)
+    def __init__(self, db):
+        self.db = db
     
     def _row_to_entity(self, row):
         if not row:
@@ -27,87 +24,65 @@ class SandboxJobRepository:
         )
     
     def create(self, job: SandboxJob) -> SandboxJob:
-        conn = self._get_connection()
-        cursor = conn.cursor()
         try:
-            cursor.execute("""
+            self.db.execute("""
                 INSERT INTO sandbox_jobs 
                 (submission_id, status, started_at, completed_at, timeout_seconds, 
                  memory_limit_mb, exit_code, error_message, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                job.get_submission_id(),
-                job.status,
-                job.started_at,
-                job.completed_at,
-                job.timeout_seconds,
-                job.memory_limit_mb,
-                job.exit_code,
-                job.error_message,
-                job.created_at.isoformat() if isinstance(job.created_at, datetime) else job.created_at
-            ))
-            conn.commit()
-            return self.get_by_id(cursor.lastrowid)
+                VALUES (:sid, :status, :start, :comp, :tout, :mem, :exit, :err, :cat)
+            """, {
+                "sid": job.get_submission_id(),
+                "status": job.status,
+                "start": job.started_at,
+                "comp": job.completed_at,
+                "tout": job.timeout_seconds,
+                "mem": job.memory_limit_mb,
+                "exit": job.exit_code,
+                "err": job.error_message,
+                "cat": job.created_at.isoformat() if isinstance(job.created_at, datetime) else job.created_at
+            })
+            self.db.commit()
+            new_id = self.db.execute("SELECT last_insert_rowid()").fetchone()[0]
+            return self.get_by_id(new_id)
         except sqlite3.Error as e:
-            conn.rollback()
+            self.db.rollback()
             raise e
-        finally:
-            conn.close()
     
     def get_by_id(self, job_id: int) -> SandboxJob:
-        conn = self._get_connection()
-        cursor = conn.cursor()
-        try:
-            cursor.execute("SELECT * FROM sandbox_jobs WHERE id = ?", (job_id,))
-            return self._row_to_entity(cursor.fetchone())
-        finally:
-            conn.close()
+        result = self.db.execute("SELECT * FROM sandbox_jobs WHERE id = :id", {"id": job_id})
+        return self._row_to_entity(result.fetchone())
     
     def get_by_submission(self, submission_id: int) -> list:
-        conn = self._get_connection()
-        cursor = conn.cursor()
-        try:
-            cursor.execute(
-                "SELECT * FROM sandbox_jobs WHERE submission_id = ? ORDER BY created_at DESC",
-                (submission_id,)
-            )
-            return [self._row_to_entity(row) for row in cursor.fetchall()]
-        finally:
-            conn.close()
+        result = self.db.execute(
+            "SELECT * FROM sandbox_jobs WHERE submission_id = :sid ORDER BY created_at DESC",
+            {"sid": submission_id}
+        )
+        return [self._row_to_entity(row) for row in result.fetchall()]
     
     def get_pending_jobs(self, limit: int = 10) -> list:
-        conn = self._get_connection()
-        cursor = conn.cursor()
-        try:
-            cursor.execute(
-                "SELECT * FROM sandbox_jobs WHERE status = 'queued' ORDER BY created_at LIMIT ?",
-                (limit,)
-            )
-            return [self._row_to_entity(row) for row in cursor.fetchall()]
-        finally:
-            conn.close()
+        result = self.db.execute(
+            "SELECT * FROM sandbox_jobs WHERE status = 'queued' ORDER BY created_at LIMIT :limit",
+            {"limit": limit}
+        )
+        return [self._row_to_entity(row) for row in result.fetchall()]
     
     def update(self, job: SandboxJob) -> SandboxJob:
-        conn = self._get_connection()
-        cursor = conn.cursor()
         try:
-            cursor.execute("""
+            self.db.execute("""
                 UPDATE sandbox_jobs 
-                SET status = ?, started_at = ?, completed_at = ?, 
-                    exit_code = ?, error_message = ?
-                WHERE id = ?
-            """, (
-                job.status,
-                job.started_at.isoformat() if isinstance(job.started_at, datetime) else job.started_at,
-                job.completed_at.isoformat() if isinstance(job.completed_at, datetime) else job.completed_at,
-                job.exit_code,
-                job.error_message,
-                job.get_id()
-            ))
-            conn.commit()
+                SET status = :status, started_at = :start, completed_at = :comp, 
+                    exit_code = :exit, error_message = :err
+                WHERE id = :id
+            """, {
+                "status": job.status,
+                "start": job.started_at.isoformat() if isinstance(job.started_at, datetime) else job.started_at,
+                "comp": job.completed_at.isoformat() if isinstance(job.completed_at, datetime) else job.completed_at,
+                "exit": job.exit_code,
+                "err": job.error_message,
+                "id": job.get_id()
+            })
+            self.db.commit()
             return self.get_by_id(job.get_id())
         except sqlite3.Error as e:
-            conn.rollback()
+            self.db.rollback()
             raise e
-        finally:
-            conn.close()
