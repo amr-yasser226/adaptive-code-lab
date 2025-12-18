@@ -12,9 +12,10 @@ class HintService:
         if not submission:
             raise Exception("Submission not found")
 
-        # Example AI call
+        # Example AI call - FIXED: pass code instead of submission_id
         ai_response = self.ai_client.generate_hint(
-            submission_id=submission_id
+            code=submission.content or "", # Use persisted code
+            error_message=None # Could be expanded to include test failure stderr
         )
 
         hint = Hint(
