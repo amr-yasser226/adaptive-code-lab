@@ -48,7 +48,7 @@ from core.services.sandbox_service import SandboxService
 from core.services.remediation_service import RemediationService
 from core.services.file_service import FileService
 from core.services.audit_log_service import AuditLogService
-from core.services.draft_Service import DraftService
+from core.services.draft_service import DraftService
 from core.services.hint_service import HintService
 
 
@@ -63,7 +63,7 @@ from web.routes.assignment import assignment_bp
 from web.routes.remediation import remediation_bp
 from web.routes.file import files_bp
 from web.routes.course import course_bp
-from web.routes.Enrollment import enrollment_bp
+from web.routes.enrollment import enrollment_bp
 from web.routes.audit_log import audit_bp
 from web.routes.hint import hint_bp
 
