@@ -30,6 +30,7 @@ from infrastructure.repositories.sandbox_job_repository import SandboxJobReposit
 from infrastructure.repositories.remediation_repository import RemediationRepository
 from infrastructure.repositories.file_repository import FileRepository
 from infrastructure.repositories.audit_log_repository import AuditLogRepository
+from infrastructure.repositories.draft_repository import DraftRepository
 
 
 
@@ -45,6 +46,7 @@ from core.services.sandbox_service import SandboxService
 from core.services.remediation_service import RemediationService
 from core.services.file_service import FileService
 from core.services.audit_log_service import AuditLogService
+from core.services.draft_service import DraftService
 
 from web.routes.auth import auth_bp
 from web.routes.student import student_bp
@@ -143,6 +145,7 @@ def create_app(test_config=None):
     remediation_repo = RemediationRepository(db_connection)
     file_repo = FileRepository(db_connection)
     audit_repo = AuditLogRepository(db_connection)
+    draft_repo = DraftRepository(db_connection)
     # 2. Initialize Services with Dependencies
     auth_service = AuthService(user_repo)
     
@@ -256,7 +259,9 @@ def create_app(test_config=None):
         'sandbox_job_repo': sandbox_job_repo,  # FR-04
         'remediation_repo': remediation_repo,  # FR-09
         'file_repo': file_repo,
-        'file_service': FileService(file_repo=file_repo, submission_repo=submission_repo)
+        'file_service': FileService(file_repo=file_repo, submission_repo=submission_repo),
+        'draft_repo': draft_repo,
+        'draft_service': DraftService(draft_repo=draft_repo)
     }
 
     # --- Register Blueprints (Bonus #1) ---
