@@ -28,6 +28,7 @@ from infrastructure.repositories.admin_repository import AdminRepository
 from infrastructure.repositories.result_repository import ResultRepository
 from infrastructure.repositories.sandbox_job_repository import SandboxJobRepository
 from infrastructure.repositories.remediation_repository import RemediationRepository
+from infrastructure.repositories.file_repository import FileRepository
 
 
 
@@ -41,6 +42,7 @@ from core.services.peer_review_service import PeerReviewService
 from core.services.admin_service import AdminService
 from core.services.sandbox_service import SandboxService
 from core.services.remediation_service import RemediationService
+from core.services.file_service import FileService
 
 from web.routes.auth import auth_bp
 from web.routes.student import student_bp
@@ -51,6 +53,7 @@ from web.routes.peer_review import peer_review_bp
 from web.routes.notification import notification_bp
 from web.routes.assignment import assignment_bp
 from web.routes.remediation import remediation_bp
+from web.routes.file import files_bp
 
 
 
@@ -133,6 +136,7 @@ def create_app(test_config=None):
     result_repo = ResultRepository(db_connection)
     sandbox_job_repo = SandboxJobRepository(db_connection)
     remediation_repo = RemediationRepository(db_connection)
+    file_repo = FileRepository(db_connection)
     # 2. Initialize Services with Dependencies
     auth_service = AuthService(user_repo)
     
@@ -229,7 +233,9 @@ def create_app(test_config=None):
         'admin_repo': admin_repo,
         'result_repo': result_repo,
         'sandbox_job_repo': sandbox_job_repo,  # FR-04
-        'remediation_repo': remediation_repo  # FR-09
+        'remediation_repo': remediation_repo,  # FR-09
+        'file_repo': file_repo,
+        'file_service': FileService(file_repo=file_repo, submission_repo=submission_repo)
     }
 
     # --- Register Blueprints (Bonus #1) ---
@@ -242,6 +248,7 @@ def create_app(test_config=None):
     app.register_blueprint(notification_bp)
     app.register_blueprint(assignment_bp)
     app.register_blueprint(remediation_bp, url_prefix='/student')  # FR-09
+    app.register_blueprint(files_bp)  # File routes
 
     # --- Routes ---
     @app.route('/')
