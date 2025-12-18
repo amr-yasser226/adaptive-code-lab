@@ -6,7 +6,7 @@ from core.entities.assignment import Assignment
 from datetime import datetime
 
 
-def test_draft_save_and_recover(setup_test_database):
+def test_draft_save_and_recover(clean_db):
     # create app after test DB env is set
     app = create_app({'TESTING': True, 'WTF_CSRF_ENABLED': False})
     client = app.test_client()
@@ -17,11 +17,11 @@ def test_draft_save_and_recover(setup_test_database):
         assignment_repo = app.extensions['services']['assignment_repo']
 
         # Create student user
-        student = User(id=None, name='Student One', email='s1@test.edu', password=User.hash_password('pass'), role='student')
+        student = User(id=None, name='Draft Student', email='draft_student_unique@test.edu', password=User.hash_password('pass'), role='student')
         saved_student = user_repo.create(student)
 
         # Create instructor user
-        instructor = User(id=None, name='Instructor', email='i1@test.edu', password=User.hash_password('pass'), role='instructor')
+        instructor = User(id=None, name='Draft Instructor', email='draft_instructor_unique@test.edu', password=User.hash_password('pass'), role='instructor')
         saved_instr = user_repo.create(instructor)
 
         # Insert instructor profile row
