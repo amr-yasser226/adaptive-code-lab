@@ -32,6 +32,8 @@ from infrastructure.repositories.file_repository import FileRepository
 from infrastructure.repositories.audit_log_repository import AuditLogRepository
 from infrastructure.repositories.draft_repository import DraftRepository
 
+from infrastructure.repositories.hint_repository import HintRepository
+from infrastructure.ai.groq_client import GroqClient
 
 
 from core.services.auth_service import AuthService
@@ -46,7 +48,9 @@ from core.services.sandbox_service import SandboxService
 from core.services.remediation_service import RemediationService
 from core.services.file_service import FileService
 from core.services.audit_log_service import AuditLogService
-from core.services.draft_service import DraftService
+from core.services.draft_Service import DraftService
+from core.services.hint_service import HintService
+
 
 from web.routes.auth import auth_bp
 from web.routes.student import student_bp
@@ -61,7 +65,7 @@ from web.routes.file import files_bp
 from web.routes.course import course_bp
 from web.routes.Enrollment import enrollment_bp
 from web.routes.audit_log import audit_bp
-
+from web.routes.hint import hint_bp
 
 
 def create_app(test_config=None):
@@ -146,6 +150,12 @@ def create_app(test_config=None):
     file_repo = FileRepository(db_connection)
     audit_repo = AuditLogRepository(db_connection)
     draft_repo = DraftRepository(db_connection)
+    hint_repo= HintRepository(db_connection)
+
+
+    # Intialze AI_client
+    groq_client=GroqClient()
+
     # 2. Initialize Services with Dependencies
     auth_service = AuthService(user_repo)
     
@@ -180,7 +190,7 @@ def create_app(test_config=None):
 
     notification_service = NotificationService(notification_repo=notification_repo)
 
-    file_service = FileService(file_repo=file_repo, submission_repo=submission_repo)
+    file_service = FileService(file_repo=file_repo,submission_repo=submission_repo)
     audit_service = AuditLogService(audit_repo=audit_repo)
 
     peer_review_service = PeerReviewService(
@@ -198,6 +208,12 @@ def create_app(test_config=None):
         course_repo=course_repo,
         enrollment_repo=enrollment_repo,
         submission_repo=submission_repo,    
+    )
+
+    hint_service =HintService(
+        hint_repo=hint_repo,
+        submission_repo= submission_repo ,
+        ai_client=groq_client
     )
 
     # FR-04: Sandbox Service (with optional Groq AI feedback)
@@ -239,6 +255,7 @@ def create_app(test_config=None):
         'peer_review_service': peer_review_service,
         'sandbox_service': sandbox_service,  # FR-04
         'remediation_service': remediation_service,  # FR-09
+        'hint_service' : hint_service,
         'user_repo': user_repo,
         'assignment_repo': assignment_repo,
         'submission_repo': submission_repo,
@@ -261,7 +278,8 @@ def create_app(test_config=None):
         'file_repo': file_repo,
         'file_service': FileService(file_repo=file_repo, submission_repo=submission_repo),
         'draft_repo': draft_repo,
-        'draft_service': DraftService(draft_repo=draft_repo)
+        'draft_service': DraftService(draft_repo=draft_repo),
+        'hint_repo' : hint_repo
     }
 
     # --- Register Blueprints (Bonus #1) ---
@@ -278,6 +296,7 @@ def create_app(test_config=None):
     app.register_blueprint(course_bp)
     app.register_blueprint(enrollment_bp)
     app.register_blueprint(audit_bp)
+    app.register_blueprint(hint_bp)
 
     # --- Routes ---
     @app.route('/')
