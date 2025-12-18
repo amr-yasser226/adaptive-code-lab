@@ -21,7 +21,8 @@
                 'Content-Type': 'application/json',
                 'X-CSRFToken': csrfToken || ''
             },
-            body: JSON.stringify({ assignment_id: assignmentId, content, metadata })
+            body: JSON.stringify({ assignment_id: assignmentId, content, metadata }),
+            keepalive: true
         }).then(r => r.json());
     }
 
@@ -54,20 +55,39 @@
         // Debounced autosave on change
         let pending = false;
         let lastContent = '';
+        const statusEl = document.getElementById('autosaveStatus');
+
+        function setStatus(state, text) {
+            if (!statusEl) return;
+            statusEl.className = 'autosave-status ' + state;
+            statusEl.textContent = text;
+        }
 
         function doSave() {
             const content = codeInput.value;
             if (content === lastContent) return;
             pending = true;
+            setStatus('saving', 'Saving...');
             postDraft(assignmentId, content, null, csrfToken)
                 .then(resp => {
-                    // We could surface errors via a small indicator - for now, simple console
-                    if (!resp || !resp.success) console.warn('Autosave failed', resp && resp.error);
+                    if (!resp || !resp.success) {
+                        console.warn('Autosave failed', resp && resp.error);
+                        setStatus('error', 'Save failed');
+                    } else {
+                        setStatus('ok', 'Saved');
+                    }
                 })
-                .catch(err => console.warn('Autosave network error', err))
+                .catch(err => {
+                    console.warn('Autosave network error', err);
+                    setStatus('error', 'Network error');
+                })
                 .finally(() => {
                     lastContent = content;
                     pending = false;
+                    // Clear status back to ok after a short delay
+                    setTimeout(() => {
+                        if (statusEl && statusEl.classList.contains('ok')) setStatus('ok', 'Saved');
+                    }, 2500);
                 });
         }
 
@@ -82,6 +102,11 @@
             if (debounceTimer) clearTimeout(debounceTimer);
             debounceTimer = setTimeout(doSave, 1500);
         });
+
+        // Expose manual save for Save Draft button
+        window.saveDraftManual = function () {
+            doSave();
+        };
 
         // Save on unload
         window.addEventListener('beforeunload', () => {
