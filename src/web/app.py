@@ -53,6 +53,7 @@ from web.routes.file import files_bp
 from web.routes.course import course_bp
 from web.routes.Enrollment import enrollment_bp
 from web.routes.audit_log import audit_bp
+from web.routes.assignment import assignment_bp
 
 
 
@@ -189,6 +190,13 @@ def create_app(test_config=None):
         submission_repo=submission_repo,    
     )
 
+    assignment_service = AssignmentService(
+        assignment_repo=assignment_repo,
+        course_repo=course_repo,
+        submission_repo=submission_repo
+    )
+
+
     # 3. Store Services in App Context
     app.extensions['services'] = {
         'auth_service': auth_service,
@@ -199,6 +207,7 @@ def create_app(test_config=None):
         'notification_service': notification_service,
         'admin_service': admin_service,
         'peer_review_service':peer_review_service,
+        'assignment_service' : assignment_service,
         'user_repo': user_repo,
         'assignment_repo': assignment_repo, # Exposed for direct read access
         'submission_repo': submission_repo,
@@ -229,6 +238,7 @@ def create_app(test_config=None):
     app.register_blueprint(course_bp)
     app.register_blueprint(enrollment_bp)
     app.register_blueprint(audit_bp)
+    app.register_blueprint(assignment_bp)
 
     # --- Routes ---
     @app.route('/')
