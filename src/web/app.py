@@ -66,6 +66,9 @@ from web.routes.course import course_bp
 from web.routes.enrollment import enrollment_bp
 from web.routes.audit_log import audit_bp
 from web.routes.hint import hint_bp
+from web.routes.test_case import test_case_bp
+from web.routes.submission import submission_bp
+from web.routes.result import result_bp
 
 
 def create_app(test_config=None):
@@ -277,6 +280,9 @@ def create_app(test_config=None):
     app.register_blueprint(enrollment_bp)
     app.register_blueprint(audit_bp)
     app.register_blueprint(hint_bp)
+    app.register_blueprint(test_case_bp)
+    app.register_blueprint(submission_bp)
+    app.register_blueprint(result_bp)
 
     # --- Routes ---
     @app.route('/')
