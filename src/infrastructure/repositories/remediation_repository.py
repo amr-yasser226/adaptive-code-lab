@@ -4,11 +4,8 @@ from core.entities.remediation import Remediation, StudentRemediation
 
 
 class RemediationRepository:
-    def __init__(self, db_path):
-        self.db_path = db_path
-    
-    def _get_connection(self):
-        return sqlite3.connect(self.db_path)
+    def __init__(self, db):
+        self.db = db
     
     def _row_to_remediation(self, row):
         if not row:
@@ -43,146 +40,106 @@ class RemediationRepository:
     # Remediation CRUD
     
     def get_by_id(self, remediation_id: int) -> Remediation:
-        conn = self._get_connection()
-        cursor = conn.cursor()
-        try:
-            cursor.execute("SELECT * FROM remediations WHERE id = ?", (remediation_id,))
-            return self._row_to_remediation(cursor.fetchone())
-        finally:
-            conn.close()
+        result = self.db.execute("SELECT * FROM remediations WHERE id = :id", {"id": remediation_id})
+        return self._row_to_remediation(result.fetchone())
     
     def find_by_pattern(self, failure_pattern: str) -> list:
         """Find remediations matching a failure pattern."""
-        conn = self._get_connection()
-        cursor = conn.cursor()
-        try:
-            cursor.execute(
-                "SELECT * FROM remediations WHERE failure_pattern = ?",
-                (failure_pattern,)
-            )
-            return [self._row_to_remediation(row) for row in cursor.fetchall()]
-        finally:
-            conn.close()
+        result = self.db.execute(
+            "SELECT * FROM remediations WHERE failure_pattern = :pattern",
+            {"pattern": failure_pattern}
+        )
+        return [self._row_to_remediation(row) for row in result.fetchall()]
     
     def get_all(self) -> list:
         """Get all remediations."""
-        conn = self._get_connection()
-        cursor = conn.cursor()
-        try:
-            cursor.execute("SELECT * FROM remediations ORDER BY failure_pattern, difficulty_level")
-            return [self._row_to_remediation(row) for row in cursor.fetchall()]
-        finally:
-            conn.close()
+        result = self.db.execute("SELECT * FROM remediations ORDER BY failure_pattern, difficulty_level")
+        return [self._row_to_remediation(row) for row in result.fetchall()]
     
     def create(self, remediation: Remediation) -> Remediation:
-        conn = self._get_connection()
-        cursor = conn.cursor()
         try:
-            cursor.execute("""
+            self.db.execute("""
                 INSERT INTO remediations 
                 (failure_pattern, resource_title, resource_type, resource_url, 
                  resource_content, difficulty_level, language, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                remediation.failure_pattern,
-                remediation.resource_title,
-                remediation.resource_type,
-                remediation.resource_url,
-                remediation.resource_content,
-                remediation.difficulty_level,
-                remediation.language,
-                datetime.utcnow().isoformat()
-            ))
-            conn.commit()
-            return self.get_by_id(cursor.lastrowid)
+                VALUES (:fp, :rt, :rtype, :rurl, :rcont, :diff, :lang, :cat)
+            """, {
+                "fp": remediation.failure_pattern,
+                "rt": remediation.resource_title,
+                "rtype": remediation.resource_type,
+                "rurl": remediation.resource_url,
+                "rcont": remediation.resource_content,
+                "diff": remediation.difficulty_level,
+                "lang": remediation.language,
+                "cat": datetime.utcnow().isoformat()
+            })
+            self.db.commit()
+            new_id = self.db.execute("SELECT last_insert_rowid()").fetchone()[0]
+            return self.get_by_id(new_id)
         except sqlite3.Error as e:
-            conn.rollback()
+            self.db.rollback()
             raise e
-        finally:
-            conn.close()
     
     def get_student_remediation(self, student_id: int, remediation_id: int) -> StudentRemediation:
-        conn = self._get_connection()
-        cursor = conn.cursor()
-        try:
-            cursor.execute(
-                "SELECT * FROM student_remediations WHERE student_id = ? AND remediation_id = ?",
-                (student_id, remediation_id)
-            )
-            return self._row_to_student_remediation(cursor.fetchone())
-        finally:
-            conn.close()
+        result = self.db.execute(
+            "SELECT * FROM student_remediations WHERE student_id = :sid AND remediation_id = :rid",
+            {"sid": student_id, "rid": remediation_id}
+        )
+        return self._row_to_student_remediation(result.fetchone())
     
     def get_student_remediation_by_id(self, sr_id: int) -> StudentRemediation:
-        conn = self._get_connection()
-        cursor = conn.cursor()
-        try:
-            cursor.execute("SELECT * FROM student_remediations WHERE id = ?", (sr_id,))
-            return self._row_to_student_remediation(cursor.fetchone())
-        finally:
-            conn.close()
+        result = self.db.execute("SELECT * FROM student_remediations WHERE id = :id", {"id": sr_id})
+        return self._row_to_student_remediation(result.fetchone())
     
     def list_student_remediations(self, student_id: int, only_pending: bool = False) -> list:
-        conn = self._get_connection()
-        cursor = conn.cursor()
-        try:
-            if only_pending:
-                cursor.execute(
-                    "SELECT * FROM student_remediations WHERE student_id = ? AND is_completed = 0 ORDER BY recommended_at DESC",
-                    (student_id,)
-                )
-            else:
-                cursor.execute(
-                    "SELECT * FROM student_remediations WHERE student_id = ? ORDER BY recommended_at DESC",
-                    (student_id,)
-                )
-            return [self._row_to_student_remediation(row) for row in cursor.fetchall()]
-        finally:
-            conn.close()
+        if only_pending:
+            result = self.db.execute(
+                "SELECT * FROM student_remediations WHERE student_id = :sid AND is_completed = 0 ORDER BY recommended_at DESC",
+                {"sid": student_id}
+            )
+        else:
+            result = self.db.execute(
+                "SELECT * FROM student_remediations WHERE student_id = :sid ORDER BY recommended_at DESC",
+                {"sid": student_id}
+            )
+        return [self._row_to_student_remediation(row) for row in result.fetchall()]
     
     def create_student_remediation(self, sr: StudentRemediation) -> StudentRemediation:
-        conn = self._get_connection()
-        cursor = conn.cursor()
         try:
-            cursor.execute("""
+            self.db.execute("""
                 INSERT INTO student_remediations 
                 (student_id, remediation_id, submission_id, is_viewed, is_completed, recommended_at)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (
-                sr.get_student_id(),
-                sr.get_remediation_id(),
-                sr.get_submission_id(),
-                sr.is_viewed,
-                sr.is_completed,
-                datetime.utcnow().isoformat()
-            ))
-            conn.commit()
-            return self.get_student_remediation_by_id(cursor.lastrowid)
+                VALUES (:sid, :rid, :subid, :iv, :ic, :rat)
+            """, {
+                "sid": sr.get_student_id(),
+                "rid": sr.get_remediation_id(),
+                "subid": sr.get_submission_id(),
+                "iv": int(sr.is_viewed),
+                "ic": int(sr.is_completed),
+                "rat": datetime.utcnow().isoformat()
+            })
+            self.db.commit()
+            new_id = self.db.execute("SELECT last_insert_rowid()").fetchone()[0]
+            return self.get_student_remediation_by_id(new_id)
         except sqlite3.Error as e:
-            conn.rollback()
+            self.db.rollback()
             raise e
-        finally:
-            conn.close()
     
     def update_student_remediation(self, sr: StudentRemediation) -> StudentRemediation:
-        conn = self._get_connection()
-        cursor = conn.cursor()
         try:
-            cursor.execute("""
+            self.db.execute("""
                 UPDATE student_remediations 
-                SET is_viewed = ?, is_completed = ?, viewed_at = ?, completed_at = ?
-                WHERE id = ?
-            """, (
-                sr.is_viewed,
-                sr.is_completed,
-                sr.viewed_at.isoformat() if isinstance(sr.viewed_at, datetime) else sr.viewed_at,
-                sr.completed_at.isoformat() if isinstance(sr.completed_at, datetime) else sr.completed_at,
-                sr.get_id()
-            ))
-            conn.commit()
+                SET is_viewed = :iv, is_completed = :ic, viewed_at = :vat, completed_at = :cat
+                WHERE id = :id
+            """, {
+                "iv": int(sr.is_viewed),
+                "ic": int(sr.is_completed),
+                "vat": sr.viewed_at.isoformat() if isinstance(sr.viewed_at, datetime) else sr.viewed_at,
+                "cat": sr.completed_at.isoformat() if isinstance(sr.completed_at, datetime) else sr.completed_at,
+                "id": sr.get_id()
+            })
+            self.db.commit()
             return self.get_student_remediation_by_id(sr.get_id())
         except sqlite3.Error as e:
-            conn.rollback()
+            self.db.rollback()
             raise e
-        finally:
-            conn.close()
