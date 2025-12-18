@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Create Course{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>Create Course</h1>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="text" name="code" placeholder="Course Code" required/>
+        <input type="text" name="title" placeholder="Title" required/>
+        <textarea name="description" placeholder="Description"></textarea>
+        <input type="number" name="year" value="2024"/>
+        <input type="text" name="semester" value="Spring"/>
+        <input type="number" name="max_students" value="50"/>
+        <input type="number" name="credits" value="3"/>
+        <button type="submit">Create</button>
+    </form>
+</div>
+{% endblock %}
