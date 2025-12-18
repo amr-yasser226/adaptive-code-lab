@@ -49,7 +49,7 @@ from web.routes.peer_review import peer_review_bp
 from web.routes.notification import notification_bp
 from web.routes.file import files_bp
 from web.routes.course import course_bp
-from web.routes.enrollment import enrollment_bp
+from web.routes.Enrollment import enrollment_bp
 
 
 
