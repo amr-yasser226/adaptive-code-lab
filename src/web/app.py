@@ -49,6 +49,7 @@ from web.routes.peer_review import peer_review_bp
 from web.routes.notification import notification_bp
 from web.routes.file import files_bp
 from web.routes.course import course_bp
+from web.routes.enrollment import enrollment_bp
 
 
 
@@ -219,6 +220,7 @@ def create_app(test_config=None):
     app.register_blueprint(notification_bp)
     app.register_blueprint(files_bp)
     app.register_blueprint(course_bp)
+    app.register_blueprint(enrollment_bp)
 
     # --- Routes ---
     @app.route('/')
