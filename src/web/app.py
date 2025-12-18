@@ -26,6 +26,8 @@ from infrastructure.repositories.notification_repository import NotificationRepo
 from infrastructure.repositories.peer_review_repository import PeerReviewRepository
 from infrastructure.repositories.admin_repository import AdminRepository
 from infrastructure.repositories.result_repository import ResultRepository
+from infrastructure.repositories.sandbox_job_repository import SandboxJobRepository
+from infrastructure.repositories.remediation_repository import RemediationRepository
 
 
 
@@ -37,6 +39,8 @@ from core.services.assignment_service import AssignmentService
 from core.services.notification_service import NotificationService
 from core.services.peer_review_service import PeerReviewService
 from core.services.admin_service import AdminService
+from core.services.sandbox_service import SandboxService
+from core.services.remediation_service import RemediationService
 
 from web.routes.auth import auth_bp
 from web.routes.student import student_bp
@@ -46,6 +50,7 @@ from web.routes.admin import admin_bp
 from web.routes.peer_review import peer_review_bp
 from web.routes.notification import notification_bp
 from web.routes.assignment import assignment_bp
+from web.routes.remediation import remediation_bp
 
 
 
@@ -126,6 +131,8 @@ def create_app(test_config=None):
     peer_review_repo = PeerReviewRepository(db_connection)
     admin_repo = AdminRepository(db_connection)
     result_repo = ResultRepository(db_connection)
+    sandbox_job_repo = SandboxJobRepository(db_connection)
+    remediation_repo = RemediationRepository(db_connection)
     # 2. Initialize Services with Dependencies
     auth_service = AuthService(user_repo)
     
@@ -177,9 +184,23 @@ def create_app(test_config=None):
         submission_repo=submission_repo,    
     )
 
-    assignment_service = AssignmentService(
-        assignment_repo=assignment_repo,
-        course_repo=course_repo,
+    # FR-04: Sandbox Service (with optional Groq AI feedback)
+    try:
+        from infrastructure.ai.groq_client import GroqClient
+        groq_client = GroqClient()
+    except Exception:
+        groq_client = None  # AI feedback optional
+    
+    sandbox_service = SandboxService(
+        sandbox_job_repo=sandbox_job_repo,
+        submission_repo=submission_repo,
+        groq_client=groq_client
+    )
+
+    # FR-09: Remediation Service
+    remediation_service = RemediationService(
+        remediation_repo=remediation_repo,
+        result_repo=result_repo,
         submission_repo=submission_repo
     )
 
@@ -193,20 +214,22 @@ def create_app(test_config=None):
         'assignment_service': assignment_service,
         'notification_service': notification_service,
         'admin_service': admin_service,
-        'peer_review_service':peer_review_service,
-        'assignment_service' : assignment_service,
+        'peer_review_service': peer_review_service,
+        'sandbox_service': sandbox_service,  # FR-04
+        'remediation_service': remediation_service,  # FR-09
         'user_repo': user_repo,
-        'assignment_repo': assignment_repo, # Exposed for direct read access
+        'assignment_repo': assignment_repo,
         'submission_repo': submission_repo,
         'course_repo': course_repo,
         'enrollment_repo': enrollment_repo,
         'test_case_repo': test_case_repo,
-        'flag_repo': flag_repo,  # For plagiarism detection
-        # Removed duplicate registrations (were also on lines 158, 160)
+        'flag_repo': flag_repo,
         'notification_repo': notification_repo,
         'peer_review_repo': peer_review_repo,
         'admin_repo': admin_repo,
-        'result_repo': result_repo
+        'result_repo': result_repo,
+        'sandbox_job_repo': sandbox_job_repo,  # FR-04
+        'remediation_repo': remediation_repo  # FR-09
     }
 
     # --- Register Blueprints (Bonus #1) ---
@@ -218,6 +241,7 @@ def create_app(test_config=None):
     app.register_blueprint(peer_review_bp)
     app.register_blueprint(notification_bp)
     app.register_blueprint(assignment_bp)
+    app.register_blueprint(remediation_bp, url_prefix='/student')  # FR-09
 
     # --- Routes ---
     @app.route('/')

@@ -1,42 +1,20 @@
-import sys
-import io
 import os
-import contextlib
-import signal
 from flask import Blueprint, jsonify, request, session
 from web.utils import login_required, get_service
 
 api_bp = Blueprint('api', __name__)
 
-# Security: Add rate limiting to code execution endpoint
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
-
-
-
-# SECURITY WARNING: This endpoint executes user code with exec()
-# It is protected with: rate limiting, environment check, timeout
-# For production, MUST use sandboxed execution (Docker, Judge0)
 @api_bp.route('/api/test-code', methods=['POST'])
 @login_required
 def test_code():
-    # Security: Disable in production
-    if os.getenv('FLASK_ENV') == 'production' or os.getenv('ENV') == 'production':
-        return jsonify({
-            'success': False,
-            'error': 'Code execution is disabled in production for security reasons'
-        }), 503
-    
-    # Note: Rate limiting is applied globally via Flask-Limiter
-    # Additional endpoint-specific limit: 5 per minute
-    # Would need: @limiter.limit("5 per minute") decorator if limiter exposed
     data = request.get_json()
     code = data.get('code', '')
     language = data.get('language', 'python')
     assignment_id = data.get('assignment_id')
     user_id = session.get('user_id')
     
+    sandbox_service = get_service('sandbox_service')
     assignment_repo = get_service('assignment_repo')
     test_case_service = get_service('test_case_service')
     user_repo = get_service('user_repo')
@@ -47,7 +25,6 @@ def test_code():
     if not assignment:
         return jsonify({'success': False, 'error': 'Assignment not found'}), 404
 
-    # Fetch test cases using service (handles visibility permissions)
     try:
         test_cases = test_case_service.list_test_cases(current_user, assignment_id)
     except Exception as e:
@@ -55,81 +32,72 @@ def test_code():
 
     test_results = []
     passed_count = 0
+    ai_feedback = None
 
     if not test_cases:
-        # Dry run if no test cases
-        try:
-            output_buffer = io.StringIO()
-            with contextlib.redirect_stdout(output_buffer), contextlib.redirect_stderr(output_buffer):
-                exec(code, {'__name__': '__main__'})
-            test_results.append({
-                'name': 'Syntax Check',
-                'passed': True,
-                'output': output_buffer.getvalue()
-            })
-        except Exception as e:
-            test_results.append({
-                'name': 'Syntax Check',
-                'passed': False,
-                'output': str(e)
-            })
+        # Dry run - just check if code runs without error
+        result = sandbox_service.execute_code(code, language)
+        
+        test_results.append({
+            'name': 'Syntax Check',
+            'passed': result['success'],
+            'output': result['stdout'] if result['success'] else result['stderr'],
+            'runtime_ms': result['runtime_ms']
+        })
+        
+        if result['success']:
+            passed_count = 1
+        elif sandbox_service.groq_client:
+            # Get AI feedback on error
+            ai_feedback = sandbox_service.get_ai_feedback(code, result['stderr'])
     else:
-        for tc in test_cases:
-            result = {
-                'name': tc.name,
-                'passed': False,
-                'output': '',
-                'expected': tc.expected_out,
-                'actual': ''
-            }
+        # Run all test cases using sandbox
+        results = sandbox_service.run_all_tests(code, test_cases, language)
+        
+        for tc_result in results['results']:
+            test_results.append({
+                'name': tc_result['test_name'],
+                'passed': tc_result['passed'],
+                'output': tc_result['stdout'],
+                'expected': tc_result['expected_output'],
+                'actual': tc_result['actual_output'],
+                'runtime_ms': tc_result['runtime_ms'],
+                'timed_out': tc_result['timed_out']
+            })
             
-            try:
-                # Capture stdout
-                output_buffer = io.StringIO()
-                # Prepare mock input if needed (stdin)
-                input_data = tc.stdin or ''
-                sys.stdin = io.StringIO(input_data)
-                
-                with contextlib.redirect_stdout(output_buffer), contextlib.redirect_stderr(output_buffer):
-                    # Create a fresh local scope for each run to avoid state pollution
-                    local_scope = {}
-                    exec(code, {'__name__': '__main__'}, local_scope)
-                
-                actual_output = output_buffer.getvalue().strip()
-                expected_output = (tc.expected_out or '').strip()
-                
-                result['actual'] = actual_output
-                result['output'] = actual_output
-                
-                if actual_output == expected_output:
-                    result['passed'] = True
-                    passed_count += 1
-                else:
-                    result['passed'] = False
-                    
-            except Exception as e:
-                result['passed'] = False
-                result['actual'] = f"Error: {str(e)}"
-                result['output'] = f"Error: {str(e)}"
-            finally:
-                # Reset stdin
-                sys.stdin = sys.__stdin__
-            
-            test_results.append(result)
+            if tc_result['passed']:
+                passed_count += 1
+        
+        # Get AI feedback if there were failures
+        if passed_count < len(test_cases) and sandbox_service.groq_client:
+            failed_result = next((r for r in results['results'] if not r['passed']), None)
+            if failed_result and failed_result.get('stderr'):
+                ai_feedback = sandbox_service.get_ai_feedback(code, failed_result['stderr'])
 
     score = 0
     if test_cases:
         score = (passed_count / len(test_cases)) * 100
+    elif passed_count > 0:
+        score = 100
 
-    return jsonify({
+    response = {
         'success': True,
         'test_results': test_results,
-        'score': round(score, 2)
-    })
+        'score': round(score, 2),
+        'passed_count': passed_count,
+        'total_count': len(test_cases) if test_cases else 1
+    }
+    
+    if ai_feedback:
+        response['ai_feedback'] = ai_feedback
+    
+    return jsonify(response)
+
 
 @api_bp.route('/api/assignment/<assignment_id>/test-cases')
 @login_required
 def get_test_cases(assignment_id):
+    """Get test cases for an assignment."""
     user_id = session.get('user_id')
     user_repo = get_service('user_repo')
     test_case_service = get_service('test_case_service')
@@ -155,3 +123,47 @@ def get_test_cases(assignment_id):
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 400
+
+
+@api_bp.route('/api/hint', methods=['POST'])
+@login_required
+def get_hint():
+    """
+    Get AI-powered hint for code.
+    FR-06: Uses Groq client for hint generation.
+    """
+    data = request.get_json()
+    code = data.get('code', '')
+    error_message = data.get('error', '')
+    
+    sandbox_service = get_service('sandbox_service')
+    
+    if not sandbox_service.groq_client:
+        return jsonify({
+            'success': False,
+            'error': 'AI hints not available (Groq API not configured)'
+        }), 503
+    
+    try:
+        hint = sandbox_service.get_ai_feedback(code, error_message)
+        return jsonify({
+            'success': True,
+            'hint': hint
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@api_bp.route('/api/languages')
+def get_supported_languages():
+    """Get list of supported programming languages."""
+    return jsonify({
+        'success': True,
+        'languages': [
+            {'id': 'python', 'name': 'Python 3.10', 'extension': '.py'},
+            {'id': 'javascript', 'name': 'JavaScript (Node.js)', 'extension': '.js'},
+            {'id': 'java', 'name': 'Java 15', 'extension': '.java'},
+            {'id': 'cpp', 'name': 'C++ 10', 'extension': '.cpp'},
+            {'id': 'c', 'name': 'C 10', 'extension': '.c'}
+        ]
+    })

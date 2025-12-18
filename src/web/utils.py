@@ -31,6 +31,22 @@ def instructor_required(f):
     return decorated_function
 
 
+def student_required(f):
+    """Decorator to require student role"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Check login first
+        if 'user_id' not in session:
+            flash('Please log in first', 'warning')
+            return redirect(url_for('auth.login'))
+        # Then check role
+        if session.get('user_role') != 'student':
+            flash('Student access required', 'error')
+            return redirect(url_for('index'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 def admin_required(f):
     """Decorator to require admin role"""
     @wraps(f)
