@@ -262,3 +262,25 @@ def plagiarism_compare(pair_id):
         student2=student2,
         similarity_score=getattr(flag, 'similarity_score', 0))
 
+@instructor_bp.route('/plagiarism/review/<flag_id>', methods=['POST'])
+@login_required
+@instructor_required
+def plagiarism_review(flag_id):
+    instructor_id = session['user_id']
+    instructor_service = get_service('instructor_service')
+    
+    action = request.form.get('action') # approve, dismiss, escalate
+    notes = request.form.get('notes')
+    
+    try:
+        updated_flag = instructor_service.review_similarity(
+            instructor_id=instructor_id,
+            flag_id=flag_id,
+            action=action,
+            notes=notes
+        )
+        flash(f'Successfully {action}ed similarity flag.', 'success')
+    except Exception as e:
+        flash(f'Error reviewing flag: {str(e)}', 'error')
+        
+    return redirect(url_for('instructor.plagiarism_dashboard'))
