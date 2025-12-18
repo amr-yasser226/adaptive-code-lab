@@ -135,7 +135,7 @@ class UserRepository:
             
             self.db.commit()
             return self.get_by_id(user.get_id())
-        except Exception as e:
+        except sqlite3.Error as e:
             self.db.rollback()
             print("Error updating user:", e)
             return None
