@@ -26,6 +26,7 @@ from infrastructure.repositories.notification_repository import NotificationRepo
 from infrastructure.repositories.peer_review_repository import PeerReviewRepository
 from infrastructure.repositories.admin_repository import AdminRepository
 from infrastructure.repositories.result_repository import ResultRepository
+from infrastructure.repositories.file_repository import FileRepository
 
 
 
@@ -37,6 +38,7 @@ from core.services.assignment_service import AssignmentService
 from core.services.notification_service import NotificationService
 from core.services.peer_review_service import PeerReviewService
 from core.services.admin_service import AdminService
+from core.services.file_service import FileService
 
 from web.routes.auth import auth_bp
 from web.routes.student import student_bp
@@ -45,6 +47,7 @@ from web.routes.api import api_bp
 from web.routes.admin import admin_bp
 from web.routes.peer_review import peer_review_bp
 from web.routes.notification import notification_bp
+from web.routes.file import files_bp
 
 
 
@@ -125,6 +128,7 @@ def create_app(test_config=None):
     peer_review_repo = PeerReviewRepository(db_connection)
     admin_repo = AdminRepository(db_connection)
     result_repo = ResultRepository(db_connection)
+    file_repo = FileRepository(db_connection)
     # 2. Initialize Services with Dependencies
     auth_service = AuthService(user_repo)
     
@@ -158,6 +162,8 @@ def create_app(test_config=None):
     )
 
     notification_service = NotificationService(notification_repo=notification_repo)
+
+    file_service = FileService(file_repo=file_repo, submission_repo=submission_repo)
 
     peer_review_service = PeerReviewService(
         peer_review_repo=peer_review_repo,
@@ -193,6 +199,8 @@ def create_app(test_config=None):
         'enrollment_repo': enrollment_repo,
         'test_case_repo': test_case_repo,
         'flag_repo': flag_repo,  # For plagiarism detection
+        'file_repo': file_repo,
+        'file_service': file_service,
         # Removed duplicate registrations (were also on lines 158, 160)
         'notification_repo': notification_repo,
         'peer_review_repo': peer_review_repo,
@@ -208,6 +216,7 @@ def create_app(test_config=None):
     app.register_blueprint(admin_bp)
     app.register_blueprint(peer_review_bp)
     app.register_blueprint(notification_bp)
+    app.register_blueprint(files_bp)
 
     # --- Routes ---
     @app.route('/')
