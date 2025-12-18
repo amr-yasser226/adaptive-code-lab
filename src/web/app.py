@@ -216,18 +216,7 @@ def create_app(test_config=None):
         ai_client=groq_client
     )
 
-    # FR-04: Sandbox Service (with optional Groq AI feedback)
-    try:
-        from infrastructure.ai.groq_client import GroqClient
-        groq_client = GroqClient()
-    except Exception:
-        groq_client = None  # AI feedback optional
-    
-    sandbox_service = SandboxService(
-        sandbox_job_repo=sandbox_job_repo,
-        submission_repo=submission_repo,
-        groq_client=groq_client
-    )
+    draft_service =DraftService(draft_repo=draft_repo)
 
     # FR-09: Remediation Service
     remediation_service = RemediationService(
@@ -242,6 +231,24 @@ def create_app(test_config=None):
     # File Service  
     file_service = FileService(file_repo=file_repo, submission_repo=submission_repo)
 
+
+
+    sandbox_service = SandboxService(
+        sandbox_job_repo=sandbox_job_repo,
+        submission_repo=submission_repo,
+        groq_client=groq_client
+    )
+
+    # FR-04: Sandbox Service (with optional Groq AI feedback)
+    try:
+        from infrastructure.ai.groq_client import GroqClient
+        groq_client = GroqClient()
+    except Exception:
+        groq_client = None  # AI feedback optional
+    
+    
+
+    
 
     # 3. Store Services in App Context
     app.extensions['services'] = {
@@ -267,18 +274,14 @@ def create_app(test_config=None):
         'file_service': file_service,
         'audit_repo': audit_repo,
         'audit_service': audit_service,
+        'draft_service': draft_service,
         'sandbox_job_repo': sandbox_job_repo,  # FR-04
         'remediation_repo': remediation_repo,  # FR-09
         'notification_repo': notification_repo,
         'peer_review_repo': peer_review_repo,
         'admin_repo': admin_repo,
         'result_repo': result_repo,
-        'sandbox_job_repo': sandbox_job_repo,  # FR-04
-        'remediation_repo': remediation_repo,  # FR-09
-        'file_repo': file_repo,
-        'file_service': FileService(file_repo=file_repo, submission_repo=submission_repo),
         'draft_repo': draft_repo,
-        'draft_service': DraftService(draft_repo=draft_repo),
         'hint_repo' : hint_repo
     }
 
