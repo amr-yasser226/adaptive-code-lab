@@ -98,3 +98,49 @@ class TestSubmissionRepo:
         
         submissions = submission_repo.list_by_student(sample_student.get_id())
         assert len(submissions) >= 2
+
+    def test_get_last_submission(self, sample_student, sample_assignment, submission_repo):
+        """Test getting the last submission for a student and assignment"""
+        # Create multiple submissions
+        for i in range(3):
+            submission = Submission(
+                id=None,
+                assignment_id=sample_assignment.get_id(),
+                student_id=sample_student.get_id(),
+                version=i+1,
+                language="python",
+                status="pending",
+                score=0.0,
+                is_late=False,
+                created_at=None,
+                updated_at=None,
+                grade_at=None
+            )
+            submission_repo.create(submission)
+        
+        last = submission_repo.get_last_submission(sample_student.get_id(), sample_assignment.get_id())
+        assert last is not None
+        assert last.version == 3
+
+    def test_get_grade_for_assignment(self, sample_student, sample_assignment, submission_repo):
+        """Test getting the best grade for an assignment"""
+        # Create submissions with different scores
+        scores = [50.0, 85.0, 70.0]
+        for i, score in enumerate(scores):
+            submission = Submission(
+                id=None,
+                assignment_id=sample_assignment.get_id(),
+                student_id=sample_student.get_id(),
+                version=i+1,
+                language="python",
+                status="graded",
+                score=score,
+                is_late=False,
+                created_at=None,
+                updated_at=None,
+                grade_at=None
+            )
+            submission_repo.create(submission)
+        
+        grade = submission_repo.get_grade_for_assignment(sample_student.get_id(), sample_assignment.get_id())
+        assert grade == 85.0

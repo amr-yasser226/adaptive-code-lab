@@ -30,6 +30,8 @@ from infrastructure.repositories.peer_review_repository import PeerReviewReposit
 from infrastructure.repositories.similarity_flag_repository import SimilarityFlagRepository as SimilarityFlag_repo
 from infrastructure.repositories.similarity_comparison_repository import SimilarityComparisonRepository
 from infrastructure.repositories.audit_log_repository import AuditLogRepository
+from infrastructure.repositories.remediation_repository import RemediationRepository
+from infrastructure.repositories.sandbox_job_repository import SandboxJobRepository
 
 from core.entities.user import User
 from core.entities.student import Student
@@ -215,6 +217,16 @@ def similarity_comparison_repo(clean_db):
 @pytest.fixture
 def audit_log_repo(clean_db):
     return AuditLogRepository(clean_db)
+
+
+@pytest.fixture
+def remediation_repo(clean_db):
+    return RemediationRepository(clean_db)
+
+
+@pytest.fixture
+def sandbox_job_repo(clean_db):
+    return SandboxJobRepository(clean_db)
 
 
 # Sample data fixtures

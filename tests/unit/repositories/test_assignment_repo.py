@@ -92,3 +92,9 @@ class TestAssignmentRepo:
         assignments = assignment_repo.list_by_course(sample_course.get_id())
         
         assert len(assignments) >= 3
+
+    def test_get_all(self, assignment_repo, sample_assignment):
+        """Test getting all assignments"""
+        all_assignments = assignment_repo.get_all()
+        assert len(all_assignments) >= 1
+        assert any(a.get_id() == sample_assignment.get_id() for a in all_assignments)
