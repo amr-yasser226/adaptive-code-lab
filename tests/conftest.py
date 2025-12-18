@@ -112,7 +112,7 @@ def clean_db(db_connection):
     tables = [
         'audit_logs', 'peer_reviews', 'similarity_comparisons',
         'similarity_flags', 'results', 'hints', 'embeddings',
-        'files', 'test_cases', 'submissions', 'enrollments',
+        'files', 'test_cases', 'submissions', 'enrollments', 'drafts',
         'assignments', 'courses', 'notifications', 'admins',
         'instructors', 'students', 'users'
     ]
