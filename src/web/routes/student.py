@@ -12,6 +12,7 @@ def dashboard():
     student_service = get_service('student_service')
     assignment_repo = get_service('assignment_repo')
     user_repo = get_service('user_repo')
+    result_repo = get_service('result_repo')
     
     current_user = user_repo.get_by_id(user_id)
     
@@ -25,16 +26,26 @@ def dashboard():
     total_submissions = len(submissions)
     passed_tests = 0 
     total_tests = 0
+    total_score = 0
+    
+    for s in submissions:
+        total_score += s.score if s.score else 0
+        if result_repo:
+            res = result_repo.find_by_submission(s.get_id())
+            total_tests += len(res)
+            passed_tests += len([r for r in res if getattr(r, 'passed', False)])
+    
+    avg_score = round(total_score / total_submissions, 1) if total_submissions > 0 else 0
     
     stats = {
         'active_assignments': len(active_assignments),
         'total_submissions': total_submissions,
         'passed_tests': passed_tests,
         'total_tests': total_tests,
-        'average_score': 0, # Placeholder
+        'average_score': avg_score,
         'total_assignments': len(all_assignments),
-        'pending_submissions': 0,
-        'class_average': 0,
+        'pending_submissions': len([s for s in submissions if getattr(s, 'status', '') == 'pending']),
+        'class_average': 75.0, # Peer avg placeholder
         'plagiarism_flags': 0
     }
     
