@@ -167,3 +167,42 @@ def get_supported_languages():
             {'id': 'c', 'name': 'C 10', 'extension': '.c'}
         ]
     })
+
+
+@api_bp.route('/api/drafts', methods=['GET'])
+@login_required
+def get_draft():
+    user_id = session.get('user_id')
+    assignment_id = request.args.get('assignment_id')
+    if not assignment_id:
+        return jsonify({'success': False, 'error': 'assignment_id required'}), 400
+
+    draft_service = get_service('draft_service')
+    draft = draft_service.get_latest_draft(user_id, int(assignment_id))
+    if not draft:
+        return jsonify({'success': True, 'draft': None})
+
+    return jsonify({'success': True, 'draft': draft.to_dict()})
+
+
+@api_bp.route('/api/drafts', methods=['POST'])
+@login_required
+def save_draft():
+    data = request.get_json() or {}
+    assignment_id = data.get('assignment_id')
+    content = data.get('content', '')
+    metadata = data.get('metadata')
+
+    if not assignment_id:
+        return jsonify({'success': False, 'error': 'assignment_id required'}), 400
+
+    user_id = session.get('user_id')
+    draft_service = get_service('draft_service')
+
+    try:
+        draft = draft_service.save_draft(user_id, int(assignment_id), content, metadata)
+        if not draft:
+            return jsonify({'success': False, 'error': 'storage error'}), 500
+        return jsonify({'success': True, 'draft': draft.to_dict()})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
