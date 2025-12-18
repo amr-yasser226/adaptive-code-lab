@@ -170,12 +170,20 @@ def create_app(test_config=None):
     # 2. Initialize Services with Dependencies
     groq_client = GroqClient()
     auth_service = AuthService(user_repo)
+    sandbox_service = SandboxService(
+        sandbox_job_repo=sandbox_job_repo,
+        submission_repo=submission_repo,
+        groq_client=groq_client
+    )
     student_service = StudentService(
         student_repo=student_repo,
         course_repo=course_repo,
         enrollment_repo=enrollment_repo,
         assignment_repo=assignment_repo,
-        submission_repo=submission_repo
+        submission_repo=submission_repo,
+        sandbox_service=sandbox_service,
+        test_case_repo=test_case_repo,
+        result_repo=result_repo
     )
     instructor_service = InstructorService(
         instructor_repo=instructor_repo,
@@ -222,11 +230,6 @@ def create_app(test_config=None):
         remediation_repo=remediation_repo,
         result_repo=result_repo,
         submission_repo=submission_repo
-    )
-    sandbox_service = SandboxService(
-        sandbox_job_repo=sandbox_job_repo,
-        submission_repo=submission_repo,
-        groq_client=groq_client
     )
     # 3. Store Services in App Context
     app.extensions['services'] = {
