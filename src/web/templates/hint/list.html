@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}AI Hints{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2 class="mb-3">
+        AI Hints for Submission {{ submission_id }}
+    </h2>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% if hints %}
+        {% for hint in hints %}
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge bg-secondary">
+                            Model: {{ hint.model_used }}
+                        </span>
+                        <span class="text-muted small">
+                            Confidence: {{ hint.confidence }}
+                        </span>
+                    </div>
+
+                    <p class="mt-2">
+                        {{ hint.hint_text }}
+                    </p>
+
+                    <div class="text-muted small mb-3">
+                        Generated at {{ hint.created_at | format_date }}
+                    </div>
+
+                    <!-- Feedback -->
+                    <div class="d-flex gap-2">
+                        <form method="post"
+                              action="{{ url_for('hint.mark_hint_helpful', hint_id=hint.id) }}">
+                            <button type="submit"
+                                    class="btn btn-sm btn-outline-success"
+                                    {% if hint.is_helpful is not none %}disabled{% endif %}>
+                                👍 Helpful
+                            </button>
+                        </form>
+
+                        <form method="post"
+                              action="{{ url_for('hint.mark_hint_not_helpful', hint_id=hint.id) }}">
+                            <button type="submit"
+                                    class="btn btn-sm btn-outline-danger"
+                                    {% if hint.is_helpful is not none %}disabled{% endif %}>
+                                👎 Not Helpful
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">
+            No hints generated yet for this submission.
+        </div>
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+            Back
+        </a>
+    </div>
+
+</div>
+{% endblock %}
