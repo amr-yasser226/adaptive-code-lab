@@ -125,6 +125,10 @@
                             class="btn btn-outline-secondary btn-lg">
                             Cancel
                         </a>
+                        <button type="button" id="saveDraftBtn" class="btn btn-outline-success btn-lg" onclick="saveDraftManual()">
+                            <i class="fas fa-save"></i> Save Draft
+                        </button>
+                        <span id="autosaveStatus" class="autosave-status"></span>
                         <button type="button" class="btn btn-outline-info btn-lg" onclick="formatCode()">
                             <i class="fas fa-align-left"></i> Format
                         </button>
@@ -670,4 +674,10 @@ if __name__ == "__main__":
         intervalMs: 10000
     };
 </script>
+<style>
+    .autosave-status { display:inline-block; margin-left:8px; font-size:0.95rem; }
+    .autosave-status.ok { color: #198754; }
+    .autosave-status.saving { color: #0d6efd; }
+    .autosave-status.error { color: #dc3545; }
+</style>
 {% endblock %}
