@@ -27,6 +27,7 @@ from infrastructure.repositories.peer_review_repository import PeerReviewReposit
 from infrastructure.repositories.admin_repository import AdminRepository
 from infrastructure.repositories.result_repository import ResultRepository
 from infrastructure.repositories.file_repository import FileRepository
+from infrastructure.repositories.audit_log_repository import AuditLogRepository
 
 
 
@@ -39,6 +40,7 @@ from core.services.notification_service import NotificationService
 from core.services.peer_review_service import PeerReviewService
 from core.services.admin_service import AdminService
 from core.services.file_service import FileService
+from core.services.audit_log_service import AuditLogService
 
 from web.routes.auth import auth_bp
 from web.routes.student import student_bp
@@ -50,6 +52,7 @@ from web.routes.notification import notification_bp
 from web.routes.file import files_bp
 from web.routes.course import course_bp
 from web.routes.Enrollment import enrollment_bp
+from web.routes.audit_log import audit_bp
 
 
 
@@ -131,6 +134,7 @@ def create_app(test_config=None):
     admin_repo = AdminRepository(db_connection)
     result_repo = ResultRepository(db_connection)
     file_repo = FileRepository(db_connection)
+    audit_repo = AuditLogRepository(db_connection)
     # 2. Initialize Services with Dependencies
     auth_service = AuthService(user_repo)
     
@@ -166,6 +170,7 @@ def create_app(test_config=None):
     notification_service = NotificationService(notification_repo=notification_repo)
 
     file_service = FileService(file_repo=file_repo, submission_repo=submission_repo)
+    audit_service = AuditLogService(audit_repo=audit_repo)
 
     peer_review_service = PeerReviewService(
         peer_review_repo=peer_review_repo,
@@ -203,6 +208,8 @@ def create_app(test_config=None):
         'flag_repo': flag_repo,  # For plagiarism detection
         'file_repo': file_repo,
         'file_service': file_service,
+        'audit_repo': audit_repo,
+        'audit_service': audit_service,
         # Removed duplicate registrations (were also on lines 158, 160)
         'notification_repo': notification_repo,
         'peer_review_repo': peer_review_repo,
@@ -221,6 +228,7 @@ def create_app(test_config=None):
     app.register_blueprint(files_bp)
     app.register_blueprint(course_bp)
     app.register_blueprint(enrollment_bp)
+    app.register_blueprint(audit_bp)
 
     # --- Routes ---
     @app.route('/')
