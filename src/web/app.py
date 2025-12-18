@@ -113,6 +113,17 @@ def create_app(test_config=None):
         return value.strftime(fmt)
     
     app.jinja_env.filters['format_date'] = format_date
+    
+    # --- Context Processors ---
+    @app.context_processor
+    def inject_user():
+        from flask import session
+        from web.utils import get_current_user
+        try:
+            user = get_current_user() if 'user_id' in session else None
+        except Exception:
+            user = None
+        return dict(current_user=user)
 
     # Initialize CSRF Protection
     csrf = CSRFProtect(app)
@@ -153,12 +164,9 @@ def create_app(test_config=None):
     hint_repo= HintRepository(db_connection)
 
 
-    # Intialze AI_client
-    groq_client=GroqClient()
-
     # 2. Initialize Services with Dependencies
+    groq_client = GroqClient()
     auth_service = AuthService(user_repo)
-    
     student_service = StudentService(
         student_repo=student_repo,
         course_repo=course_repo,
@@ -166,7 +174,6 @@ def create_app(test_config=None):
         assignment_repo=assignment_repo,
         submission_repo=submission_repo
     )
-    
     instructor_service = InstructorService(
         instructor_repo=instructor_repo,
         course_repo=course_repo,
@@ -175,24 +182,19 @@ def create_app(test_config=None):
         enrollment_repo=enrollment_repo,
         flag_repo=flag_repo
     )
-
     test_case_service = TestCaseService(
         testcase_repo=test_case_repo,
         assignment_repo=assignment_repo,
         course_repo=course_repo
     )
-
     assignment_service = AssignmentService(
         assignment_repo=assignment_repo,
         course_repo=course_repo,
         submission_repo=submission_repo
     )
-
     notification_service = NotificationService(notification_repo=notification_repo)
-
-    file_service = FileService(file_repo=file_repo,submission_repo=submission_repo)
+    file_service = FileService(file_repo=file_repo, submission_repo=submission_repo)
     audit_service = AuditLogService(audit_repo=audit_repo)
-
     peer_review_service = PeerReviewService(
         peer_review_repo=peer_review_repo,
         submission_repo=submission_repo,
@@ -200,8 +202,6 @@ def create_app(test_config=None):
         assignment_repo=assignment_repo,
         course_repo=course_repo
     )
-
-
     admin_service = AdminService(
         user_repo=user_repo,
         admin_repo=admin_repo,
@@ -209,47 +209,22 @@ def create_app(test_config=None):
         enrollment_repo=enrollment_repo,
         submission_repo=submission_repo,    
     )
-
-    hint_service =HintService(
+    hint_service = HintService(
         hint_repo=hint_repo,
-        submission_repo= submission_repo ,
+        submission_repo=submission_repo,
         ai_client=groq_client
     )
-
-    draft_service =DraftService(draft_repo=draft_repo)
-
-    # FR-09: Remediation Service
+    draft_service = DraftService(draft_repo=draft_repo)
     remediation_service = RemediationService(
         remediation_repo=remediation_repo,
         result_repo=result_repo,
         submission_repo=submission_repo
     )
-    
-    # AuditLog Service
-    audit_service = AuditLogService(audit_repo=audit_repo)
-    
-    # File Service  
-    file_service = FileService(file_repo=file_repo, submission_repo=submission_repo)
-
-
-
     sandbox_service = SandboxService(
         sandbox_job_repo=sandbox_job_repo,
         submission_repo=submission_repo,
         groq_client=groq_client
     )
-
-    # FR-04: Sandbox Service (with optional Groq AI feedback)
-    try:
-        from infrastructure.ai.groq_client import GroqClient
-        groq_client = GroqClient()
-    except Exception:
-        groq_client = None  # AI feedback optional
-    
-    
-
-    
-
     # 3. Store Services in App Context
     app.extensions['services'] = {
         'auth_service': auth_service,
@@ -260,10 +235,13 @@ def create_app(test_config=None):
         'notification_service': notification_service,
         'admin_service': admin_service,
         'peer_review_service': peer_review_service,
-        'sandbox_service': sandbox_service,  # FR-04
-        'remediation_service': remediation_service,  # FR-09
-        'hint_service' : hint_service,
+        'sandbox_service': sandbox_service,
+        'remediation_service': remediation_service,
+        'hint_service': hint_service,
+        'draft_service': draft_service,
         'user_repo': user_repo,
+        'student_repo': student_repo,
+        'instructor_repo': instructor_repo,
         'assignment_repo': assignment_repo,
         'submission_repo': submission_repo,
         'course_repo': course_repo,
@@ -271,24 +249,23 @@ def create_app(test_config=None):
         'test_case_repo': test_case_repo,
         'flag_repo': flag_repo,
         'file_repo': file_repo,
-        'file_service': file_service,
         'audit_repo': audit_repo,
-        'audit_service': audit_service,
-        'draft_service': draft_service,
-        'sandbox_job_repo': sandbox_job_repo,  # FR-04
-        'remediation_repo': remediation_repo,  # FR-09
+        'sandbox_job_repo': sandbox_job_repo,
+        'remediation_repo': remediation_repo,
         'notification_repo': notification_repo,
         'peer_review_repo': peer_review_repo,
         'admin_repo': admin_repo,
         'result_repo': result_repo,
         'draft_repo': draft_repo,
-        'hint_repo' : hint_repo
+        'hint_repo': hint_repo,
+        'file_service': file_service,
+        'audit_service': audit_service
     }
 
     # --- Register Blueprints (Bonus #1) ---
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(student_bp)
-    app.register_blueprint(instructor_bp)
+    app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(student_bp, url_prefix='/student')
+    app.register_blueprint(instructor_bp, url_prefix='/instructor')
     app.register_blueprint(api_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(peer_review_bp)
