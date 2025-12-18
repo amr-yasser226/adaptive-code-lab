@@ -1,97 +1,27 @@
 {% extends "base.html" %}
-
-{% block title %}Statistics - Assignment {{ assignment_id }}{% endblock %}
+{% block title %}Assignment Statistics{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('instructor.dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item active">Statistics</li>
-                </ol>
-            </nav>
-            <h1 class="display-6">
-                <i class="fas fa-chart-bar text-primary me-2"></i>
-                Assignment Statistics
-            </h1>
-        </div>
-    </div>
+<div class="container mt-4">
+    <h2>Statistics</h2>
 
-    <div class="row g-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body text-center">
-                    <h3>{{ stats.total_submissions if stats.total_submissions else 0 }}</h3>
-                    <p class="mb-0">Total Submissions</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body text-center">
-                    <h3>{{ "%.1f"|format(stats.avg_score if stats.avg_score else 0) }}%</h3>
-                    <p class="mb-0">Average Score</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body text-center">
-                    <h3>{{ stats.highest_score if stats.highest_score else 0 }}%</h3>
-                    <p class="mb-0">Highest Score</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-dark">
-                <div class="card-body text-center">
-                    <h3>{{ stats.lowest_score if stats.lowest_score else 0 }}%</h3>
-                    <p class="mb-0">Lowest Score</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Score Distribution</h5>
-                </div>
-                <div class="card-body">
-                    {% if stats.distribution %}
-                    <div class="row">
-                        {% for range, count in stats.distribution.items() %}
-                        <div class="col-md-2 text-center mb-3">
-                            <div class="progress"
-                                style="height: 100px; writing-mode: vertical-lr; transform: rotate(180deg);">
-                                <div class="progress-bar bg-primary"
-                                    style="height: {{ (count / stats.total_submissions * 100) if stats.total_submissions else 0 }}%">
-                                </div>
-                            </div>
-                            <small class="text-muted">{{ range }}</small>
-                            <p class="mb-0"><strong>{{ count }}</strong></p>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <p class="text-muted text-center">No data available yet.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="mt-4">
-        <a href="{{ url_for('instructor.dashboard') }}" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
-        </a>
-        <a href="{{ url_for('assignment.view_submissions', assignment_id=assignment_id) }}"
-            class="btn btn-outline-primary">
-            <i class="fas fa-list me-1"></i> View Submissions
-        </a>
-    </div>
+    <table class="table table-bordered w-50">
+        <tr>
+            <th>Total Submissions</th>
+            <td>{{ stats.count }}</td>
+        </tr>
+        <tr>
+            <th>Average Score</th>
+            <td>{{ stats.average }}</td>
+        </tr>
+        <tr>
+            <th>Minimum Score</th>
+            <td>{{ stats.min }}</td>
+        </tr>
+        <tr>
+            <th>Maximum Score</th>
+            <td>{{ stats.max }}</td>
+        </tr>
+    </table>
 </div>
 {% endblock %}
