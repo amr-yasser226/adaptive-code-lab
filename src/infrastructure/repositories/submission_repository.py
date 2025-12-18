@@ -209,12 +209,11 @@ class SubmissionRepository:
 
     def get_grade_for_assignment (self , student_id : int , assignment_id : int ): 
         query ="""
-                SELECT score FROM submissions WHERE student_id = :sid  AND assignment_id=:aid  AND score IS NOT NULL ORDER BY grade_at DESC LIMIT 1    
-            
+                SELECT MAX(score) as best_score FROM submissions WHERE student_id = :sid  AND assignment_id=:aid  AND score IS NOT NULL
         """
         row  =self.db.execute(query,{"sid":student_id , "aid":assignment_id}).fetchone()
-        if row : 
-            return row.score 
+        if row and row.best_score is not None: 
+            return row.best_score 
         else : 
             return None
     
