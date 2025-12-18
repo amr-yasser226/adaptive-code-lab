@@ -660,4 +660,14 @@ if __name__ == "__main__":
         versionNumber.textContent = submissionCount + 1;
     });
 </script>
+
+<!-- Autosave initialization -->
+<script src="{{ url_for('static', filename='js/submission_autosave.js') }}"></script>
+<script>
+    window.AUTOSAVE_CONFIG = {
+        assignmentId: {{ assignment.id }},
+        csrfToken: '{{ csrf_token() if csrf_token else "" }}',
+        intervalMs: 10000
+    };
+</script>
 {% endblock %}
