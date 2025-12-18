@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}My Learning Resources{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-6 mb-3">
+                <i class="fas fa-book-reader text-primary me-2"></i>
+                Learning Resources
+            </h1>
+            <p class="text-muted">Personalized recommendations based on your submissions</p>
+        </div>
+    </div>
+
+    <!-- Filter Toggle -->
+    <div class="row mb-4">
+        <div class="col-auto">
+            <div class="btn-group" role="group">
+                <a href="{{ url_for('remediation.list_remediations') }}"
+                    class="btn {{ 'btn-primary' if not only_pending else 'btn-outline-primary' }}">
+                    <i class="fas fa-list me-1"></i> All
+                </a>
+                <a href="{{ url_for('remediation.list_remediations', pending='true') }}"
+                    class="btn {{ 'btn-primary' if only_pending else 'btn-outline-primary' }}">
+                    <i class="fas fa-clock me-1"></i> Pending
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if remediations %}
+    <div class="row g-4">
+        {% for item in remediations %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm {{ 'border-success' if item.is_completed else '' }}">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span
+                        class="badge bg-{{ 'success' if item.is_completed else 'warning' if item.is_viewed else 'primary' }}">
+                        {% if item.is_completed %}
+                        <i class="fas fa-check me-1"></i> Completed
+                        {% elif item.is_viewed %}
+                        <i class="fas fa-eye me-1"></i> Viewed
+                        {% else %}
+                        <i class="fas fa-sparkles me-1"></i> New
+                        {% endif %}
+                    </span>
+                    <span class="badge bg-secondary">
+                        {{ item.remediation.resource_type | capitalize }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.remediation.resource_title }}</h5>
+                    <p class="card-text small text-muted">
+                        <i class="fas fa-tag me-1"></i>
+                        {{ item.remediation.failure_pattern | replace('_', ' ') | title }}
+                    </p>
+                    {% if item.remediation.resource_content %}
+                    <p class="card-text">{{ item.remediation.resource_content[:100] }}...</p>
+                    {% endif %}
+                    <span
+                        class="badge bg-{{ 'success' if item.remediation.difficulty_level == 'beginner' else 'warning' if item.remediation.difficulty_level == 'intermediate' else 'danger' }}">
+                        {{ item.remediation.difficulty_level | capitalize }}
+                    </span>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{{ url_for('remediation.view_remediation', remediation_id=item.id) }}"
+                            class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-external-link-alt me-1"></i> View
+                        </a>
+                        {% if not item.is_completed %}
+                        <form action="{{ url_for('remediation.complete_remediation', remediation_id=item.id) }}"
+                            method="POST" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-success">
+                                <i class="fas fa-check me-1"></i> Complete
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-graduation-cap fa-4x text-muted mb-3"></i>
+        <h4>No learning resources yet</h4>
+        <p class="text-muted">Submit some assignments and we'll recommend resources based on your progress!</p>
+        <a href="{{ url_for('student.dashboard') }}" class="btn btn-primary">
+            <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

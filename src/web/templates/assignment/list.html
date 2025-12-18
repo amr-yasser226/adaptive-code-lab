@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Assignments - Course {{ course_id }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="display-6">
+                    <i class="fas fa-tasks text-primary me-2"></i>
+                    Course Assignments
+                </h1>
+                <p class="text-muted">Course ID: {{ course_id }}</p>
+            </div>
+            {% if current_user and current_user.role == 'instructor' %}
+            <a href="{{ url_for('assignment.create_assignment') }}" class="btn btn-success">
+                <i class="fas fa-plus me-1"></i> New Assignment
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if assignments %}
+    <div class="row g-4">
+        {% for assignment in assignments %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header d-flex justify-content-between">
+                    <span class="badge bg-{{ 'success' if assignment.is_published else 'secondary' }}">
+                        {{ 'Published' if assignment.is_published else 'Draft' }}
+                    </span>
+                    <span class="text-muted small">{{ assignment.total_points }} pts</span>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ assignment.title }}</h5>
+                    <p class="card-text small text-muted">
+                        {{ assignment.description[:100] }}{% if assignment.description|length > 100 %}...{% endif %}
+                    </p>
+                    <div class="small">
+                        <p class="mb-1"><i class="fas fa-calendar-alt me-1"></i> Due: {{ assignment.due_date |
+                            format_date }}</p>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('student.assignment_detail', assignment_id=assignment.get_id()) }}"
+                            class="btn btn-sm btn-outline-primary">View</a>
+                        {% if current_user and current_user.role == 'instructor' %}
+                        <a href="{{ url_for('assignment.view_submissions', assignment_id=assignment.get_id()) }}"
+                            class="btn btn-sm btn-outline-secondary">Submissions</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-clipboard-list fa-4x text-muted mb-3"></i>
+        <h4>No assignments yet</h4>
+        <p class="text-muted">Assignments for this course will appear here.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
