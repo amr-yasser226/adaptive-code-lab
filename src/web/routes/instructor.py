@@ -16,12 +16,17 @@ def dashboard():
     submission_repo = get_service('submission_repo')
     flag_repo = get_service('flag_repo')
     enrollment_repo = get_service('enrollment_repo')
+    course_repo = get_service('course_repo')
     
     current_user = user_repo.get_by_id(user_id)
     
     # Get real stats from repositories
+    courses = course_repo.list_by_instructor(user_id)
     all_assignments = assignment_repo.get_all()
-    active_assignments = [a for a in all_assignments if a.is_published]
+    # Filter assignments for instructor's courses
+    instructor_course_ids = [c.get_id() for c in courses]
+    instructor_assignments = [a for a in all_assignments if a.get_course_id() in instructor_course_ids]
+    active_assignments = [a for a in instructor_assignments if a.is_published]
     all_submissions = submission_repo.get_all() if hasattr(submission_repo, 'get_all') else []
     
     # Get enrolled students count (unique students)
@@ -29,30 +34,40 @@ def dashboard():
     
     # Get pending submissions (status = 'pending')
     pending_submissions = [s for s in all_submissions if getattr(s, 'status', '') == 'pending']
+    for s in pending_submissions:
+        s.student = user_repo.get_by_id(s.get_student_id())
+        s.assignment = assignment_repo.get_by_id(s.get_assignment_id())
     
     # Get flagged submissions
     all_flags = flag_repo.get_all() if hasattr(flag_repo, 'get_all') else []
     flagged_count = len([f for f in all_flags if not getattr(f, 'is_dismissed', True)])
     
     stats = {
-        'total_students': total_students,
+        'total_assignments': len(all_assignments),
         'active_assignments': len(active_assignments),
-        'submissions_review': len(pending_submissions),
-        'flagged_cases': flagged_count
+        'passed_tests': 0,
+        'pending_submissions': len(pending_submissions),
+        'class_average': 0,
+        'plagiarism_flags': flagged_count,
+        'total_students': total_students
     }
     
     # Get recent submissions (last 5)
     recent_submissions = sorted(all_submissions, key=lambda s: getattr(s, 'created_at', datetime.min), reverse=True)[:5]
+    for s in recent_submissions:
+        s.student = user_repo.get_by_id(s.get_student_id())
+        s.assignment = assignment_repo.get_by_id(s.get_assignment_id())
     
     # Get flagged submissions
     flagged_submissions = [s for s in all_submissions if any(
-        getattr(f, 'submission_id', None) == s.id for f in all_flags if not getattr(f, 'is_dismissed', True)
+        getattr(f, 'submission_id', None) == s.get_id() for f in all_flags if not getattr(f, 'is_dismissed', True)
     )][:5]
     
     return render_template('dashboard.html',
         user=current_user,
         stats=stats,
-        assignments=active_assignments,
+        courses=courses,
+        assignments=instructor_assignments,
         submissions=recent_submissions,
         recent_submissions=recent_submissions,
         flagged_submissions=flagged_submissions)

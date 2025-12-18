@@ -16,6 +16,8 @@ def dashboard():
     current_user = user_repo.get_by_id(user_id)
     
     submissions = student_service.get_student_submissions(user_id)
+    for s in submissions:
+        s.assignment = assignment_repo.get_by_id(s.get_assignment_id())
     
     all_assignments = assignment_repo.get_all()
     active_assignments = [a for a in all_assignments if a.is_published]
