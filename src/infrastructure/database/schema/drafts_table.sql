@@ -1,4 +1,4 @@
-(-- Drafts table for autosave/draft recovery
+-- Drafts table for autosave/draft recovery
 CREATE TABLE IF NOT EXISTS drafts (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	user_id INTEGER NOT NULL,
@@ -11,4 +11,3 @@ CREATE TABLE IF NOT EXISTS drafts (
 );
 
 CREATE INDEX IF NOT EXISTS idx_drafts_user_assignment ON drafts(user_id, assignment_id);
-)
