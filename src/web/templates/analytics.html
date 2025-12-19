@@ -22,8 +22,8 @@
                 <select name="assignment" class="form-select" id="assignment">
                     <option value="">All Assignments</option>
                     {% for assignment in assignments %}
-                    <option value="{{ assignment.id }}" {% if request.args.get('assignment')==assignment.id|string
-                        %}selected{% endif %}>
+                    <option value="{{ assignment.get_id() }}" {% if
+                        request.args.get('assignment')==assignment.get_id()|string %}selected{% endif %}>
                         {{ assignment.title }}
                     </option>
                     {% endfor %}
