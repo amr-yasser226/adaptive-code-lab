@@ -83,9 +83,49 @@ def analytics():
     
     current_user = user_repo.get_by_id(user_id)
     
+    # Read filter parameters
+    filter_assignment = request.args.get('assignment', '')
+    filter_date_range = request.args.get('date_range', 'all')
+    
     # Fetch real data
     all_assignments = assignment_repo.get_all()
     all_submissions = submission_repo.get_all() if hasattr(submission_repo, 'get_all') else []
+    
+    # Apply assignment filter
+    if filter_assignment:
+        try:
+            filter_id = int(filter_assignment)
+            all_submissions = [s for s in all_submissions if s.get_assignment_id() == filter_id]
+        except ValueError:
+            pass  # Invalid filter, show all
+    
+    # Apply date range filter
+    if filter_date_range != 'all':
+        from datetime import timedelta
+        now = datetime.now()
+        if filter_date_range == 'week':
+            cutoff = now - timedelta(days=7)
+        elif filter_date_range == 'month':
+            cutoff = now - timedelta(days=30)
+        elif filter_date_range == 'semester':
+            cutoff = now - timedelta(days=120)
+        else:
+            cutoff = None
+        
+        if cutoff:
+            filtered = []
+            for s in all_submissions:
+                if s.created_at:
+                    try:
+                        # Handle both string and datetime
+                        created = s.created_at if hasattr(s.created_at, 'timestamp') else datetime.fromisoformat(str(s.created_at)[:19])
+                        if created >= cutoff:
+                            filtered.append(s)
+                    except:
+                        filtered.append(s)  # Keep if can't parse
+                else:
+                    filtered.append(s)
+            all_submissions = filtered
     
     # Calculate real stats
     total_students = len(set(s.get_student_id() for s in all_submissions)) if all_submissions else 0
