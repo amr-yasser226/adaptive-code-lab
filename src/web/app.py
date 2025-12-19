@@ -204,8 +204,11 @@ def create_app(test_config=None):
         submission_repo=submission_repo
     )
     notification_service = NotificationService(notification_repo=notification_repo)
+
     file_service = FileService(file_repo=file_repo, submission_repo=submission_repo)
+
     audit_service = AuditLogService(audit_repo=audit_repo)
+
     peer_review_service = PeerReviewService(
         peer_review_repo=peer_review_repo,
         submission_repo=submission_repo,
@@ -226,10 +229,17 @@ def create_app(test_config=None):
         ai_client=groq_client
     )
     draft_service = DraftService(draft_repo=draft_repo)
+
     remediation_service = RemediationService(
         remediation_repo=remediation_repo,
         result_repo=result_repo,
         submission_repo=submission_repo
+    )
+    
+    sandbox_service = SandboxService(
+        sandbox_job_repo=sandbox_job_repo,
+        submission_repo=submission_repo,
+        groq_client=groq_client
     )
     # 3. Store Services in App Context
     app.extensions['services'] = {
