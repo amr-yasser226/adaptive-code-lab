@@ -7,26 +7,86 @@
     <div class="dashboard-header mb-4">
         <h1><i class="fas fa-chart-bar"></i> {{ report_type|title }} Report</h1>
     </div>
-    
+
     <div class="card">
         <div class="card-header">
-            <h5 class="mb-0">Report Data</h5>
+            <h5 class="mb-0">Report Data ({{ data|length if data else 0 }} records)</h5>
         </div>
         <div class="card-body">
             {% if data %}
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead class="table-light">
+                        {% if report_type == 'users' %}
+                        <tr>
+                            <th>#</th>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                        </tr>
+                        {% elif report_type == 'courses' %}
+                        <tr>
+                            <th>#</th>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Status</th>
+                        </tr>
+                        {% elif report_type == 'submissions' %}
+                        <tr>
+                            <th>#</th>
+                            <th>ID</th>
+                            <th>Student</th>
+                            <th>Assignment</th>
+                            <th>Score</th>
+                            <th>Status</th>
+                        </tr>
+                        {% else %}
                         <tr>
                             <th>#</th>
                             <th>Details</th>
                         </tr>
+                        {% endif %}
                     </thead>
                     <tbody>
                         {% for item in data %}
                         <tr>
+                            {% if report_type == 'users' %}
+                            <td>{{ loop.index }}</td>
+                            <td>#{{ item.get_id() if item.get_id else item.id if item.id else 'N/A' }}</td>
+                            <td>{{ item.name if item.name else 'N/A' }}</td>
+                            <td>{{ item.email if item.email else 'N/A' }}</td>
+                            <td><span
+                                    class="badge bg-{% if item.role == 'admin' %}danger{% elif item.role == 'instructor' %}primary{% else %}success{% endif %}">{{
+                                    item.role if item.role else 'N/A' }}</span></td>
+                            <td>
+                                {% if item.is_active %}
+                                <span class="badge bg-success">Active</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Inactive</span>
+                                {% endif %}
+                            </td>
+                            {% elif report_type == 'courses' %}
+                            <td>{{ loop.index }}</td>
+                            <td>#{{ item.get_id() if item.get_id else item.id if item.id else 'N/A' }}</td>
+                            <td>{{ item.title if item.title else item.name if item.name else 'N/A' }}</td>
+                            <td><span class="badge bg-info">{{ item.status if item.status else 'N/A' }}</span></td>
+                            {% elif report_type == 'submissions' %}
+                            <td>{{ loop.index }}</td>
+                            <td>#{{ item.get_id() if item.get_id else item.id if item.id else 'N/A' }}</td>
+                            <td>{{ item.get_student_id() if item.get_student_id else item.student_id if item.student_id
+                                else 'N/A' }}</td>
+                            <td>{{ item.get_assignment_id() if item.get_assignment_id else item.assignment_id if
+                                item.assignment_id else 'N/A' }}</td>
+                            <td>{{ item.score if item.score else 'N/A' }}</td>
+                            <td><span
+                                    class="badge bg-{% if item.status == 'graded' %}success{% elif item.status == 'pending' %}warning{% else %}secondary{% endif %}">{{
+                                    item.status if item.status else 'N/A' }}</span></td>
+                            {% else %}
                             <td>{{ loop.index }}</td>
                             <td>{{ item }}</td>
+                            {% endif %}
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -37,7 +97,7 @@
             {% endif %}
         </div>
     </div>
-    
+
     <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary mt-3">
         <i class="fas fa-arrow-left"></i> Back to Dashboard
     </a>
