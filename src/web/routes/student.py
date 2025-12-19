@@ -67,7 +67,7 @@ def assignments():
     published_assignments = [a for a in all_assignments if a.is_published]
     submissions = student_service.get_student_submissions(user_id)
     
-    user_submissions = {s.assignment_id: s for s in submissions}
+    user_submissions = {s.get_assignment_id(): s for s in submissions}
     
     pagination = type('Pagination', (), {
         'pages': 1, 'page': 1, 'has_prev': False, 'has_next': False,

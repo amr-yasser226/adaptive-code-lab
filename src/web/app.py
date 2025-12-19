@@ -50,6 +50,7 @@ from core.services.file_service import FileService
 from core.services.audit_log_service import AuditLogService
 from core.services.draft_service import DraftService
 from core.services.hint_service import HintService
+from core.services.enrollment_service import EnrollmentService
 
 
 from web.routes.auth import auth_bp
@@ -230,6 +231,11 @@ def create_app(test_config=None):
         ai_client=groq_client
     )
     draft_service = DraftService(draft_repo=draft_repo)
+    
+    enrollment_service = EnrollmentService(
+        enrollment_repo=enrollment_repo,
+        course_repo=course_repo
+    )
 
     remediation_service = RemediationService(
         remediation_repo=remediation_repo,
@@ -276,7 +282,8 @@ def create_app(test_config=None):
         'draft_repo': draft_repo,
         'hint_repo': hint_repo,
         'file_service': file_service,
-        'audit_service': audit_service
+        'audit_service': audit_service,
+        'enrollment_service': enrollment_service
     }
 
     # --- Register Blueprints (Bonus #1) ---
