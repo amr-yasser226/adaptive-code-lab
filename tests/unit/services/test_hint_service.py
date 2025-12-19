@@ -35,12 +35,14 @@ class TestHintService:
     def test_generate_hint_success(self, hint_service, mock_submission_repo,
                                     mock_ai_client, mock_hint_repo):
         """Test successful hint generation"""
-        mock_submission_repo.get_by_id.return_value = Mock()
+        mock_sub = Mock()
+        mock_sub.content = "print('hello')"
+        mock_submission_repo.get_by_id.return_value = mock_sub
         mock_hint_repo.create.return_value = Mock()
 
         result = hint_service.generate_hint(1)
 
-        mock_ai_client.generate_hint.assert_called_once_with(submission_id=1)
+        mock_ai_client.generate_hint.assert_called_once_with(code="print('hello')", error_message=None)
         mock_hint_repo.create.assert_called_once()
 
     def test_generate_hint_submission_not_found(self, hint_service, mock_submission_repo):

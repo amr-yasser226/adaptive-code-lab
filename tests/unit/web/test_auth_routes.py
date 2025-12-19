@@ -20,6 +20,7 @@ def mock_services():
         'course_repo': Mock(),
         'enrollment_repo': Mock(),
         'flag_repo': Mock(),
+        'result_repo': Mock(),
     }
 
 

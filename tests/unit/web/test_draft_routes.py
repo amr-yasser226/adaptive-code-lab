@@ -29,17 +29,20 @@ def app(mock_services):
 
     from web.routes.api import api_bp
     app.register_blueprint(api_bp)
+    
+    # Stub auth blueprint for login_required redirect
+    from flask import Blueprint
+    auth_bp = Blueprint('auth', __name__)
+    @auth_bp.route('/login')
+    def login():
+        return 'login page'
+    app.register_blueprint(auth_bp, url_prefix='/auth')
+    
     return app
 
 
-def test_save_draft_requires_authentication(client=None):
-    # use a fresh Flask app client without session
-    from flask import Flask
-    app = Flask(__name__)
-    app.secret_key = 's'
-    app.config['TESTING'] = True
-    from web.routes.api import api_bp
-    app.register_blueprint(api_bp)
+def test_save_draft_requires_authentication(app):
+    # use app.test_client without setting session
     c = app.test_client()
     resp = c.post('/api/drafts', json={'assignment_id': 1, 'content': 'x'})
     assert resp.status_code in (302, 401)
