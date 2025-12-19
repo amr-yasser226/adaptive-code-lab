@@ -88,7 +88,7 @@ def analytics():
     all_submissions = submission_repo.get_all() if hasattr(submission_repo, 'get_all') else []
     
     # Calculate real stats
-    total_students = len(set(s.student_id for s in all_submissions)) if all_submissions else 0
+    total_students = len(set(s.get_student_id() for s in all_submissions)) if all_submissions else 0
     total_submissions = len(all_submissions)
     
     # Calculate average score
@@ -111,7 +111,7 @@ def analytics():
     # Build assignment stats
     assignment_stats = []
     for assignment in all_assignments:
-        assignment_submissions = [s for s in all_submissions if s.assignment_id == assignment.id]
+        assignment_submissions = [s for s in all_submissions if s.get_assignment_id() == assignment.get_id()]
         sub_scores = [s.score for s in assignment_submissions if hasattr(s, 'score') and s.score is not None]
         avg_score = sum(sub_scores) / len(sub_scores) if sub_scores else 0.0
         pass_count = len([s for s in sub_scores if s >= 50])
