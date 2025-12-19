@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, make_response
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, make_response, Response
 from web.utils import login_required, instructor_required, get_service
 from datetime import datetime
 import io
@@ -169,10 +169,16 @@ def export_csv():
             str(sub.created_at)[:16] if sub.created_at else 'N/A'
         ])
     
-    output = make_response(si.getvalue())
-    output.headers["Content-Disposition"] = f"attachment; filename=grades_export_{datetime.now().strftime('%Y%m%d')}.csv"
-    output.headers["Content-type"] = "text/csv"
-    return output
+    # Create proper CSV response with filename
+    filename = f"grades_export_{datetime.now().strftime('%Y%m%d')}.csv"
+    return Response(
+        si.getvalue(),
+        mimetype='text/csv',
+        headers={
+            'Content-Disposition': f'attachment; filename="{filename}"',
+            'Content-Type': 'text/csv; charset=utf-8'
+        }
+    )
 
 @instructor_bp.route('/analytics/assignment/<assignment_id>')
 @login_required
