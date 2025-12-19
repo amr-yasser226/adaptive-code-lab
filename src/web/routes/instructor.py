@@ -191,10 +191,19 @@ def assignment_detail(assignment_id):
     all_submissions = submission_repo.get_all() if hasattr(submission_repo, 'get_all') else []
     assignment_submissions = [s for s in all_submissions if str(s.assignment_id) == str(assignment_id)]
     
+    # Calculate stats for template (FIX BUG #2)
+    scores = [s.score for s in assignment_submissions if hasattr(s, 'score') and s.score is not None]
+    stats = {
+        'total_submissions': len(assignment_submissions),
+        'average_score': sum(scores) / len(scores) if scores else 0,
+        'pass_rate': (len([s for s in scores if s >= 50]) / len(scores) * 100) if scores else 0
+    }
+    
     return render_template('assignment_detail.html',
         user={'role': 'instructor'},
         assignment=assignment,
         submissions=assignment_submissions,
+        stats=stats,
         current_user={'role': 'instructor'})
 
 @instructor_bp.route('/plagiarism')

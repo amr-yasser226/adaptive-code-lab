@@ -191,7 +191,8 @@ def create_app(test_config=None):
         assignment_repo=assignment_repo,
         submission_repo=submission_repo,
         enrollment_repo=enrollment_repo,
-        flag_repo=flag_repo
+        flag_repo=flag_repo,
+        user_repo=user_repo  # Added to fix course creation bug
     )
     test_case_service = TestCaseService(
         testcase_repo=test_case_repo,
