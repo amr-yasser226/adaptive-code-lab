@@ -214,8 +214,8 @@ def plagiarism_dashboard():
     submission_repo = get_service('submission_repo')
     user_repo = get_service('user_repo')
     
-    # Get all similarity flags
-    all_flags = flag_repo.get_all() if hasattr(flag_repo, 'get_all') else []
+    # Get all unreviewed similarity flags
+    all_flags = flag_repo.list_unreviewed() if hasattr(flag_repo, 'list_unreviewed') else []
     
     # Build flagged pairs with details
     flagged_pairs = []
@@ -227,7 +227,7 @@ def plagiarism_dashboard():
         student = user_repo.get_by_id(submission.student_id) if submission else None
         
         flagged_pairs.append({
-            'id': flag.id,
+            'id': flag.get_id(),
             'submission_id': getattr(flag, 'submission_id', None),
             'student_name': student.name if student else 'Unknown',
             'similarity_score': getattr(flag, 'similarity_score', 0),
@@ -261,9 +261,8 @@ def plagiarism_compare(pair_id):
     student1 = user_repo.get_by_id(submission1.student_id) if submission1 else None
     student2 = user_repo.get_by_id(submission2.student_id) if submission2 else None
     
-    return render_template('plagiarism_report.html',
+    return render_template('plagiarism_compare.html',
         user={'role': 'instructor'},
-        comparison_mode=True,
         flag=flag,
         submission1=submission1,
         submission2=submission2,
