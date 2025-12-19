@@ -48,8 +48,8 @@
                 <button type="submit" class="btn btn-primary w-100">
                     <i class="fas fa-filter"></i> Apply Filters
                 </button>
-                <a href="#" class="btn btn-success ms-2">
-                    <i class="fas fa-download"></i>
+                <a href="{{ url_for('instructor.export_csv') }}" class="btn btn-success ms-2" title="Export CSV">
+                    <i class="fas fa-download"></i> Export
                 </a>
             </div>
         </form>
