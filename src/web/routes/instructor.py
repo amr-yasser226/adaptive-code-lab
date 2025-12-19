@@ -30,7 +30,7 @@ def dashboard():
     all_submissions = submission_repo.get_all() if hasattr(submission_repo, 'get_all') else []
     
     # Get enrolled students count (unique students)
-    total_students = len(set(s.student_id for s in all_submissions)) if all_submissions else 0
+    total_students = len(set(s.get_student_id() for s in all_submissions)) if all_submissions else 0
     
     # Get pending submissions (status = 'pending')
     pending_submissions = [s for s in all_submissions if getattr(s, 'status', '') == 'pending']
@@ -158,15 +158,15 @@ def export_csv():
     cw.writerow(['Student ID', 'Student Name', 'Assignment', 'Score', 'Status', 'Submitted At'])
     
     for sub in all_submissions:
-        student = user_repo.get_by_id(sub.student_id)
-        assignment = assignment_repo.get_by_id(sub.assignment_id)
+        student = user_repo.get_by_id(sub.get_student_id())
+        assignment = assignment_repo.get_by_id(sub.get_assignment_id())
         cw.writerow([
-            sub.student_id,
+            sub.get_student_id(),
             student.name if student else 'Unknown',
             assignment.title if assignment else 'Unknown',
             sub.score if hasattr(sub, 'score') else 'N/A',
             sub.status if hasattr(sub, 'status') else 'N/A',
-            sub.created_at.strftime('%Y-%m-%d %H:%M') if hasattr(sub, 'created_at') else 'N/A'
+            str(sub.created_at)[:16] if sub.created_at else 'N/A'
         ])
     
     output = make_response(si.getvalue())
