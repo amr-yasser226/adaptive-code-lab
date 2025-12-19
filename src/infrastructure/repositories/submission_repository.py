@@ -109,6 +109,34 @@ class SubmissionRepository:
             self.db.rollback()
             return False
 
+    def get_all(self):
+        """Get all submissions for export"""
+        query = """
+            SELECT *
+            FROM submissions
+            ORDER BY created_at DESC
+        """
+        result = self.db.execute(query)
+        rows = result.fetchall()
+        return [
+            Submission(
+                id=row.id,
+                assignment_id=row.assignment_id,
+                student_id=row.student_id,
+                version=row.version,
+                language=row.language,
+                status=row.status,
+                score=row.score,
+                content=row.content,
+                file_id=row.file_id,
+                is_late=row.is_late,
+                created_at=row.created_at,
+                updated_at=row.updated_at,
+                grade_at=row.grade_at
+            )
+            for row in rows
+        ]
+
     def list_by_assignment(self, assignment_id: int):
         query = """
             SELECT *
