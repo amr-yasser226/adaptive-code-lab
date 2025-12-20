@@ -43,7 +43,7 @@ class InstructorService:
             semester=semester,
             max_students=max_students,
             created_at=datetime.now(),
-            status="inactive",     # by system rule: new courses are inactive
+            status="active",     # by system rule: new courses are inactive
             updated_at=datetime.now(),
             credits=credits
         )
