@@ -74,25 +74,28 @@ def generate_report(report_type):
 
 
 
-@admin_bp.route("/settings", methods=["POST"])
+@admin_bp.route("/settings", methods=["GET", "POST"])
 @login_required
 @admin_required
 def configure_system_setting():
-    key = request.form.get("key")
-    value = request.form.get("value")
+    if request.method == "POST":
+        key = request.form.get("key")
+        value = request.form.get("value")
 
-    admin_service = get_service("admin_service")
+        admin_service = get_service("admin_service")
 
-    try:
-        admin_service.configure_system_setting(
-            admin_user=get_current_user(),
-            key=key,
-            value=value
-        )
-        flash("System setting updated successfully", "success")
+        try:
+            admin_service.configure_system_setting(
+                admin_user=get_current_user(),
+                key=key,
+                value=value
+            )
+            flash("System setting updated successfully", "success")
 
-    except (ValidationError, sqlite3.Error) as e:
-        flash(str(e), "error")
+        except (ValidationError, sqlite3.Error) as e:
+            flash(str(e), "error")
+
+    return redirect(url_for("admin.dashboard"))
 
 @admin_bp.route('/profile')
 @login_required
