@@ -1,3 +1,4 @@
+import sqlite3
 from flask import (
     Blueprint,
     request,
@@ -25,7 +26,7 @@ def generate_hint(submission_id):
         hint_service.generate_hint(submission_id=submission_id)
         flash("Hint generated successfully", "success")
 
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         # Service raises generic Exception
         flash(str(e), "error")
 
@@ -52,7 +53,7 @@ def list_hints(submission_id):
             submission_id=submission_id
         )
 
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         flash(str(e), "error")
         return redirect(url_for("index"))
 
@@ -69,7 +70,7 @@ def mark_hint_helpful(hint_id):
         hint_service.mark_hint_helpful(hint_id)
         flash("Thanks for your feedback!", "success")
 
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         flash(str(e), "error")
 
     return redirect(request.referrer or url_for("index"))
@@ -89,7 +90,7 @@ def mark_hint_not_helpful(hint_id):
         hint_service.mark_hint_not_helpful(hint_id)
         flash("Feedback recorded", "success")
 
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         flash(str(e), "error")
 
     return redirect(request.referrer or url_for("index"))

@@ -1,3 +1,4 @@
+import sqlite3
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from web.utils import login_required, instructor_required, admin_required, get_service, get_current_user
 from core.exceptions.validation_error import ValidationError
@@ -14,7 +15,7 @@ def my_enrollments():
     try:
         enrollments = enrollment_service.list_by_student(user_id)
         return render_template('enrollments/my.html', enrollments=enrollments)
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         flash(str(e), 'error')
         return redirect(url_for('index'))
 
@@ -26,7 +27,7 @@ def course_enrollments(course_id):
     try:
         enrollments = enrollment_service.list_by_course(course_id)
         return render_template('enrollments/course.html', enrollments=enrollments, course_id=course_id)
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         flash(str(e), 'error')
         return redirect(url_for('index'))
 
@@ -41,7 +42,7 @@ def enroll_in_course(course_id):
         flash('Enrolled successfully', 'success')
     except (ValidationError, AuthError) as e:
         flash(str(e), 'error')
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         flash(str(e), 'error')
     return redirect(request.referrer or url_for('course.course_detail', course_id=course_id))
 
@@ -115,7 +116,7 @@ def manage_enrollment(student_id, course_id):
         else:
             flash('Unknown action', 'error')
 
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         flash(str(e), 'error')
 
     return redirect(request.referrer or url_for('course.list_courses'))

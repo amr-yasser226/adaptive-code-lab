@@ -32,32 +32,16 @@ def project_root_path():
     return project_root
 
 
-@pytest.fixture(scope="session")
-def src_path_fixture():
-    """Return the src directory path"""
-    return src_path
+from core.entities.user import User
+from core.entities.student import Student
+from core.entities.instructor import Instructor
+from core.entities.admin import Admin
+from core.entities.course import Course
+from core.entities.assignment import Assignment
+from core.entities.submission import Submission
 
-
-# Import these after path is set
+from web.app import create_app
 from infrastructure.repositories.database import Database
-from infrastructure.repositories.user_repository import UserRepository as User_repo
-from infrastructure.repositories.student_repository import StudentRepository as Student_repo
-from infrastructure.repositories.instructor_repository import InstructorRepository as Instructor_repo
-from infrastructure.repositories.admin_repository import AdminRepository
-from infrastructure.repositories.course_repository import CourseRepository as Course_repo
-from infrastructure.repositories.assignment_repository import AssignmentRepository as Assignments_repo
-from infrastructure.repositories.submission_repository import SubmissionRepository as Submission_repo
-from infrastructure.repositories.test_case_repository import TestCaseRepository as Testcase_repo
-from infrastructure.repositories.result_repository import ResultRepository
-from infrastructure.repositories.enrollment_repository import EnrollmentRepository as Enrollment_repo
-from infrastructure.repositories.notification_repository import NotificationRepository as Notification_repo
-from infrastructure.repositories.hint_repository import HintRepository
-from infrastructure.repositories.file_repository import FileRepository
-from infrastructure.repositories.embedding_repository import EmbeddingRepository
-from infrastructure.repositories.peer_review_repository import PeerReviewRepository as PeerReview_repo
-from infrastructure.repositories.similarity_flag_repository import SimilarityFlagRepository as SimilarityFlag_repo
-from infrastructure.repositories.similarity_comparison_repository import SimilarityComparisonRepository
-from infrastructure.repositories.audit_log_repository import AuditLogRepository
 
 
 @pytest.fixture(scope="session")
@@ -129,7 +113,42 @@ def clean_db(db_connection):
     return db_connection
 
 
+@pytest.fixture(scope="session")
+def app(setup_test_database):
+    """Create and configure a new app instance for each test session"""
+    app = create_app({
+        'TESTING': True,
+        'WTF_CSRF_ENABLED': False,
+        'SECRET_KEY': 'test_secret_key'
+    })
+    return app
+
+
+@pytest.fixture(scope="function")
+def client(app, clean_db):
+    """A test client for the app."""
+    return app.test_client()
+
+
 # Repository fixtures
+from infrastructure.repositories.user_repository import UserRepository as User_repo
+from infrastructure.repositories.student_repository import StudentRepository as Student_repo
+from infrastructure.repositories.instructor_repository import InstructorRepository as Instructor_repo
+from infrastructure.repositories.admin_repository import AdminRepository
+from infrastructure.repositories.course_repository import CourseRepository as Course_repo
+from infrastructure.repositories.assignment_repository import AssignmentRepository as Assignments_repo
+from infrastructure.repositories.submission_repository import SubmissionRepository as Submission_repo
+from infrastructure.repositories.test_case_repository import TestCaseRepository as Testcase_repo
+from infrastructure.repositories.result_repository import ResultRepository
+from infrastructure.repositories.enrollment_repository import EnrollmentRepository as Enrollment_repo
+from infrastructure.repositories.notification_repository import NotificationRepository as Notification_repo
+from infrastructure.repositories.hint_repository import HintRepository
+from infrastructure.repositories.file_repository import FileRepository
+from infrastructure.repositories.embedding_repository import EmbeddingRepository
+from infrastructure.repositories.peer_review_repository import PeerReviewRepository as PeerReview_repo
+from infrastructure.repositories.similarity_flag_repository import SimilarityFlagRepository as SimilarityFlag_repo
+from infrastructure.repositories.similarity_comparison_repository import SimilarityComparisonRepository
+from infrastructure.repositories.audit_log_repository import AuditLogRepository
 @pytest.fixture
 def user_repo(clean_db):
     return User_repo(clean_db)

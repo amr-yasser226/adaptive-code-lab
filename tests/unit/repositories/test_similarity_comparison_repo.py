@@ -1,7 +1,11 @@
 import pytest
+import sqlite3
+import json
+from unittest.mock import Mock
 from core.entities.similarity_comparison import SimilarityComparison
 from core.entities.similarity_flag import SimilarityFlag
 from core.entities.submission import Submission
+
 
 @pytest.mark.repo
 @pytest.mark.unit
@@ -54,6 +58,7 @@ class TestSimilarityComparisonRepo:
         
         assert saved is not None
         assert saved.match_score == 0.88
+        assert saved.match_segments == {"segments": [[0, 50], [100, 150]]}
     
     def test_get_similarity_comparison(self, sample_submission, similarity_flag_repo,
                                        similarity_comparison_repo, sample_student,
@@ -103,6 +108,10 @@ class TestSimilarityComparisonRepo:
         
         assert retrieved is not None
         assert retrieved.note == "Moderate similarity"
+
+    def test_get_not_found(self, similarity_comparison_repo):
+        """Line 20: get returns None for non-existent comparison"""
+        assert similarity_comparison_repo.get(999, 999) is None
     
     def test_update_similarity_comparison(self, sample_submission, similarity_flag_repo,
                                           similarity_comparison_repo, sample_student,
@@ -199,6 +208,33 @@ class TestSimilarityComparisonRepo:
         )
         
         assert result is True
+        assert similarity_comparison_repo.get(saved_flag.get_id(), saved_submission2.get_id()) is None
+
+    def test_create_error(self, similarity_comparison_repo):
+        """Line 51-53: create handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        similarity_comparison_repo.db = mock_db
+        comp = SimilarityComparison(1, 1, 0.5, "N", None)
+        assert similarity_comparison_repo.create(comp) is None
+        mock_db.rollback.assert_called_once()
+
+    def test_update_error(self, similarity_comparison_repo):
+        """Line 75-77: update handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        similarity_comparison_repo.db = mock_db
+        comp = SimilarityComparison(1, 1, 0.5, "N", None)
+        assert similarity_comparison_repo.update(comp) is None
+        mock_db.rollback.assert_called_once()
+
+    def test_delete_error(self, similarity_comparison_repo):
+        """Line 87-89: delete handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        similarity_comparison_repo.db = mock_db
+        assert similarity_comparison_repo.delete(1, 1) is False
+        mock_db.rollback.assert_called_once()
     
     def test_list_by_similarity(self, sample_submission, similarity_flag_repo,
                                 similarity_comparison_repo, sample_student,

@@ -1,3 +1,4 @@
+import sqlite3
 from flask import Blueprint, request, redirect, url_for, flash, render_template
 from web.utils import login_required, instructor_required, get_service, get_current_user
 from core.exceptions.validation_error import ValidationError
@@ -69,7 +70,7 @@ def delete_test_case(testcase_id):
     try:
         get_service('test_case_service').delete_test_case(get_current_user(), testcase_id)
         flash('Test case deleted', 'success')
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         flash(str(e), 'error')
 
     return redirect(request.referrer or url_for('instructor.dashboard'))

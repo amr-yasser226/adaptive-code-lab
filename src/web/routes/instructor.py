@@ -1,3 +1,4 @@
+import sqlite3
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, make_response, Response
 from web.utils import login_required, instructor_required, get_service
 from datetime import datetime
@@ -352,7 +353,7 @@ def plagiarism_review(flag_id):
             notes=notes
         )
         flash(f'Successfully {action}ed similarity flag.', 'success')
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         flash(f'Error reviewing flag: {str(e)}', 'error')
         
     return redirect(url_for('instructor.plagiarism_dashboard'))

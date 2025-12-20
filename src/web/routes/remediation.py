@@ -1,3 +1,4 @@
+import sqlite3
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from web.utils import login_required, student_required, get_service
 
@@ -34,7 +35,7 @@ def view_remediation(remediation_id):
     # Mark as viewed
     try:
         remediation_service.mark_viewed(user_id, remediation_id)
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         flash(str(e), 'error')
         return redirect(url_for('remediation.list_remediations'))
     
@@ -63,7 +64,7 @@ def complete_remediation(remediation_id):
     try:
         remediation_service.mark_completed(user_id, remediation_id)
         flash('Remediation marked as completed!', 'success')
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         flash(str(e), 'error')
     
     return redirect(url_for('remediation.list_remediations'))
@@ -97,7 +98,7 @@ def api_mark_viewed(remediation_id):
     try:
         remediation_service.mark_viewed(user_id, remediation_id)
         return jsonify({'success': True})
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         return jsonify({'success': False, 'error': str(e)}), 400
 
 
@@ -111,5 +112,5 @@ def api_mark_completed(remediation_id):
     try:
         remediation_service.mark_completed(user_id, remediation_id)
         return jsonify({'success': True})
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         return jsonify({'success': False, 'error': str(e)}), 400

@@ -1,3 +1,4 @@
+import sqlite3
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from core.exceptions.auth_error import AuthError
 from web.utils import get_service
@@ -27,7 +28,7 @@ def login():
             else:
                 return redirect(url_for('index'))
                 
-        except AuthError as e:
+        except (AuthError, sqlite3.Error) as e:
             flash(str(e), 'error')
             
     return render_template('auth/login.html')
@@ -61,7 +62,7 @@ def register():
             auth_service.register(name, email, password, role)
             flash('Registration successful! Please log in.', 'success')
             return redirect(url_for('auth.login'))
-        except AuthError as e:
+        except (AuthError, sqlite3.Error) as e:
             flash(str(e), 'error')
             
     return render_template('auth/register.html')

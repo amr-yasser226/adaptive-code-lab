@@ -1,5 +1,6 @@
 import pytest
 import os
+import sqlite3
 from datetime import datetime as dt
 from unittest.mock import Mock, MagicMock
 from flask import Flask
@@ -218,3 +219,31 @@ class TestAuthRoutes:
         # Session should be cleared
         with client.session_transaction() as sess:
             assert 'user_id' not in sess
+
+    def test_login_success_admin(self, client, mock_services):
+        """Test successful login as admin redirects to index."""
+        mock_user = User(3, "Test Admin", "admin@test.com", "hashed", "admin")
+        mock_services['auth_service'].login.return_value = mock_user
+        
+        response = client.post('/auth/login', data={
+            'email': 'admin@test.com',
+            'password': 'password123'
+        })
+        
+        assert response.status_code == 302
+        assert response.location.endswith('/') or response.location == '/'
+        mock_services['auth_service'].login.assert_called_with('admin@test.com', 'password123')
+
+    def test_register_failure_auth_error(self, client, mock_services):
+        """Test registration failure with AuthError."""
+        mock_services['auth_service'].register.side_effect = AuthError("Email already exists")
+        
+        response = client.post('/auth/register', data={
+            'name': 'Existing User',
+            'email': 'existing@test.com',
+            'password': 'password123',
+            'role': 'student'
+        })
+        
+        assert response.status_code == 200
+        assert b'Email already exists' in response.data

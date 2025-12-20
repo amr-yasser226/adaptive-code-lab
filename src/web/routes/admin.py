@@ -1,3 +1,4 @@
+import sqlite3
 from flask import Blueprint, request, redirect, url_for, flash, render_template
 
 from web.utils import login_required, admin_required, get_service ,get_current_user
@@ -30,7 +31,7 @@ def manage_user_account(user_id):
         )
         flash("User account updated successfully", "success")
 
-    except (AuthError, ValidationError) as e:
+    except (AuthError, ValidationError, sqlite3.Error) as e:
         flash(str(e), "error")
 
     return redirect(url_for("admin.dashboard"))
@@ -57,7 +58,7 @@ def generate_report(report_type):
             data=data
         )
 
-    except ValidationError as e:
+    except (ValidationError, sqlite3.Error) as e:
         flash(str(e), "error")
         return redirect(url_for("admin.dashboard"))
 
@@ -81,7 +82,7 @@ def configure_system_setting():
         )
         flash("System setting updated successfully", "success")
 
-    except ValidationError as e:
+    except (ValidationError, sqlite3.Error) as e:
         flash(str(e), "error")
 
     return redirect(url_for("admin.dashboard"))
@@ -106,7 +107,7 @@ def export_db_dump():
         )
         flash("Database exported successfully", "success")
 
-    except ValidationError as e:
+    except (ValidationError, sqlite3.Error) as e:
         flash(str(e), "error")
 
     return redirect(url_for("admin.dashboard"))

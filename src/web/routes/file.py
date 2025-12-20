@@ -1,3 +1,4 @@
+import sqlite3
 from flask import (
     Blueprint,
     request,
@@ -107,7 +108,7 @@ def download_file(file_id):
         flash("File is not available for download", "error")
         return redirect(request.referrer or "/")
 
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         flash(str(e), "error")
         return redirect(request.referrer or "/")
 

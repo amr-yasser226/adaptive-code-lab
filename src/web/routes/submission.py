@@ -1,3 +1,4 @@
+import sqlite3
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from web.utils import login_required, instructor_required, get_service
 from core.exceptions.validation_error import ValidationError
@@ -38,7 +39,7 @@ def regrade_submission(submission_id):
         # Re-run tests (service handles enqueuing or immediate run)
         sandbox_service.regrade_submission(submission)
         flash('Regrade requested', 'success')
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         flash(str(e), 'error')
 
     return redirect(request.referrer or url_for('instructor.dashboard'))

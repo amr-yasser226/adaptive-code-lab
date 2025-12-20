@@ -83,7 +83,7 @@
             </div>
             <h3>{{ stats.passed_tests }}</h3>
             <p>Completed</p>
-            <small>Avg score: 92%</small>
+            <small>Avg score: {{ stats.average_score }}%</small>
         </div>
     </div>
 
@@ -93,8 +93,8 @@
             <div class="stat-icon">
                 <i class="fas fa-exclamation-triangle"></i>
             </div>
-            <h3>2</h3>
-            <p>Overdue</p>
+            <h3>{{ stats.pending_submissions }}</h3>
+            <p>Pending</p>
             <small>Requires attention</small>
         </div>
     </div>

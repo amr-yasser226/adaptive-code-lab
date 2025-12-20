@@ -111,7 +111,7 @@ class TestCourseRoutes:
             'title': 'New Title',
             'description': 'New Desc',
             'year': '2025',
-            'semester': 'Winter',
+            'semester': 'Summer',
             'max_students': '100',
             'credits': '5'
         }

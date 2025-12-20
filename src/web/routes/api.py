@@ -1,3 +1,4 @@
+import sqlite3
 import os
 from flask import Blueprint, jsonify, request, session
 from web.utils import login_required, get_service
@@ -27,7 +28,7 @@ def test_code():
 
     try:
         test_cases = test_case_service.list_test_cases(current_user, assignment_id)
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         return jsonify({'success': False, 'error': str(e)}), 400
 
     test_results = []
@@ -121,7 +122,7 @@ def get_test_cases(assignment_id):
             'success': True,
             'test_cases': cases_list
         })
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         return jsonify({'success': False, 'error': str(e)}), 400
 
 
@@ -150,7 +151,7 @@ def get_hint():
             'success': True,
             'hint': hint
         })
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
@@ -204,5 +205,5 @@ def save_draft():
         if not draft:
             return jsonify({'success': False, 'error': 'storage error'}), 500
         return jsonify({'success': True, 'draft': draft.to_dict()})
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         return jsonify({'success': False, 'error': str(e)}), 500

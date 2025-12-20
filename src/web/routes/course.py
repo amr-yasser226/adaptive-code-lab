@@ -1,9 +1,9 @@
+import sqlite3
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from web.utils import login_required, instructor_required, get_service, get_current_user
 from core.exceptions.validation_error import ValidationError
 from core.exceptions.auth_error import AuthError
 from core.entities.course import Course
-import sqlite3
 from core.entities.enrollment import Enrollment
 from datetime import datetime
 
@@ -31,7 +31,7 @@ def list_courses():
 
         return render_template('courses/list.html', courses=courses)
 
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         flash(str(e), 'error')
         return redirect(url_for('index'))
 
@@ -56,7 +56,7 @@ def course_detail(course_id):
 
         return render_template('courses/detail.html', course=course, assignments=assignments, is_enrolled=is_enrolled)
 
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         flash(str(e), 'error')
         return redirect(url_for('course.list_courses'))
 

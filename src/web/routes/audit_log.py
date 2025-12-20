@@ -1,3 +1,4 @@
+import sqlite3
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from web.utils import login_required, admin_required, get_service
 from core.exceptions.validation_error import ValidationError
@@ -13,7 +14,7 @@ def recent_audit():
     try:
         entries = audit_service.list_recent(limit=200)
         return render_template('audit/list.html', entries=entries)
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         flash(str(e), 'error')
         return redirect(url_for('admin.dashboard'))
 
@@ -26,7 +27,7 @@ def audit_by_user(user_id):
     try:
         entries = audit_service.list_by_user(user_id)
         return render_template('audit/user.html', entries=entries, user_id=user_id)
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         flash(str(e), 'error')
         return redirect(url_for('audit.recent_audit'))
 
@@ -42,7 +43,7 @@ def audit_detail(audit_id):
             flash('Audit entry not found', 'error')
             return redirect(url_for('audit.recent_audit'))
         return render_template('audit/detail.html', entry=entry)
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         flash(str(e), 'error')
         return redirect(url_for('audit.recent_audit'))
 
@@ -58,6 +59,6 @@ def delete_audit(audit_id):
             flash('Audit entry deleted', 'success')
         else:
             flash('Failed to delete audit entry', 'error')
-    except Exception as e:
+    except (sqlite3.Error, Exception) as e:
         flash(str(e), 'error')
     return redirect(request.referrer or url_for('audit.recent_audit'))

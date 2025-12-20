@@ -110,7 +110,8 @@ class TestCourseRepo:
             updated_at=None,
             credits=3
         )
-        assert course_repo.create(course) is None
+        with pytest.raises(sqlite3.Error):
+            course_repo.create(course)
         mock_db.rollback.assert_called_once()
 
     def test_update_error(self, course_repo, sample_course):
@@ -121,7 +122,8 @@ class TestCourseRepo:
         mock_db.execute.side_effect = sqlite3.Error("Mock error")
         course_repo.db = mock_db
         
-        assert course_repo.update(sample_course) is None
+        with pytest.raises(sqlite3.Error):
+            course_repo.update(sample_course)
         mock_db.rollback.assert_called_once()
 
     def test_publish_error(self, course_repo):
@@ -132,7 +134,8 @@ class TestCourseRepo:
         mock_db.execute.side_effect = sqlite3.Error("Mock error")
         course_repo.db = mock_db
         
-        assert course_repo.publish(1) is None
+        with pytest.raises(sqlite3.Error):
+            course_repo.publish(1)
         mock_db.rollback.assert_called_once()
 
     def test_archive_error(self, course_repo):
@@ -143,7 +146,8 @@ class TestCourseRepo:
         mock_db.execute.side_effect = sqlite3.Error("Mock error")
         course_repo.db = mock_db
         
-        assert course_repo.archive(1) is None
+        with pytest.raises(sqlite3.Error):
+            course_repo.archive(1)
         mock_db.rollback.assert_called_once()
 
     def test_get_by_assignment_success(self, course_repo, sample_course, sample_assignment):

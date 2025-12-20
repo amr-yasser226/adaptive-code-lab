@@ -1,3 +1,4 @@
+import sqlite3
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from web.utils import login_required, get_service
 from core.exceptions.validation_error import ValidationError
@@ -122,7 +123,7 @@ def submit_code(assignment_id):
             flash('Code submitted successfully!', 'success')
 
             return redirect(url_for('student.dashboard')) 
-        except Exception as e:
+        except (sqlite3.Error, ValidationError, Exception) as e:
             flash(str(e), 'error')
             
     return render_template('submit_code.html',
@@ -174,7 +175,7 @@ def profile():
     # Try to get submissions
     try:
         submissions = student_service.get_student_submissions(user_id)
-    except Exception:
+    except sqlite3.Error:
         submissions = []
     
     # Calculate stats
@@ -271,7 +272,7 @@ def update_profile():
         else:
             flash('Profile updated successfully!', 'success')
             
-    except Exception as e:
+    except (sqlite3.Error, ValidationError) as e:
         flash(str(e), 'error')
     
     return redirect(url_for('student.profile'))
