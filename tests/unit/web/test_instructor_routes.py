@@ -144,7 +144,7 @@ class TestInstructorRoutes:
         
         response = client.get('/instructor/dashboard')
         assert response.status_code == 200
-        assert b'Assignment Dashboard' in response.data
+        assert b'Learning Progress' in response.data
         assert b'Total Assignments' in response.data
 
     def test_analytics_page_accessible(self, client, mock_services, instructor_session, mock_instructor_user):
