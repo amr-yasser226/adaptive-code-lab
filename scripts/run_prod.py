@@ -73,6 +73,9 @@ def main():
             print("❌ ERROR: Waitress not found. Run 'pip install waitress'")
             sys.exit(1)
         
+        # Add current directory to Python path for imports
+        sys.path.insert(0, os.getcwd())
+        
         from wsgi import app
         print("🚀 Server starting at http://localhost:5000")
         print("Press CTRL+C to stop the server")
