@@ -142,3 +142,31 @@ def export_db_dump():
 
     return redirect(url_for("admin.dashboard"))
 
+
+@admin_bp.route("/db/download")
+@login_required
+@admin_required
+def download_db():
+    from flask import send_file
+    import os
+    output_path = request.args.get("path")
+    if not output_path:
+        flash("No file path provided", "error")
+        return redirect(url_for("admin.dashboard"))
+    
+    # Security: Ensure we are only sending files from the root or backups
+    filename = os.path.basename(output_path)
+    if not (filename.endswith('.db') or filename.endswith('.sqlite')):
+         flash("Invalid file type", "error")
+         return redirect(url_for("admin.dashboard"))
+
+    try:
+        abs_path = os.path.abspath(output_path)
+        if not os.path.exists(abs_path):
+             flash("File not found on server", "error")
+             return redirect(url_for("admin.dashboard"))
+             
+        return send_file(abs_path, as_attachment=True)
+    except Exception as e:
+        flash(f"Download failed: {str(e)}", "error")
+        return redirect(url_for("admin.dashboard"))
