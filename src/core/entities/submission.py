@@ -2,7 +2,7 @@ from core.entities.file import File
 from datetime import datetime
 class Submission :
     valid_languages =('python', 'java', 'cpp', 'javascript') 
-    valid_statuses =('pending','queued', 'running', 'graded', 'failed', 'error')
+    valid_statuses =('pending','queued', 'running', 'graded', 'failed', 'error','submitted')
     def __init__(self, id , assignment_id , student_id , version , language , status , score , content=None, file_id=None, is_late=False , created_at=None , updated_at=None , grade_at=None ): 
         if language not in Submission.valid_languages:
             raise ValueError(
