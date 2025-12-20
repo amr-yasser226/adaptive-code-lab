@@ -83,9 +83,14 @@
             </div>
         </div>
         <div class="col-md-4 text-end">
-            <button class="btn btn-outline-secondary"><i class="fas fa-sort"></i> Sort by Score</button>
-            <button class="btn btn-outline-secondary"><i class="fas fa-download"></i> Export Report</button>
-            <button class="btn btn-outline-secondary"><i class="fas fa-cog"></i> Settings</button>
+            <a href="{{ url_for('instructor.plagiarism_dashboard', sort='score') }}"
+                class="btn btn-outline-secondary"><i class="fas fa-sort"></i> Sort by Score</a>
+            <button class="btn btn-outline-secondary"
+                onclick="alert('Export feature coming soon. Use browser print (Ctrl+P) for now.')"><i
+                    class="fas fa-download"></i> Export Report</button>
+            <button class="btn btn-outline-secondary"
+                onclick="alert('Similarity threshold settings: High >80%, Medium 50-80%, Low <50%')"><i
+                    class="fas fa-cog"></i> Settings</button>
         </div>
     </div>
 </div>

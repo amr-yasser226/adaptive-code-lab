@@ -116,7 +116,7 @@
             <div class="assignment-card-body">
                 <div class="assignment-content">
                     <!-- Removed | safe filter to prevent XSS -->
-                    {{ assignment.full_description }}
+                    {{ assignment.description if assignment.description else 'No description provided.' }}
                 </div>
             </div>
         </div>

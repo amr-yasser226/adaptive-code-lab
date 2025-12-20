@@ -295,6 +295,11 @@ def plagiarism_dashboard():
             'created_at': getattr(flag, 'created_at', None)
         })
     
+    # Apply sorting
+    sort_by = request.args.get('sort', '')
+    if sort_by == 'score':
+        flagged_pairs.sort(key=lambda x: x['similarity_score'], reverse=True)
+    
     return render_template('plagiarism_report.html',
         user={'role': 'instructor'},
         flagged_pairs=flagged_pairs)
