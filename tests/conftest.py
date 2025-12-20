@@ -113,7 +113,7 @@ def clean_db(db_connection):
     return db_connection
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def app(setup_test_database):
     """Create and configure a new app instance for each test session"""
     app = create_app({

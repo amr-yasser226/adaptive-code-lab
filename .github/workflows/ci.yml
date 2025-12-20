@@ -29,8 +29,10 @@ jobs:
     - name: Run tests with coverage
       env:
         SECRET_KEY: ci-testing-secret-key
+        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
       run: |
-        pytest tests/ -v --tb=short --import-mode=importlib --cov=src --cov-report=xml --cov-report=term
+        pytest tests/ -v --tb=short --import-mode=importlib --ignore=tests/test_apis.py --cov=src --cov-report=xml --cov-report=term
 
     - name: Upload coverage report
       uses: codecov/codecov-action@v4

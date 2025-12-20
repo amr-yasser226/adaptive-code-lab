@@ -74,10 +74,15 @@ def create_course():
         max_students = int(request.form.get('max_students') or 0)
         credits = int(request.form.get('credits') or 0)
 
+        current_user = get_current_user()
+        if not current_user:
+            flash('User session invalid', 'error')
+            return redirect(url_for('auth.login'))
+
         instructor_service = get_service('instructor_service')
         try:
             new_course = instructor_service.create_course(
-                instructor_id=get_current_user().get_id(),
+                instructor_id=current_user.get_id(),
                 code=code,
                 title=title,
                 description=description,
@@ -105,7 +110,12 @@ def edit_course(course_id):
             flash('Course not found', 'error')
             return redirect(url_for('course.list_courses'))
 
-        if course.get_instructor_id() != get_current_user().get_id():
+        current_user = get_current_user()
+        if not current_user:
+            flash('User session invalid', 'error')
+            return redirect(url_for('auth.login'))
+
+        if course.get_instructor_id() != current_user.get_id():
             raise AuthError('You are not the owner of this course')
 
         if request.method == 'POST':
@@ -157,7 +167,8 @@ def publish_course(course_id):
             flash('Course not found', 'error')
             return redirect(url_for('course.list_courses'))
 
-        if course.get_instructor_id() != get_current_user().get_id():
+        current_user = get_current_user()
+        if not current_user or course.get_instructor_id() != current_user.get_id():
             raise AuthError('Not authorized')
 
         course_repo.publish(course_id)
@@ -180,7 +191,8 @@ def archive_course(course_id):
             flash('Course not found', 'error')
             return redirect(url_for('course.list_courses'))
 
-        if course.get_instructor_id() != get_current_user().get_id():
+        current_user = get_current_user()
+        if not current_user or course.get_instructor_id() != current_user.get_id():
             raise AuthError('Not authorized')
 
         course_repo.archive(course_id)
