@@ -242,14 +242,16 @@ def assignment_detail(assignment_id):
     submission_repo = get_service('submission_repo')
     user_repo = get_service('user_repo')
     
+    user_id = session['user_id']
+    current_user = user_repo.get_by_id(user_id)
+    
     assignment = assignment_repo.get_by_id(assignment_id)
     if not assignment:
         flash('Assignment not found', 'error')
         return redirect(url_for('instructor.analytics'))
     
     # Get all submissions for this assignment
-    all_submissions = submission_repo.get_all() if hasattr(submission_repo, 'get_all') else []
-    assignment_submissions = [s for s in all_submissions if str(s.get_assignment_id()) == str(assignment_id)]
+    assignment_submissions = submission_repo.list_by_assignment(assignment_id)
     
     # Get test cases for the template
     test_case_repo = get_service('test_case_repo')
@@ -267,6 +269,7 @@ def assignment_detail(assignment_id):
         user=current_user,
         assignment=assignment,
         submissions=assignment_submissions,
+        latest_submission=None,
         stats=stats,
         visible_test_cases=visible_test_cases,
         current_user=current_user)
