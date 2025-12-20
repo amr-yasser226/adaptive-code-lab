@@ -12,21 +12,14 @@ class DraftService:
     def get_latest_draft(self, user_id: int, assignment_id: int):
         return self.draft_repo.get_latest(user_id, assignment_id)
 
-    def save_draft(self, user_id: int, assignment_id: int, content: str, metadata: str = None):
-        # Determine new version number
+    def save_draft(self, user_id: int, assignment_id: int, content: str, language: str = 'python'):
         try:
-            last = self.draft_repo.get_latest(user_id, assignment_id)
-            new_version = (last.version + 1) if last and getattr(last, 'version', None) else 1
-
             draft = Draft(
                 id=None,
                 user_id=user_id,
                 assignment_id=assignment_id,
                 content=content,
-                metadata=metadata,
-                version=new_version,
-                created_at=datetime.now(),
-                updated_at=datetime.now()
+                language=language
             )
 
             saved = self.draft_repo.create(draft)
@@ -35,5 +28,4 @@ class DraftService:
             return saved
         except Exception as e:
             logger.exception('Error saving draft: %s', e)
-            # Re-raise or return None to let caller handle user-facing message
             raise

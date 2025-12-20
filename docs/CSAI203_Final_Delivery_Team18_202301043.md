@@ -16,13 +16,13 @@
 
 ### 1.1 Test Suite Overview
 
-The ACCL project maintains a comprehensive test suite with **412 automated tests** achieving **66% code coverage**.
+The ACCL project maintains a comprehensive test suite with **561 automated tests** achieving **74% code coverage**.
 
 | Test Category | Count | Description |
 |--------------|-------|-------------|
-| Unit Tests | ~350 | Service and repository tests |
-| Integration Tests | ~50 | End-to-end route tests |
-| Security Tests | ~8 | Authentication and authorization |
+| Unit Tests | ~480 | Service and repository tests |
+| Integration Tests | ~65 | End-to-end route tests |
+| Security Tests | ~12 | Authentication and authorization |
 | Performance Tests | ~4 | Response time benchmarks |
 
 ### 1.2 Running Tests
@@ -104,7 +104,7 @@ GitHub Actions runs on every push/PR:
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/your-repo/adaptive-code-lab.git
+git clone https://github.com/amr-yasser226/adaptive-code-lab.git
 cd adaptive-code-lab
 
 # 2. Create virtual environment
@@ -247,4 +247,4 @@ ACCL follows the **Clean Architecture** pattern with **MVC** structure:
 
 ---
 
-*Document Version: 1.0 | Date: December 2025*
+*Document Version: 1.1 | Date: December 20, 2025*

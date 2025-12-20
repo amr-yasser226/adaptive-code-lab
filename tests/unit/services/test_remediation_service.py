@@ -115,6 +115,11 @@ class TestRemediationService:
         """Test no pattern detected for None."""
         pattern = remediation_service.detect_failure_pattern(None)
         assert pattern is None
+
+    def test_detect_failure_pattern_no_match(self, remediation_service):
+        """Test returning None when no patterns match and no generic error keyword."""
+        pattern = remediation_service.detect_failure_pattern("Everything is fine")
+        assert pattern is None
     
     def test_get_recommendations(self, remediation_service, mock_remediation_repo):
         """Test getting recommendations for a pattern."""
@@ -162,6 +167,39 @@ class TestRemediationService:
         )
         
         assert recommendations == []
+
+    def test_recommend_for_student_detect_patterns(self, remediation_service, mock_result_repo):
+        """Test that recommend_for_student calls analyze_submission_results if patterns is None."""
+        mock_result = Mock()
+        mock_result.passed = False
+        mock_result.stderr = "SyntaxError"
+        mock_result.error_message = None
+        mock_result_repo.find_by_submission.return_value = [mock_result]
+        
+        recommendations = remediation_service.recommend_for_student(
+            student_id=100,
+            submission_id=200,
+            patterns=None
+        )
+        
+        assert len(recommendations) > 0
+        mock_result_repo.find_by_submission.assert_called_with(200)
+
+    def test_analyze_submission_results_no_repo(self):
+        """Test analyze_submission_results when result_repo is None."""
+        service = RemediationService(remediation_repo=Mock(), result_repo=None)
+        assert service.analyze_submission_results(1) == []
+
+    def test_analyze_submission_results_error_message(self, remediation_service, mock_result_repo):
+        """Test analyze_submission_results checks error_message if stderr is empty."""
+        mock_result = Mock()
+        mock_result.passed = False
+        mock_result.stderr = ""
+        mock_result.error_message = "NameError"
+        mock_result_repo.find_by_submission.return_value = [mock_result]
+        
+        patterns = remediation_service.analyze_submission_results(1)
+        assert "name_error" in patterns
     
     def test_get_student_remediations(self, remediation_service, mock_remediation_repo):
         """Test getting student's remediations."""
@@ -210,6 +248,35 @@ class TestRemediationService:
         
         assert result.is_completed is True
         mock_remediation_repo.update_student_remediation.assert_called()
+
+    def test_mark_viewed_not_found(self, remediation_service, mock_remediation_repo):
+        """Test mark_viewed raises ValidationError if not found."""
+        mock_remediation_repo.get_student_remediation_by_id.return_value = None
+        from core.exceptions.validation_error import ValidationError
+        with pytest.raises(ValidationError, match="not found"):
+            remediation_service.mark_viewed(1, 1)
+
+    def test_mark_completed_not_found(self, remediation_service, mock_remediation_repo):
+        """Test mark_completed raises ValidationError if not found."""
+        mock_remediation_repo.get_student_remediation_by_id.return_value = None
+        from core.exceptions.validation_error import ValidationError
+        with pytest.raises(ValidationError, match="not found"):
+            remediation_service.mark_completed(1, 1)
+
+    def test_mark_completed_unauthorized(self, remediation_service, mock_remediation_repo):
+        """Test mark_completed raises ValidationError if unauthorized."""
+        sr = StudentRemediation(id=1, student_id=100, remediation_id=1)
+        mock_remediation_repo.get_student_remediation_by_id.return_value = sr
+        from core.exceptions.validation_error import ValidationError
+        with pytest.raises(ValidationError, match="Not authorized"):
+            remediation_service.mark_completed(999, 1)
+
+    def test_get_all_remediations(self, remediation_service, mock_remediation_repo):
+        """Test getting all generic remediation resources."""
+        mock_remediation_repo.get_all.return_value = []
+        result = remediation_service.get_all_remediations()
+        assert result == []
+        mock_remediation_repo.get_all.assert_called_once()
     
     def test_create_remediation(self, remediation_service, mock_remediation_repo):
         """Test creating a new remediation resource."""

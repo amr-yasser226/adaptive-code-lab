@@ -182,3 +182,108 @@ print(a + b)
         
         mock_sandbox_job_repo.get_by_id.assert_called_with(1)
         assert job is not None
+
+    def test_get_jobs_for_submission(self, sandbox_service, mock_sandbox_job_repo):
+        """Test getting all jobs for a submission (covers line 338)"""
+        mock_sandbox_job_repo.get_by_submission.return_value = []
+        result = sandbox_service.get_jobs_for_submission(100)
+        assert result == []
+        mock_sandbox_job_repo.get_by_submission.assert_called_with(100)
+
+    @patch('requests.post')
+    def test_execute_via_piston_success(self, mock_post, sandbox_service):
+        """Test successful Piston API execution"""
+        sandbox_service.use_external_api = True
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            'run': {'stdout': 'hello\n', 'stderr': '', 'code': 0}
+        }
+        mock_post.return_value = mock_response
+        
+        result = sandbox_service.execute_code('print("hello")', language='python')
+        assert result['success'] is True
+        assert result['stdout'] == 'hello\n'
+
+    @patch('requests.post')
+    def test_execute_via_piston_api_error(self, mock_post, sandbox_service):
+        """Test Piston API returning non-200 status"""
+        sandbox_service.use_external_api = True
+        mock_response = Mock()
+        mock_response.status_code = 500
+        mock_post.return_value = mock_response
+        
+        result = sandbox_service.execute_code('print("hello")', language='python')
+        assert result['success'] is False
+        assert 'API error: 500' in result['stderr']
+
+    @patch('requests.post')
+    def test_execute_via_piston_timeout(self, mock_post, sandbox_service):
+        """Test Piston API timeout exception"""
+        from requests.exceptions import Timeout
+        sandbox_service.use_external_api = True
+        mock_post.side_effect = Timeout()
+        
+        result = sandbox_service.execute_code('print("hello")', language='python')
+        assert result['timed_out'] is True
+        assert 'Request timed out' in result['stderr']
+
+    @patch('requests.post')
+    def test_execute_via_piston_fallback_on_exception(self, mock_post, sandbox_service):
+        """Test falling back to subprocess on Piston API RequestException"""
+        from requests.exceptions import RequestException
+        sandbox_service.use_external_api = True
+        mock_post.side_effect = RequestException("Network error")
+        
+        # This should fallback to subprocess (which works for python)
+        result = sandbox_service.execute_code('print("hello")', language='python')
+        assert result['success'] is True # Subprocess succeeded
+
+    def test_execute_via_subprocess_error(self, sandbox_service):
+        """Test subprocess execution error (covers lines 199-201)"""
+        with patch('subprocess.Popen', side_effect=Exception("Execution failed")):
+            result = sandbox_service.execute_code('print("hi")')
+            assert result['success'] is False
+            assert 'Execution failed' in result['stderr']
+
+    def test_get_ai_feedback_error(self, sandbox_service, mock_groq_client):
+        """Test AI feedback error handling (covers lines 317-319)"""
+        mock_groq_client.generate_hint.side_effect = Exception("AI Crash")
+        feedback = sandbox_service.get_ai_feedback("code", "error")
+        assert feedback is None
+
+    def test_execute_via_piston_unsupported_language(self, sandbox_service):
+        """Line 58: Error for unsupported language in Piston"""
+        result = sandbox_service._execute_via_piston("code", language="brainfuck")
+        assert result["success"] is False
+        assert "not supported" in result["stderr"]
+
+    def test_execute_via_subprocess_unlink_error(self, sandbox_service):
+        """Lines 212-213: Handle error during temporary file cleanup"""
+        from unittest.mock import patch
+        with patch("os.unlink", side_effect=Exception("Permission Denied")):
+            # This should not crash despite unlink failure
+            result = sandbox_service._execute_via_subprocess("print('hi')", language="python")
+            assert result["success"] is True
+            assert result["stdout"].strip() == "hi"
+
+    def test_run_all_tests_no_points(self, sandbox_service):
+        """Test scoring when test cases don't have points"""
+        tc = Mock()
+        # No .points attribute
+        tc.name = "Test"
+        tc.stdin = ""
+        tc.expected_out = "hi"
+        tc.timeout_seconds = 5
+        
+        if hasattr(tc, 'points'):
+            del tc.points # Ensure it doesn't have it
+        
+        code = 'print("hi")'
+        result = sandbox_service.run_all_tests(code, [tc])
+        assert result['score'] == 100.0
+
+    def test_run_all_tests_empty(self, sandbox_service):
+        """Test scoring with no test cases"""
+        result = sandbox_service.run_all_tests("code", [])
+        assert result['score'] == 0.0

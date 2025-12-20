@@ -154,6 +154,9 @@ class TestStudentRoutes:
 
     def test_profile_view(self, client, mock_services, auth_session):
         """Test that profile page renders correctly."""
+        mock_user = User(1, "Student Name", "s@test.com", "pwd", "student")
+        mock_services['user_repo'].get_by_id.return_value = mock_user
+        
         mock_student = Student(
             1, "Student Name", "s@test.com", "pwd", None, None, "S123", "CS", 1
         )

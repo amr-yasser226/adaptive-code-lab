@@ -165,7 +165,14 @@ class TestSubmissionService:
         result = submission_service.enqueue_for_grading(1)
 
         assert submission.status == "queued"
+        assert submission.status == "queued"
         mock_submission_repo.update.assert_called_once()
+
+    def test_enqueue_for_grading_not_found(self, submission_service, mock_submission_repo):
+        """Test enqueue for grading raises ValidationError when submission not found"""
+        mock_submission_repo.get_by_id.return_value = None
+        with pytest.raises(ValidationError, match="Submission not found"):
+            submission_service.enqueue_for_grading(999)
 
     def test_regrade(self, submission_service, mock_submission_repo):
         """Test regrade submission"""
@@ -177,7 +184,15 @@ class TestSubmissionService:
 
         assert submission.status == "queued"
         assert submission.score is None
+        assert submission.status == "queued"
+        assert submission.score is None
         assert submission.grade_at is None
+
+    def test_regrade_not_found(self, submission_service, mock_submission_repo):
+        """Test regrade raises ValidationError when submission not found"""
+        mock_submission_repo.get_by_id.return_value = None
+        with pytest.raises(ValidationError, match="Submission not found"):
+            submission_service.regrade(999)
 
     def test_list_by_assignment(self, submission_service, mock_submission_repo):
         """Test listing submissions by assignment"""

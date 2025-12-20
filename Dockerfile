@@ -13,6 +13,10 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
+    g++ \
+    python3-dev \
+    libc-dev \
+    libyaml-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for layer caching

@@ -191,7 +191,7 @@ def save_draft():
     data = request.get_json() or {}
     assignment_id = data.get('assignment_id')
     content = data.get('content', '')
-    metadata = data.get('metadata')
+    language = data.get('language', 'python')
 
     if not assignment_id:
         return jsonify({'success': False, 'error': 'assignment_id required'}), 400
@@ -200,7 +200,7 @@ def save_draft():
     draft_service = get_service('draft_service')
 
     try:
-        draft = draft_service.save_draft(user_id, int(assignment_id), content, metadata)
+        draft = draft_service.save_draft(user_id, int(assignment_id), content, language)
         if not draft:
             return jsonify({'success': False, 'error': 'storage error'}), 500
         return jsonify({'success': True, 'draft': draft.to_dict()})

@@ -105,3 +105,9 @@ class TestHintService:
 
         mock_hint_repo.list_by_submission.assert_called_once_with(1)
         assert result == hints
+
+    def test_mark_hint_not_helpful_not_found(self, hint_service, mock_hint_repo):
+        """Line 45: Exception when hint to mark not helpful is not found"""
+        mock_hint_repo.get_by_id.return_value = None
+        with pytest.raises(Exception, match="Hint not found"):
+            hint_service.mark_hint_not_helpful(999)

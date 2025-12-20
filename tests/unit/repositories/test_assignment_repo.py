@@ -36,6 +36,10 @@ class TestAssignmentRepo:
         
         assert retrieved is not None
         assert retrieved.title == sample_assignment.title
+
+    def test_get_by_id_not_found(self, assignment_repo):
+        """Line 22: get_by_id returns None for non-existent ID"""
+        assert assignment_repo.get_by_id(9999) is None
     
     def test_update_assignment(self, sample_assignment, assignment_repo):
         """Test updating assignment"""
@@ -98,3 +102,72 @@ class TestAssignmentRepo:
         all_assignments = assignment_repo.get_all()
         assert len(all_assignments) >= 1
         assert any(a.get_id() == sample_assignment.get_id() for a in all_assignments)
+
+    def test_create_error(self, assignment_repo, sample_course):
+        """Line 68-71: create handles sqlite3.Error"""
+        from unittest.mock import Mock
+        import sqlite3
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        assignment_repo.db = mock_db
+        
+        assignment = Assignment(
+            id=None,
+            course_id=sample_course.get_id(),
+            title="T",
+            description="D",
+            release_date="2024-01-01",
+            due_date="2024-01-30",
+            max_points=100,
+            is_published=True,
+            allow_late_submissions=True,
+            late_submission_penalty=0.1,
+            created_at=None,
+            updated_at=None
+        )
+        assert assignment_repo.create(assignment) is None
+        mock_db.rollback.assert_called_once()
+
+    def test_update_error(self, assignment_repo, sample_assignment):
+        """Line 102-105: update handles sqlite3.Error"""
+        from unittest.mock import Mock
+        import sqlite3
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        assignment_repo.db = mock_db
+        
+        assert assignment_repo.update(sample_assignment) is None
+        mock_db.rollback.assert_called_once()
+
+    def test_publish_error(self, assignment_repo):
+        """Line 117-120: publish handles sqlite3.Error"""
+        from unittest.mock import Mock
+        import sqlite3
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        assignment_repo.db = mock_db
+        
+        assert assignment_repo.publish(1) is None
+        mock_db.rollback.assert_called_once()
+
+    def test_unpublish_error(self, assignment_repo):
+        """Line 132-135: unpublish handles sqlite3.Error"""
+        from unittest.mock import Mock
+        import sqlite3
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        assignment_repo.db = mock_db
+        
+        assert assignment_repo.unpublish(1) is None
+        mock_db.rollback.assert_called_once()
+
+    def test_extend_deadline_error(self, assignment_repo):
+        """Line 147-150: extend_deadline handles sqlite3.Error"""
+        from unittest.mock import Mock
+        import sqlite3
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        assignment_repo.db = mock_db
+        
+        assert assignment_repo.extend_deadline(1, "2024") is None
+        mock_db.rollback.assert_called_once()

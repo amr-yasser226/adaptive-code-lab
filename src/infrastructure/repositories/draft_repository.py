@@ -8,15 +8,14 @@ class DraftRepository:
     def create(self, draft: Draft):
         try:
             query = '''
-                INSERT INTO drafts (user_id, assignment_id, content, metadata, version, created_at, updated_at)
-                VALUES (:user_id, :assignment_id, :content, :metadata, :version, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                INSERT INTO drafts (user_id, assignment_id, content, language, saved_at)
+                VALUES (:user_id, :assignment_id, :content, :language, CURRENT_TIMESTAMP)
             '''
             self.db.execute(query, {
                 'user_id': draft.get_user_id(),
                 'assignment_id': draft.get_assignment_id(),
                 'content': draft.content,
-                'metadata': draft.metadata,
-                'version': draft.version
+                'language': draft.language
             })
             new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
             self.db.commit()
@@ -34,17 +33,15 @@ class DraftRepository:
             user_id=row.user_id,
             assignment_id=row.assignment_id,
             content=row.content,
-            metadata=row.metadata,
-            version=row.version,
-            created_at=row.created_at,
-            updated_at=row.updated_at
+            language=getattr(row, 'language', 'python'),
+            saved_at=getattr(row, 'saved_at', None)
         )
 
     def get_latest(self, user_id: int, assignment_id: int):
         query = '''
             SELECT * FROM drafts
             WHERE user_id = :uid AND assignment_id = :aid
-            ORDER BY version DESC, updated_at DESC
+            ORDER BY saved_at DESC
             LIMIT 1
         '''
         row = self.db.execute(query, {'uid': user_id, 'aid': assignment_id}).fetchone()
@@ -55,10 +52,8 @@ class DraftRepository:
             user_id=row.user_id,
             assignment_id=row.assignment_id,
             content=row.content,
-            metadata=row.metadata,
-            version=row.version,
-            created_at=row.created_at,
-            updated_at=row.updated_at
+            language=getattr(row, 'language', 'python'),
+            saved_at=getattr(row, 'saved_at', None)
         )
 
     def delete(self, id: int):

@@ -48,6 +48,10 @@ class TestStudentRepo:
         assert retrieved is not None
         assert retrieved.get_id() == sample_student.get_id()
         assert retrieved.student_number == sample_student.student_number
+
+    def test_get_by_id_not_found(self, student_repo):
+        """Line 21: get_by_id returns None for non-existent ID"""
+        assert student_repo.get_by_id(9999) is None
     
     def test_find_by_number(self, sample_student, student_repo):
         """Test finding student by student number"""
@@ -65,6 +69,11 @@ class TestStudentRepo:
         
         assert updated.program == "Software Engineering"
         assert updated.year_level == 4
+
+    def test_find_by_number_not_found(self, student_repo):
+        """Line 113: find_by_number returns None for non-existent number"""
+        student = Student(None, "N", "E", "P", None, None, "S99", "Pr", 1)
+        assert student_repo.find_by_number(student) is None
     
     def test_save_student_without_user_fails(self, student_repo):
         """Test that saving student without user record fails"""
@@ -82,3 +91,28 @@ class TestStudentRepo:
         
         with pytest.raises(Exception):
             student_repo.save_student(student)
+
+    def test_save_student_no_id(self, student_repo):
+        """Line 39: save_student raises Exception if ID is None"""
+        student = Student(None, "N", "E", "P", None, None, "S1", "P", 1)
+        with pytest.raises(Exception, match="Student must have a user ID"):
+            student_repo.save_student(student)
+
+    def test_save_student_wrong_role(self, user_repo, student_repo):
+        """Line 46: save_student raises Exception if user is not a student"""
+        user = User(None, "I", "inst@test.com", "P", "instructor")
+        saved_user = user_repo.create(user)
+        student = Student(saved_user.get_id(), "I", "inst@test.com", "P", saved_user.created_at, saved_user.updated_at, "S1", "P", 1)
+        with pytest.raises(Exception, match="User role must be 'student'"):
+            student_repo.save_student(student)
+
+    def test_save_student_error(self, student_repo, sample_student):
+        """Line 95-98: save_student handles sqlite3.Error"""
+        from unittest.mock import Mock
+        import sqlite3
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        student_repo.db = mock_db
+        with pytest.raises(sqlite3.Error):
+            student_repo.save_student(sample_student)
+        mock_db.rollback.assert_called_once()

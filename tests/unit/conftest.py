@@ -32,6 +32,7 @@ from infrastructure.repositories.similarity_comparison_repository import Similar
 from infrastructure.repositories.audit_log_repository import AuditLogRepository
 from infrastructure.repositories.remediation_repository import RemediationRepository
 from infrastructure.repositories.sandbox_job_repository import SandboxJobRepository
+from infrastructure.repositories.draft_repository import DraftRepository
 
 from core.entities.user import User
 from core.entities.student import Student
@@ -116,7 +117,7 @@ def clean_db(db_connection):
         'similarity_flags', 'results', 'hints', 'embeddings',
         'files', 'test_cases', 'submissions', 'enrollments',
         'assignments', 'courses', 'notifications', 'admins',
-        'instructors', 'students', 'users'
+        'instructors', 'students', 'users', 'drafts'
     ]
     
     db_connection.execute("PRAGMA foreign_keys = OFF")
@@ -227,6 +228,11 @@ def remediation_repo(clean_db):
 @pytest.fixture
 def sandbox_job_repo(clean_db):
     return SandboxJobRepository(clean_db)
+
+
+@pytest.fixture
+def draft_repo(clean_db):
+    return DraftRepository(clean_db)
 
 
 # Sample data fixtures

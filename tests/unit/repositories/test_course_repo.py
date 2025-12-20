@@ -83,3 +83,75 @@ class TestCourseRepo:
         courses = course_repo.list_by_instructor(sample_instructor.get_id())
         
         assert len(courses) >= 3
+
+    def test_get_by_id_not_found(self, course_repo):
+        """Line 20: get_by_id returns None for non-existent ID"""
+        assert course_repo.get_by_id(9999) is None
+
+    def test_create_error(self, course_repo, sample_instructor):
+        """Line 64-67: create handles sqlite3.Error"""
+        from unittest.mock import Mock
+        import sqlite3
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        course_repo.db = mock_db
+        
+        course = Course(
+            id=None,
+            instructor_id=sample_instructor.get_id(),
+            code="C",
+            title="T",
+            description="D",
+            year=2024,
+            semester="F",
+            max_students=10,
+            created_at=None,
+            status="active",
+            updated_at=None,
+            credits=3
+        )
+        assert course_repo.create(course) is None
+        mock_db.rollback.assert_called_once()
+
+    def test_update_error(self, course_repo, sample_course):
+        """Line 100-103: update handles sqlite3.Error"""
+        from unittest.mock import Mock
+        import sqlite3
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        course_repo.db = mock_db
+        
+        assert course_repo.update(sample_course) is None
+        mock_db.rollback.assert_called_once()
+
+    def test_publish_error(self, course_repo):
+        """Line 115-118: publish handles sqlite3.Error"""
+        from unittest.mock import Mock
+        import sqlite3
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        course_repo.db = mock_db
+        
+        assert course_repo.publish(1) is None
+        mock_db.rollback.assert_called_once()
+
+    def test_archive_error(self, course_repo):
+        """Line 130-133: archive handles sqlite3.Error"""
+        from unittest.mock import Mock
+        import sqlite3
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        course_repo.db = mock_db
+        
+        assert course_repo.archive(1) is None
+        mock_db.rollback.assert_called_once()
+
+    def test_get_by_assignment_success(self, course_repo, sample_course, sample_assignment):
+        """Lines 161-173: get_by_assignment logic"""
+        retrieved = course_repo.get_by_assignment(sample_assignment.get_id())
+        assert retrieved is not None
+        assert retrieved.get_id() == sample_course.get_id()
+
+    def test_get_by_assignment_not_found(self, course_repo):
+        """Line 170: get_by_assignment returns None for non-existent assignment"""
+        assert course_repo.get_by_assignment(9999) is None

@@ -6,14 +6,14 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..
 dotenv_path = os.path.join(PROJECT_ROOT, ".env")
 load_dotenv(dotenv_path)
 
-DB_PATH = os.getenv("ACCL_DB_PATH", "data/Accl_DB.db")
-if DB_PATH.startswith("sqlite:///"):
-    DB_PATH = DB_PATH.replace("sqlite:///", "")
-
-if not os.path.isabs(DB_PATH):
-    DB_PATH = os.path.join(PROJECT_ROOT, DB_PATH)
-
-
+def get_db_path():
+    path = os.getenv("ACCL_DB_PATH", "data/Accl_DB.db")
+    if path.startswith("sqlite:///"):
+        path = path.replace("sqlite:///", "")
+    if not os.path.isabs(path):
+        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
+        path = os.path.join(project_root, path)
+    return path
 
 import threading
 
@@ -30,15 +30,20 @@ class DatabaseManager:
         return cls._instance
 
     def _init_connection(self, db_path):
-        self.db_path = db_path if db_path else DB_PATH
-        # DatabaseManager initialized silently
+        self.db_path = db_path if db_path else get_db_path()
+        # DatabaseManager initialized
 
     @classmethod
     def get_instance(cls):
         if cls._instance is None:
              # Default initialization if not already created
-             cls(DB_PATH)
+             cls(get_db_path())
         return cls._instance
+
+    @classmethod
+    def _reset_instance(cls):
+        """Internal helper to reset singleton for testing purposes"""
+        cls._instance = None
 
     def get_connection(self):
         """Returns a NEW connection object. SQLite connections cannot be shared across threads."""

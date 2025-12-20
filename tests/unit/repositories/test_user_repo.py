@@ -104,3 +104,67 @@ class TestUserRepo:
         
         students = user_repo.list_all({"role": "student"})
         assert all(u.role == "student" for u in students)
+
+    def test_get_user_with_missing_bio_col(self, user_repo, sample_user):
+        """Line 24/49: Handle IndexError when bio column is missing (older schema)"""
+        from unittest.mock import Mock
+        mock_db = Mock()
+        # Mocking row result with only 8 columns (0-7)
+        row = (1, "N", "E", "H", "S", 1, "C", "U") 
+        mock_db.execute.return_value.fetchone.return_value = row
+        user_repo.db = mock_db
+        
+        user = user_repo.get_by_id(1)
+        assert user.bio is None
+        
+        user2 = user_repo.get_by_email("E")
+        assert user2.bio is None
+
+    def test_create_user_error(self, user_repo):
+        """Line 85-86: sqlite3.Error handling in create"""
+        from unittest.mock import Mock
+        import sqlite3
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("DB Error")
+        user_repo.db = mock_db
+        
+        user = User(None, "N", "E", "P", "student")
+        with pytest.raises(sqlite3.Error):
+            user_repo.create(user)
+        mock_db.rollback.assert_called_once()
+
+    def test_delete_user_error(self, user_repo):
+        """Line 94-95: sqlite3.Error handling in delete"""
+        from unittest.mock import Mock
+        import sqlite3
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("DB Error")
+        user_repo.db = mock_db
+        
+        with pytest.raises(sqlite3.Error):
+            user_repo.delete(1)
+        mock_db.rollback.assert_called_once()
+
+    def test_list_all_missing_bio_col(self, user_repo):
+        """Line 113-114: Handle IndexError in list_all"""
+        from unittest.mock import Mock
+        mock_db = Mock()
+        row = (1, "N", "E", "H", "S", 1, "C", "U")
+        mock_db.execute.return_value.fetchall.return_value = [row]
+        user_repo.db = mock_db
+        
+        users = user_repo.list_all()
+        assert len(users) == 1
+        assert users[0].bio is None
+
+    def test_update_user_error(self, user_repo, sample_user):
+        """Line 156-159: sqlite3.Error handling in update"""
+        from unittest.mock import Mock
+        import sqlite3
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("DB Error")
+        user_repo.db = mock_db
+        
+        result = user_repo.update(sample_user)
+        assert result is None
+        mock_db.rollback.assert_called_once()

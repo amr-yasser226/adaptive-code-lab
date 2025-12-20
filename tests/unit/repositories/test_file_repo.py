@@ -1,4 +1,6 @@
 import pytest
+import sqlite3
+from unittest.mock import Mock
 from core.entities.file import File
 
 
@@ -48,6 +50,10 @@ class TestFileRepo:
         
         assert retrieved is not None
         assert retrieved.file_name == "test.txt"
+
+    def test_get_by_id_not_found(self, file_repo):
+        """Line 19: get_by_id returns None for non-existent ID"""
+        assert file_repo.get_by_id(9999) is None
     
     def test_delete_file(self, sample_submission, sample_student, file_repo):
         """Test deleting file"""
@@ -69,6 +75,24 @@ class TestFileRepo:
         retrieved = file_repo.get_by_id(saved.get_id())
         
         assert retrieved is None
+
+    def test_save_error(self, file_repo, sample_submission, sample_student):
+        """Line 61-64: save_file handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        file_repo.db = mock_db
+        file = File(None, sample_submission.get_id(), sample_student.get_id(), "p", "f", "t", 0, "c", "s", None)
+        assert file_repo.save_file(file) is None
+        mock_db.rollback.assert_called_once()
+
+    def test_delete_error(self, file_repo):
+        """Line 71-73: delete handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        file_repo.db = mock_db
+        with pytest.raises(sqlite3.Error):
+            file_repo.delete(1)
+        mock_db.rollback.assert_called_once()
     
     def test_find_by_submission(self, sample_submission, sample_student, file_repo):
         """Test finding files by submission"""

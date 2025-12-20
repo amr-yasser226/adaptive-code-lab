@@ -160,7 +160,7 @@ class TestInstructorRoutes:
     def test_plagiarism_dashboard_renders(self, client, mock_services, instructor_session, mock_instructor_user):
         """Test that plagiarism dashboard renders for instructor."""
         mock_services['user_repo'].get_by_id.return_value = mock_instructor_user
-        mock_services['flag_repo'].get_all.return_value = []
+        mock_services['flag_repo'].list_unreviewed.return_value = []
         mock_services['assignment_repo'].get_all.return_value = []
         
         response = client.get('/instructor/plagiarism')

@@ -177,6 +177,56 @@ class TestTestCaseService:
                                                    mock_assignment_repo):
         """Assignment not found raises ValidationError"""
         mock_assignment_repo.get_by_id.return_value = None
-
         with pytest.raises(ValidationError, match="Assignment not found"):
             test_case_service.list_test_cases(instructor_user, 999)
+
+    def test_verify_instructor_owns_assignment_course_not_found(self, test_case_service, instructor_user,
+                                                              mock_assignment_repo, mock_course_repo):
+        """Line 22: ValidationError when course not found during ownership check"""
+        assignment = Mock()
+        assignment.get_course_id.return_value = 1
+        mock_assignment_repo.get_by_id.return_value = assignment
+        mock_course_repo.get_by_id.return_value = None
+        
+        with pytest.raises(ValidationError, match="Course not found"):
+            test_case_service._verify_instructor_owns_assignment(10, assignment)
+
+    def test_update_test_case_assignment_not_found(self, test_case_service, instructor_user,
+                                                    mock_testcase_repo, mock_assignment_repo):
+        """Line 81: ValidationError when assignment not found during update"""
+        testcase = Mock()
+        testcase.get_assignment_id.return_value = 999
+        mock_testcase_repo.get_by_id.return_value = testcase
+        mock_assignment_repo.get_by_id.return_value = None
+        
+        with pytest.raises(ValidationError, match="Assignment not found"):
+            test_case_service.update_test_case(instructor_user, 1)
+
+    def test_update_test_case_invalid_points(self, test_case_service, instructor_user,
+                                              mock_testcase_repo, mock_assignment_repo, mock_course_repo):
+        """Line 97: ValidationError for invalid points in update"""
+        testcase = Mock()
+        testcase.get_assignment_id.return_value = 1
+        testcase.points = 10
+        mock_testcase_repo.get_by_id.return_value = testcase
+        setup_instructor_owns(mock_assignment_repo, mock_course_repo)
+        
+        with pytest.raises(ValidationError, match="Points must be greater than zero"):
+            test_case_service.update_test_case(instructor_user, 1, points=0)
+
+    def test_delete_test_case_not_found(self, test_case_service, instructor_user, mock_testcase_repo):
+        """Line 104: ValidationError if test case not found during deletion"""
+        mock_testcase_repo.get_by_id.return_value = None
+        with pytest.raises(ValidationError, match="Test case not found"):
+            test_case_service.delete_test_case(instructor_user, 1)
+
+    def test_delete_test_case_assignment_not_found(self, test_case_service, instructor_user,
+                                                    mock_testcase_repo, mock_assignment_repo):
+        """Line 110: ValidationError if assignment not found during deletion"""
+        testcase = Mock()
+        testcase.get_assignment_id.return_value = 1
+        mock_testcase_repo.get_by_id.return_value = testcase
+        mock_assignment_repo.get_by_id.return_value = None
+        
+        with pytest.raises(ValidationError, match="Assignment not found"):
+            test_case_service.delete_test_case(instructor_user, 1)

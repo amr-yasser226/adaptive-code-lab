@@ -59,9 +59,68 @@ def test_login_invalid_credentials_not_found(auth_service, mock_user_repo):
         auth_service.login("test@example.com", "wrong")
 
 def test_login_deactivated_account(auth_service, mock_user_repo):
+    """Line 53: AuthError on deactivated account"""
     user = Mock(spec=User)
     user.is_active = False
     mock_user_repo.get_by_email.return_value = user
-    
     with pytest.raises(AuthError, match="Account is deactivated"):
         auth_service.login("test@example.com", "password")
+
+def test_register_failed_to_create(auth_service, mock_user_repo):
+    """Line 42: AuthError when user repository fails to create user"""
+    mock_user_repo.get_by_email.return_value = None
+    mock_user_repo.create.return_value = None
+    with pytest.raises(AuthError, match="Failed to create user"):
+        auth_service.register("T", "t@e.com", "p")
+
+def test_login_invalid_password(auth_service, mock_user_repo, monkeypatch):
+    """Line 59: AuthError on password mismatch"""
+    user = Mock(spec=User)
+    user.is_active = True
+    user.get_password_hash.return_value = "hash"
+    mock_user_repo.get_by_email.return_value = user
+    monkeypatch.setattr("core.services.auth_service.check_password_hash", lambda h, p: False)
+    with pytest.raises(AuthError, match="Invalid credentials"):
+        auth_service.login("t@e.com", "wrong")
+
+def test_require_role_success(auth_service):
+    """Line 65: Path where role is allowed"""
+    user = Mock()
+    user.role = "admin"
+    auth_service.require_role(user, ["admin", "instructor"]) # Should not raise
+
+def test_require_role_denied(auth_service):
+    """Line 66: AuthError when role not in allowed list"""
+    user = Mock()
+    user.role = "student"
+    with pytest.raises(AuthError, match="Permission denied"):
+        auth_service.require_role(user, ["admin"])
+
+def test_change_password_success(auth_service, mock_user_repo, monkeypatch):
+    """Lines 70-84: Successful password change"""
+    user = Mock(spec=User)
+    user.get_password_hash.return_value = "old_hash"
+    mock_user_repo.get_by_id.return_value = user
+    mock_user_repo.update.return_value = True
+    monkeypatch.setattr("core.services.auth_service.check_password_hash", lambda h, p: True)
+    monkeypatch.setattr("core.services.auth_service.generate_password_hash", lambda p: "new_hash")
+    
+    result = auth_service.change_password(1, "old", "new")
+    assert result is True
+    assert user.password == "new_hash"
+    mock_user_repo.update.assert_called_once()
+
+def test_change_password_user_not_found(auth_service, mock_user_repo):
+    """Line 72: AuthError when user not found during password change"""
+    mock_user_repo.get_by_id.return_value = None
+    with pytest.raises(AuthError, match="User not found"):
+        auth_service.change_password(1, "o", "n")
+
+def test_change_password_incorrect_current(auth_service, mock_user_repo, monkeypatch):
+    """Line 77: AuthError when current password verification fails"""
+    user = Mock(spec=User)
+    user.get_password_hash.return_value = "hash"
+    mock_user_repo.get_by_id.return_value = user
+    monkeypatch.setattr("core.services.auth_service.check_password_hash", lambda h, p: False)
+    with pytest.raises(AuthError, match="Current password is incorrect"):
+        auth_service.change_password(1, "wrong", "new")

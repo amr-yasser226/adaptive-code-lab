@@ -1,4 +1,6 @@
 import pytest
+import sqlite3
+from unittest.mock import Mock
 from core.entities.notification import Notification
 
 
@@ -44,6 +46,10 @@ class TestNotificationRepo:
         
         assert retrieved is not None
         assert retrieved.type == "warning"
+
+    def test_get_by_id_not_found(self, notification_repo):
+        """Line 19: get_by_id returns None for non-existent ID"""
+        assert notification_repo.get_by_id(9999) is None
     
     def test_find_by_user(self, sample_user, notification_repo):
         """Test finding notifications by user"""
@@ -62,3 +68,27 @@ class TestNotificationRepo:
         
         notifications = notification_repo.find_by_user(sample_user.get_id())
         assert len(notifications) >= 3
+
+    def test_save_error(self, notification_repo, sample_user):
+        """Line 52-55: save_notification handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        notification_repo.db = mock_db
+        notification = Notification(None, sample_user.get_id(), "Msg", "info", False, None, None, None)
+        assert notification_repo.save_notification(notification) is None
+        mock_db.rollback.assert_called_once()
+
+    def test_delete_error(self, notification_repo):
+        """Line 85-87: delete_by_id handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        notification_repo.db = mock_db
+        assert notification_repo.delete_by_id(1) is False
+        mock_db.rollback.assert_called_once()
+    
+    def test_delete_by_id_success(self, sample_user, notification_repo):
+        """Test successful deletion of notification"""
+        notification = Notification(None, sample_user.get_id(), "To Delete", "info", False, None, None, None)
+        saved = notification_repo.save_notification(notification)
+        assert notification_repo.delete_by_id(saved.get_id()) is True
+        assert notification_repo.get_by_id(saved.get_id()) is None

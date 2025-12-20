@@ -199,3 +199,26 @@ class TestFileService:
 
         with pytest.raises(AuthError, match="You cannot view these files"):
             file_service.list_files(student_user, 1)
+
+    def test_list_files_submission_not_found(self, file_service, student_user, mock_submission_repo):
+        """Line 72: ValidationError when submission not found in list_files"""
+        mock_submission_repo.get_by_id.return_value = None
+        with pytest.raises(ValidationError, match="Submission not found"):
+            file_service.list_files(student_user, 999)
+
+    def test_upload_file_missing_content_type(self, file_service, student_user, mock_submission_repo):
+        """Line 91: ValidationError when content_type is missing"""
+        submission = Mock()
+        submission.get_student_id.return_value = 1
+        mock_submission_repo.get_by_id.return_value = submission
+        with pytest.raises(ValidationError, match="Content type is required"):
+            file_service.upload_file(
+                user=student_user,
+                submission_id=1,
+                path="/",
+                file_name="test.txt",
+                content_type="",
+                size_bytes=100,
+                checksum="abc",
+                storage_url="url"
+            )

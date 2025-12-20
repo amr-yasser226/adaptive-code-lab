@@ -190,3 +190,95 @@ class TestSimilarityService:
             assert result["comparisons"] == []
         finally:
             similarity_service._compute_cosine_similarity = original_method
+
+    def test_analyze_submission_no_assignment_id(self, similarity_service, mock_submission_repo):
+        """Line 58: ValidationError when submission has no assignment_id"""
+        submission = Mock()
+        submission.get_assignment_id.return_value = None
+        mock_submission_repo.get_by_id.return_value = submission
+        
+        with pytest.raises(ValidationError, match="no assignment id"):
+            similarity_service.analyze_submission(1)
+
+    def test_analyze_submission_link_error_logging(self, similarity_service, mock_submission_repo, 
+                                                   mock_embedding_service, mock_comparison_repo, 
+                                                   mock_similarity_repo):
+        """Lines 149-151: Error handling during comparison record linking"""
+        # Trigger high similarity to hit the linking logic
+        sub1 = Mock()
+        sub1.get_id.return_value = 1
+        sub1.get_assignment_id.return_value = 1
+        
+        sub2 = Mock()
+        sub2.get_id.return_value = 2
+        
+        mock_submission_repo.get_by_id.return_value = sub1
+        mock_submission_repo.list_by_assignment.return_value = [sub1, sub2]
+        mock_embedding_service.get_embedding_vector.return_value = [1.0] # simple vectors
+        
+        # Mock comparison record that causes error on update
+        comp_rec = Mock()
+        comp_rec.get_similarity_id.return_value = None
+        comp_rec.similarity_id = None # to avoid hasattr check failure if needed
+        mock_comparison_repo.create.return_value = comp_rec
+        
+        # CREATE FLAG
+        flag = Mock()
+        flag.get_id.return_value = 100
+        mock_similarity_repo.create.return_value = flag
+        
+        # TRIGGER ERROR ON UPDATE
+        mock_comparison_repo.update.side_effect = Exception("Storage Failure")
+        
+        # This should log but not crash
+        result = similarity_service.analyze_submission(1)
+        assert result["flag_created"] == flag
+        mock_comparison_repo.update.assert_called()
+
+    def test_analyze_submission_link_general_exception(self, similarity_service, mock_submission_repo, 
+                                                      mock_embedding_service, mock_comparison_repo, 
+                                                      mock_similarity_repo):
+        """Line 151: Outer exception handling for linking"""
+        sub1 = Mock()
+        sub1.get_assignment_id.return_value = 1
+        sub2 = Mock()
+        sub2.get_id.return_value = 2
+        mock_submission_repo.get_by_id.return_value = sub1
+        mock_submission_repo.list_by_assignment.return_value = [sub1, sub2]
+        mock_embedding_service.get_embedding_vector.return_value = [1.0]
+        
+        # High similarity
+        similarity_service.threshold = 0.5
+        
+        flag = Mock()
+        # Trigger exception in the hasattr(created_flag, "get_id") or similar
+        flag.get_id.side_effect = Exception("Major Crash")
+        mock_similarity_repo.create.return_value = flag
+        mock_comparison_repo.create.return_value = Mock()
+        
+        # This should log but not crash because of line 151
+        result = similarity_service.analyze_submission(1)
+        assert result["flag_created"] == flag
+
+    def test_analyze_submission_other_embedding_missing(self, similarity_service, mock_submission_repo, mock_embedding_service):
+        """Line 84: Skip other submission if its embedding is missing"""
+        sub1 = Mock()
+        sub1.get_id.return_value = 1
+        sub1.get_assignment_id.return_value = 1
+        
+        sub2 = Mock()
+        sub2.get_id.return_value = 2
+        
+        mock_submission_repo.get_by_id.return_value = sub1
+        mock_submission_repo.list_by_assignment.return_value = [sub1, sub2]
+        
+        # sub1 has embedding, sub2 does not
+        def get_embed(sid):
+            if sid == 1: return [1.0]
+            return None
+        
+        mock_embedding_service.get_embedding_vector.side_effect = get_embed
+        
+        result = similarity_service.analyze_submission(1)
+        assert result["comparisons"] == []
+        assert result["highest_score"] == 0.0

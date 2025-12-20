@@ -98,6 +98,9 @@ def setup_test_database(test_db_path):
 @pytest.fixture(scope="function")
 def db_connection(setup_test_database):
     """Provide a fresh database connection for each test"""
+    from infrastructure.database.connection import DatabaseManager
+    DatabaseManager._reset_instance()
+    
     db = Database()
     db.connect()
     yield db
