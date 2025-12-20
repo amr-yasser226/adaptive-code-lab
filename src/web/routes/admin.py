@@ -14,19 +14,23 @@ def dashboard():
     return render_template("admin/dashboard.html")
 
 
-@admin_bp.route("/users/<int:user_id>/manage", methods=["POST"])
+@admin_bp.route("/users/manage", methods=["POST"])
 @login_required
 @admin_required
-def manage_user_account(user_id):
+def manage_user_account():
+    user_id = request.form.get("user_id")
     action = request.form.get("action")
 
+    if not user_id or not action:
+        flash("User ID and action are required", "error")
+        return redirect(url_for("admin.dashboard"))
+
     admin_service = get_service("admin_service")
-    auth_service = get_service("auth_service")
 
     try:
         admin_service.manage_user_account(
             admin_user=get_current_user(),
-            target_user_id=user_id,
+            target_user_id=int(user_id),
             action=action
         )
         flash("User account updated successfully", "success")
@@ -35,7 +39,6 @@ def manage_user_account(user_id):
         flash(str(e), "error")
 
     return redirect(url_for("admin.dashboard"))
-
 
 
 
@@ -72,7 +75,6 @@ def configure_system_setting():
     value = request.form.get("value")
 
     admin_service = get_service("admin_service")
-    auth_service = get_service("auth_service")
 
     try:
         admin_service.configure_system_setting(
