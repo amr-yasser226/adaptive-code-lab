@@ -25,7 +25,9 @@
     <i class="fas fa-exclamation-circle"></i>
     <strong>Potential Academic Integrity Violations Detected</strong>
     <p class="mb-0">3 submissions flagged with high similarity scores requiring review</p>
-    <button type="button" class="btn btn-sm btn-danger float-end"><i class="fas fa-arrow-right"></i> Review All
+    <button type="button" class="btn btn-sm btn-danger float-end"
+        onclick="document.querySelector('.similarity-card').scrollIntoView({behavior: 'smooth'})"><i
+            class="fas fa-arrow-right"></i> Review All
         →</button>
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 </div>
@@ -70,10 +72,14 @@
     <div class="row align-items-center">
         <div class="col-md-8">
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-primary active">All</button>
-                <button type="button" class="btn btn-outline-primary">High</button>
-                <button type="button" class="btn btn-outline-primary">Medium</button>
-                <button type="button" class="btn btn-outline-primary">Low</button>
+                <a href="{{ url_for('instructor.plagiarism_dashboard') }}"
+                    class="btn btn-{{ 'primary' if not request.args.get('severity') else 'outline-primary' }}">All</a>
+                <a href="{{ url_for('instructor.plagiarism_dashboard', severity='high') }}"
+                    class="btn btn-{{ 'primary' if request.args.get('severity') == 'high' else 'outline-primary' }}">High</a>
+                <a href="{{ url_for('instructor.plagiarism_dashboard', severity='medium') }}"
+                    class="btn btn-{{ 'primary' if request.args.get('severity') == 'medium' else 'outline-primary' }}">Medium</a>
+                <a href="{{ url_for('instructor.plagiarism_dashboard', severity='low') }}"
+                    class="btn btn-{{ 'primary' if request.args.get('severity') == 'low' else 'outline-primary' }}">Low</a>
             </div>
         </div>
         <div class="col-md-4 text-end">

@@ -264,9 +264,8 @@ def update_profile():
                 flash('New password must be at least 8 characters', 'error')
                 return redirect(url_for('student.profile'))
             
-            # Update password in database
-            from werkzeug.security import generate_password_hash
-            user.password_hash = generate_password_hash(new_password)
+            # Update password using the proper method
+            user.set_password(new_password)
             user_repo.update(user)
             flash('Profile and password updated successfully!', 'success')
         else:

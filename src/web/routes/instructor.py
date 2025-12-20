@@ -260,6 +260,9 @@ def plagiarism_dashboard():
     submission_repo = get_service('submission_repo')
     user_repo = get_service('user_repo')
     
+    # Get severity filter from query params
+    severity_filter = request.args.get('severity', '')
+    
     # Get all unreviewed similarity flags
     all_flags = flag_repo.list_unreviewed() if hasattr(flag_repo, 'list_unreviewed') else []
     
@@ -267,6 +270,16 @@ def plagiarism_dashboard():
     flagged_pairs = []
     for flag in all_flags:
         if getattr(flag, 'is_dismissed', False):
+            continue
+        
+        score = getattr(flag, 'similarity_score', 0)
+        
+        # Apply severity filter
+        if severity_filter == 'high' and score < 0.8:
+            continue
+        elif severity_filter == 'medium' and (score >= 0.8 or score < 0.5):
+            continue
+        elif severity_filter == 'low' and score >= 0.5:
             continue
         
         submission = submission_repo.get_by_id(flag.submission_id) if hasattr(flag, 'submission_id') else None
