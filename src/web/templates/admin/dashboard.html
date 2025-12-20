@@ -95,22 +95,27 @@ Admin Dashboard
     <!-- ===================== -->
     <!-- System Settings -->
     <!-- ===================== -->
-    <section class="card mb-4">
-        <div class="card-header">
-            <h5>System Settings</h5>
+    <section class="card mb-4 shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="fas fa-cogs me-2 text-warning"></i>System Settings</h5>
         </div>
         <div class="card-body">
+            <p class="text-muted small">Update global site configurations. <strong>Key</strong> is the setting name, and
+                <strong>Value</strong> is the data.
+            </p>
             <form method="post" action="{{ url_for('admin.configure_system_setting') }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <div class="row g-2">
+                <div class="row g-2 align-items-center">
                     <div class="col-md-4">
-                        <input type="text" name="key" class="form-control" placeholder="Setting Key" required>
+                        <label class="small fw-bold">Setting Key</label>
+                        <input type="text" name="key" class="form-control" placeholder="e.g. app_name" required>
                     </div>
                     <div class="col-md-4">
-                        <input type="text" name="value" class="form-control" placeholder="Setting Value" required>
+                        <label class="small fw-bold">Setting Value</label>
+                        <input type="text" name="value" class="form-control" placeholder="e.g. My Lab" required>
                     </div>
-                    <div class="col-md-4">
-                        <button type="submit" class="btn btn-warning">
+                    <div class="col-md-4 pt-4">
+                        <button type="submit" class="btn btn-warning w-100 fw-bold">
                             Update Setting
                         </button>
                     </div>

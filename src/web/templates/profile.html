@@ -59,9 +59,7 @@
                     </h5>
                 </div>
                 <div class="card-body p-4">
-                    <form method="POST"
-                        action="{{ url_for('instructor.update_profile' if current_user.role == 'instructor' else 'student.update_profile') }}"
-                        novalidate>
+                    <form method="POST" action="{{ url_for(current_user.role + '.update_profile') }}" novalidate>
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
                         <div class="row">
