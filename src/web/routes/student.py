@@ -282,7 +282,13 @@ def submission_results(submission_id):
         flash('Submission not found', 'error')
         return redirect(url_for('student.dashboard'))
     
-    if str(submission.get_student_id()) != str(user_id):
+    peer_review_repo = get_service('peer_review_repo')
+    assigned_review = peer_review_repo.get(submission_id, user_id) if peer_review_repo else None
+    
+    is_owner = str(submission.get_student_id()) == str(user_id)
+    is_reviewer = assigned_review is not None
+    
+    if not (is_owner or is_reviewer):
         flash('Unauthorized access', 'error')
         return redirect(url_for('student.dashboard'))
         
@@ -296,4 +302,5 @@ def submission_results(submission_id):
         submission=submission,
         assignment=assignment,
         test_results=test_results,
-        current_user=current_user)
+        current_user=current_user,
+        assigned_review=assigned_review)

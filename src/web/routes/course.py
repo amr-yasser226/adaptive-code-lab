@@ -24,9 +24,9 @@ def list_courses():
             instructor_service = get_service('instructor_service')
             courses = instructor_service.list_instructor_courses(user_id)
         elif role == 'student':
-            # Show all published courses that are available for enrollment
+            # Show all courses that are available for enrollment (published or active)
             courses = course_repo.list_all()
-            courses = [c for c in courses if c.status == 'published']
+            courses = [c for c in courses if c.status in ['published', 'active']]
             # Also fetch enrollment status for each course to show "Enrolled" badge
             enrollments = enrollment_repo.list_by_student(user_id)
             enrolled_course_ids = {e.get_course_id() for e in enrollments if e.status == 'enrolled'}
