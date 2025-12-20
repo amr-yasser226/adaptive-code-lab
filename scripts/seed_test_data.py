@@ -101,8 +101,8 @@ def seed_test_data():
     cursor.execute('SELECT id FROM submissions WHERE student_id = ? AND assignment_id = ?', (student_id, assignment_id))
     if not cursor.fetchone():
         cursor.execute('''
-            INSERT INTO submissions (student_id, assignment_id, code, status, score, submitted_at, created_at)
-            VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+            INSERT INTO submissions (student_id, assignment_id, content, status, score, created_at)
+            VALUES (?, ?, ?, ?, ?, datetime('now'))
         ''', (student_id, assignment_id, 'print("Hello, World!")', 'graded', 85))
         submission_id = cursor.lastrowid
         print(f"  Created submission ID: {submission_id}")
