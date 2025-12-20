@@ -8,7 +8,7 @@
         content="ACCL - Adaptive Collaborative Code Lab. Online coding platform for assignments, testing, and plagiarism detection.">
     <meta name="author" content="ACCL Team">
     <meta name="theme-color" content="#667eea">
-    <title>{% block title %}ACCL - Adaptive Collaborative Code Lab{% endblock %}</title>
+    <title>{% block title %}{{ site_settings.get('app_name', 'ACCL') }}{% endblock %}</title>
 
     <!-- Modern Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,11 +39,11 @@
     <nav class="navbar navbar-expand-lg sticky-top glass" aria-label="Main Navigation">
         <div class="container-fluid px-lg-5">
             <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('index') }}"
-                aria-label="ACCL Home">
+                aria-label="{{ site_settings.get('app_name', 'ACCL') }} Home">
                 <div class="brand-logo-container">
                     <i class="fas fa-code"></i>
                 </div>
-                <span class="brand-text">ACCL</span>
+                <span class="brand-text">{{ site_settings.get('app_name', 'ACCL') }}</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -152,7 +152,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-4">
-                    <h5>ACCL</h5>
+                    <h5>{{ site_settings.get('app_name', 'ACCL') }}</h5>
                     <p>Adaptive Collaborative Code Learning Lab</p>
                 </div>
                 <div class="col-md-4">
@@ -171,7 +171,8 @@
             </div>
             <hr class="bg-secondary">
             <div class="text-center small">
-                <p>&copy; 2025 ACCL. All rights reserved.</p>
+                <p>&copy; {{ now.year if now else '2025' }} {{ site_settings.get('app_name', 'ACCL') }}. All rights
+                    reserved.</p>
             </div>
         </div>
     </footer>

@@ -13,7 +13,8 @@ class AdminService:
         course_repo=None,
         enrollment_repo=None,
         submission_repo=None,
-        db_path=None
+        db_path=None,
+        settings_repo=None
     ):
         self.user_repo = user_repo
         self.admin_repo = admin_repo
@@ -21,6 +22,7 @@ class AdminService:
         self.enrollment_repo = enrollment_repo
         self.submission_repo = submission_repo
         self.db_path = db_path
+        self.settings_repo = settings_repo
 
     def _ensure_admin(self, user):
         if not user or user.role != "admin":
@@ -81,10 +83,16 @@ class AdminService:
         if not key:
             raise ValidationError("Setting key is required")
 
-        if settings_repo:
-            return settings_repo.set(key, value)
+        # Prioritize the passed repo, then the class-level repo
+        repo = settings_repo or self.settings_repo
 
-        # fallback simple config
+        if repo:
+            success = repo.set(key, value)
+            if not success:
+                raise ValidationError(f"Failed to update setting: {key}")
+            return True
+
+        # fallback simple config (deprecated)
         return {
             "key": key,
             "value": value,

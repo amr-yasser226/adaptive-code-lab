@@ -32,6 +32,7 @@ from infrastructure.repositories.file_repository import FileRepository
 from infrastructure.repositories.audit_log_repository import AuditLogRepository
 from infrastructure.repositories.draft_repository import DraftRepository
 
+from infrastructure.repositories.settings_repository import SettingsRepository
 from infrastructure.repositories.hint_repository import HintRepository
 from infrastructure.ai.groq_client import GroqClient
 
@@ -129,6 +130,16 @@ def create_app(test_config=None):
             user = None
         return dict(current_user=user)
 
+    @app.context_processor
+    def inject_settings():
+        from web.utils import get_service
+        try:
+            settings_repo = get_service('settings_repo')
+            settings = {s['key']: s['value'] for s in settings_repo.list_all()}
+        except Exception:
+            settings = {}
+        return dict(site_settings=settings)
+
     # Initialize CSRF Protection
     csrf = CSRFProtect(app)
     
@@ -170,6 +181,7 @@ def create_app(test_config=None):
     audit_repo = AuditLogRepository(db_connection)
     draft_repo = DraftRepository(db_connection)
     hint_repo= HintRepository(db_connection)
+    settings_repo = SettingsRepository(db_connection)
 
 
     # 2. Initialize Services with Dependencies
@@ -228,7 +240,8 @@ def create_app(test_config=None):
         course_repo=course_repo,
         enrollment_repo=enrollment_repo,
         submission_repo=submission_repo,
-        db_path=db_manager.db_path
+        db_path=db_manager.db_path,
+        settings_repo=settings_repo
     )
     hint_service = HintService(
         hint_repo=hint_repo,
@@ -288,7 +301,8 @@ def create_app(test_config=None):
         'hint_repo': hint_repo,
         'file_service': file_service,
         'audit_service': audit_service,
-        'enrollment_service': enrollment_service
+        'enrollment_service': enrollment_service,
+        'settings_repo': settings_repo
     }
 
     # --- Register Blueprints (Bonus #1) ---
