@@ -28,9 +28,14 @@ Admin Dashboard
         <div class="card-header">
             <h5>User Management</h5>
         </div>
+
         <div class="card-body">
-            <form method="post" action="">
+            <form method="post" action="{{ url_for('admin.manage_user_account') }}">
+                
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
                 <div class="row g-2 align-items-center">
+
                     <div class="col-md-3">
                         <input
                             type="number"
@@ -40,6 +45,7 @@ Admin Dashboard
                             required
                         >
                     </div>
+
                     <div class="col-md-3">
                         <select name="action" class="form-select" required>
                             <option value="">Select Action</option>
@@ -48,23 +54,22 @@ Admin Dashboard
                             <option value="delete">Delete</option>
                         </select>
                     </div>
+
                     <div class="col-md-3">
-                        <button
-                            type="submit"
-                            formaction="/admin/users/{{ '' }}/manage"
-                            class="btn btn-primary"
-                            disabled
-                        >
+                        <button type="submit" class="btn btn-primary">
                             Apply Action
                         </button>
                     </div>
+
                 </div>
+
                 <small class="text-muted mt-2 d-block">
                     Enter a User ID and choose an action.
                 </small>
             </form>
         </div>
     </section>
+
 
     <!-- ===================== -->
     <!-- Reports -->
