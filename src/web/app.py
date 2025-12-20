@@ -227,7 +227,8 @@ def create_app(test_config=None):
         admin_repo=admin_repo,
         course_repo=course_repo,
         enrollment_repo=enrollment_repo,
-        submission_repo=submission_repo,    
+        submission_repo=submission_repo,
+        db_path=db_manager.db_path
     )
     hint_service = HintService(
         hint_repo=hint_repo,
