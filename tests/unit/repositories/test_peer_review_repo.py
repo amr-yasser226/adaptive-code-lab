@@ -1,4 +1,7 @@
 import pytest
+import sqlite3
+import json
+from unittest.mock import Mock
 from core.entities.peer_review import PeerReview
 
 
@@ -23,6 +26,7 @@ class TestPeerReviewRepo:
         
         assert saved is not None
         assert saved.comments == "Good work overall"
+        assert saved.rubric_score == {"clarity": 8, "correctness": 7}
     
     def test_get_peer_review(self, sample_submission, sample_student, peer_review_repo):
         """Test retrieving peer review"""
@@ -44,6 +48,10 @@ class TestPeerReviewRepo:
         
         assert retrieved is not None
         assert retrieved.comments == "Excellent"
+
+    def test_get_not_found(self, peer_review_repo):
+        """Line 20: get returns None for non-existent review"""
+        assert peer_review_repo.get(999, 999) is None
     
     def test_update_peer_review(self, sample_submission, sample_student, peer_review_repo):
         """Test updating peer review"""
@@ -63,6 +71,7 @@ class TestPeerReviewRepo:
         updated = peer_review_repo.update(peer_review)
         
         assert updated.comments == "Updated review"
+        assert updated.rubric_score == {"clarity": 8, "correctness": 9}
     
     def test_delete_peer_review(self, sample_submission, sample_student, peer_review_repo):
         """Test deleting peer review"""
@@ -83,6 +92,33 @@ class TestPeerReviewRepo:
         )
         
         assert result is True
+        assert peer_review_repo.get(sample_submission.get_id(), sample_student.get_id()) is None
+
+    def test_create_error(self, peer_review_repo, sample_submission, sample_student):
+        """Line 55-57: create handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        peer_review_repo.db = mock_db
+        review = PeerReview(sample_submission.get_id(), sample_student.get_id(), {}, "C", False, None, None)
+        assert peer_review_repo.create(review) is None
+        mock_db.rollback.assert_called_once()
+
+    def test_update_error(self, peer_review_repo, sample_submission, sample_student):
+        """Line 80-82: update handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        peer_review_repo.db = mock_db
+        review = PeerReview(sample_submission.get_id(), sample_student.get_id(), {}, "C", False, None, None)
+        assert peer_review_repo.update(review) is None
+        mock_db.rollback.assert_called_once()
+
+    def test_delete_error(self, peer_review_repo):
+        """Line 89-91: delete handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        peer_review_repo.db = mock_db
+        assert peer_review_repo.delete(1, 1) is False
+        mock_db.rollback.assert_called_once()
     
     def test_list_by_submission(self, sample_submission, sample_student, peer_review_repo):
         """Test listing peer reviews by submission"""

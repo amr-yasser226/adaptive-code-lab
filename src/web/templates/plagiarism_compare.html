@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Plagiarism Comparison - ACCL{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('instructor.plagiarism_dashboard') }}">Plagiarism Detection</a>
+        </li>
+        <li class="breadcrumb-item active">Compare Submissions</li>
+    </ol>
+</nav>
+
+<div class="card mb-4">
+    <div class="card-header bg-danger text-white">
+        <h4 class="mb-0">
+            <i class="fas fa-balance-scale"></i>
+            Similarity Comparison
+            <span class="badge bg-white text-danger float-end">{{ similarity_score }}% Match</span>
+        </h4>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Submission 1 -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-user"></i>
+                    {% if student1 %}{{ student1.name }}{% else %}Unknown Student{% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if submission1 %}
+                <div class="mb-3">
+                    <strong>Submission ID:</strong> {{ submission1.id }}<br>
+                    <strong>Language:</strong> {{ submission1.language }}<br>
+                    <strong>Status:</strong> <span class="badge bg-info">{{ submission1.status }}</span>
+                </div>
+                <div class="card bg-light">
+                    <div class="card-header"><i class="fas fa-code"></i> Code</div>
+                    <div class="card-body">
+                        <pre
+                            class="mb-0"><code>{{ submission1.code if submission1.code else 'Code not available' }}</code></pre>
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> Submission not found
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Submission 2 -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="fas fa-user"></i>
+                    {% if student2 %}{{ student2.name }}{% else %}Unknown Student{% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if submission2 %}
+                <div class="mb-3">
+                    <strong>Submission ID:</strong> {{ submission2.id }}<br>
+                    <strong>Language:</strong> {{ submission2.language }}<br>
+                    <strong>Status:</strong> <span class="badge bg-info">{{ submission2.status }}</span>
+                </div>
+                <div class="card bg-light">
+                    <div class="card-header"><i class="fas fa-code"></i> Code</div>
+                    <div class="card-body">
+                        <pre
+                            class="mb-0"><code>{{ submission2.code if submission2.code else 'Code not available' }}</code></pre>
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> Matched submission not found
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Review Actions -->
+<div class="card">
+    <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0"><i class="fas fa-gavel"></i> Take Action</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <form action="{{ url_for('instructor.plagiarism_review', flag_id=flag.id) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="hidden" name="action" value="dismiss" />
+                    <div class="mb-3">
+                        <label class="form-label">Notes (optional)</label>
+                        <textarea name="notes" class="form-control" rows="2"
+                            placeholder="Reason for dismissing..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100"
+                        onclick="return confirm('Dismiss this similarity flag?')">
+                        <i class="fas fa-check-circle"></i> Dismiss (False Positive)
+                    </button>
+                </form>
+            </div>
+            <div class="col-md-4">
+                <form action="{{ url_for('instructor.plagiarism_review', flag_id=flag.id) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="hidden" name="action" value="approve" />
+                    <div class="mb-3">
+                        <label class="form-label">Notes (optional)</label>
+                        <textarea name="notes" class="form-control" rows="2" placeholder="Evidence notes..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100"
+                        onclick="return confirm('Confirm this as plagiarism?')">
+                        <i class="fas fa-exclamation-triangle"></i> Confirm Plagiarism
+                    </button>
+                </form>
+            </div>
+            <div class="col-md-4">
+                <form action="{{ url_for('instructor.plagiarism_review', flag_id=flag.id) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="hidden" name="action" value="escalate" />
+                    <div class="mb-3">
+                        <label class="form-label">Notes (optional)</label>
+                        <textarea name="notes" class="form-control" rows="2"
+                            placeholder="Escalation notes..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-warning w-100" onclick="return confirm('Escalate this case?')">
+                        <i class="fas fa-arrow-up"></i> Escalate to Admin
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{{ url_for('instructor.plagiarism_dashboard') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+{% endblock %}

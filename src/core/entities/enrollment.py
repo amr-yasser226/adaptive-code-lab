@@ -20,13 +20,17 @@ class Enrollment :
             return self.__course_id  
 
 
-#     def get_progress(self):
-#             pass 
-#     def calculate_grade(self):
-#             pass
-#     def drop(self , dropped_at):
-#             self.status = 'dropped'
-#             self.dropped_at = dropped_at
-#     def complete(self, grade):
-#             self.status = 'completed'
-#             self.final_grade = grade
+    def get_progress(self):
+        # Placeholder for future logic (e.g., calculating completion %)
+        return 0.0
+
+    def calculate_grade(self):
+        return self.final_grade if self.final_grade is not None else 0.0
+
+    def drop(self , dropped_at):
+        self.status = 'dropped'
+        self.dropped_at = dropped_at
+
+    def complete(self, grade):
+        self.status = 'completed'
+        self.final_grade = grade

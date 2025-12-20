@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Edit Test Case{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Edit Test Case: {{ testcase.name }}</h2>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="text" name="name" class="form-control" value="{{ testcase.name }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Stdin</label>
+            <textarea name="stdin" class="form-control">{{ testcase.stdin }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Expected Output</label>
+            <textarea name="expected_out" class="form-control" required>{{ testcase.expected_out }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Points</label>
+            <input type="number" name="points" class="form-control" value="{{ testcase.points }}">
+        </div>
+        <div class="mb-3 form-check">
+            <input type="checkbox" name="is_visible" class="form-check-input" id="isVisible" {% if testcase.is_visible
+                %}checked{% endif %}>
+            <label class="form-check-label" for="isVisible">Visible to Students</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Test Case</button>
+    </form>
+</div>
+{% endblock %}

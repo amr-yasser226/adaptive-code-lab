@@ -3,247 +3,118 @@
 {% block title %}Home - ACCL{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
+<!-- Hero Section - Premium Design -->
 {% if not current_user %}
-<div class="hero-section mb-5">
+<div class="hero-section mb-5"
+    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; padding: 4rem 3rem; position: relative; overflow: hidden; box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);">
+    <!-- Decorative Elements -->
+    <div
+        style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%;">
+    </div>
+    <div
+        style="position: absolute; bottom: -30px; left: 20%; width: 100px; height: 100px; background: rgba(255,255,255,0.05); border-radius: 50%;">
+    </div>
+
     <div class="container">
         <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="hero-title fw-bold">
-                    <i class="fas fa-graduation-cap"></i> Welcome to ACCL
+            <div class="col-lg-7">
+                <span class="badge mb-3"
+                    style="background: rgba(255,255,255,0.2); color: white; padding: 8px 16px; font-size: 0.85rem; border-radius: 20px;">
+                    <i class="fas fa-sparkles me-2"></i>Learn. Code. Succeed.
+                </span>
+                <h1 class="display-4 fw-bold text-white mb-3" style="line-height: 1.2;">
+                    Welcome to <span
+                        style="background: linear-gradient(90deg, #fff, #e0e7ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">ACCL</span>
                 </h1>
-                <p class="hero-subtitle">Adaptive Collaborative Code Learning Lab</p>
-                <p class="hero-description">Master programming with automated grading, AI-powered hints, plagiarism
-                    detection, and real-time instructor feedback.</p>
-                <div class="mt-4 d-flex gap-2">
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg" title="Create a new account">
-                        <i class="fas fa-user-plus"></i> Get Started Free
+                <p class="lead text-white mb-2" style="opacity: 0.95; font-size: 1.3rem;">
+                    Adaptive Collaborative Code Learning Lab
+                </p>
+                <p class="text-white mb-4" style="opacity: 0.85; font-size: 1rem; max-width: 500px;">
+                    Master programming with automated grading, AI-powered hints, plagiarism detection, and real-time
+                    instructor feedback.
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg px-4 py-3"
+                        style="border-radius: 12px; font-weight: 600; box-shadow: 0 4px 15px rgba(255,255,255,0.3);">
+                        <i class="fas fa-rocket me-2"></i>Get Started Free
                     </a>
-                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg"
-                        title="Sign in to your account">
-                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-lg px-4 py-3"
+                        style="background: rgba(255,255,255,0.15); color: white; border: 2px solid rgba(255,255,255,0.3); border-radius: 12px; font-weight: 600;">
+                        <i class="fas fa-sign-in-alt me-2"></i>Sign In
                     </a>
                 </div>
             </div>
-            <div class="col-md-4 text-center d-none d-md-block">
-                <i class="fas fa-laptop-code hero-icon"></i>
+            <div class="col-lg-5 text-center d-none d-lg-block">
+                <div
+                    style="background: rgba(255,255,255,0.1); border-radius: 20px; padding: 3rem; backdrop-filter: blur(10px);">
+                    <i class="fas fa-laptop-code" style="font-size: 8rem; color: white; opacity: 0.9;"></i>
+                    <p class="text-white mt-3 mb-0" style="opacity: 0.8;">Start coding today</p>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Features Section -->
-<div class="row mb-5">
-    <div class="col-md-4 mb-4">
-        <div class="card h-100 text-center feature-card">
-            <div class="card-body">
-                <i class="fas fa-flask feature-icon"></i>
-                <h5 class="card-title">Automated Testing</h5>
-                <p class="card-text">Automatic grading with comprehensive test execution in secure sandboxes.</p>
+<!-- Features Section - Modern Cards -->
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card h-100 text-center border-0"
+            style="background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: all 0.3s ease;">
+            <div class="card-body p-4">
+                <div class="mb-3"
+                    style="width: 70px; height: 70px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 8px 20px rgba(102, 126, 234, 0.25);">
+                    <i class="fas fa-flask fa-lg text-white"></i>
+                </div>
+                <h5 class="card-title fw-bold mb-2" style="color: #1e293b;">Automated Testing</h5>
+                <p class="card-text" style="color: #64748b; font-size: 0.95rem;">Automatic grading with comprehensive
+                    test execution in secure sandboxes.</p>
             </div>
         </div>
     </div>
-    <div class="col-md-4 mb-4">
-        <div class="card h-100 text-center">
-            <div class="card-body">
-                <i class="fas fa-lightbulb text-warning" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                <h5 class="card-title">AI Hints</h5>
-                <p class="card-text">Get intelligent, progressive hints to help you learn and solve problems.</p>
+    <div class="col-md-4">
+        <div class="card h-100 text-center border-0"
+            style="background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: all 0.3s ease;">
+            <div class="card-body p-4">
+                <div class="mb-3"
+                    style="width: 70px; height: 70px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);">
+                    <i class="fas fa-lightbulb fa-lg text-white"></i>
+                </div>
+                <h5 class="card-title fw-bold mb-2" style="color: #1e293b;">AI Hints</h5>
+                <p class="card-text" style="color: #64748b; font-size: 0.95rem;">Get intelligent, progressive hints to
+                    help you learn and solve problems.</p>
             </div>
         </div>
     </div>
-    <div class="col-md-4 mb-4">
-        <div class="card h-100 text-center">
-            <div class="card-body">
-                <i class="fas fa-chart-bar text-success" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                <h5 class="card-title">Analytics</h5>
-                <p class="card-text">Track your progress with detailed analytics and performance insights.</p>
+    <div class="col-md-4">
+        <div class="card h-100 text-center border-0"
+            style="background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: all 0.3s ease;">
+            <div class="card-body p-4">
+                <div class="mb-3"
+                    style="width: 70px; height: 70px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);">
+                    <i class="fas fa-chart-line fa-lg text-white"></i>
+                </div>
+                <h5 class="card-title fw-bold mb-2" style="color: #1e293b;">Analytics</h5>
+                <p class="card-text" style="color: #64748b; font-size: 0.95rem;">Track your progress with detailed
+                    analytics and performance insights.</p>
             </div>
         </div>
     </div>
 </div>
 
-<hr>
-
-<!-- Call to Action -->
-<div class="row">
-    <div class="col-md-12 text-center py-5">
-        <h3>Ready to start learning?</h3>
-        <p class="lead text-muted mb-4">Join now and access programming assignments with instant feedback.</p>
-        <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
-            <i class="fas fa-user-plus"></i> Register Now
+<!-- Call to Action Section -->
+<div class="text-center py-5"
+    style="background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%); border-radius: 20px; margin-bottom: 2rem;">
+    <div class="container py-4">
+        <h2 class="fw-bold mb-3" style="color: #1e293b;">Ready to start learning?</h2>
+        <p class="lead mb-4" style="color: #64748b; max-width: 500px; margin: 0 auto;">
+            Join thousands of students and access programming assignments with instant feedback.
+        </p>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-lg px-5 py-3"
+            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; font-weight: 600; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.35);">
+            <i class="fas fa-user-plus me-2"></i>Register Now — It's Free
         </a>
     </div>
 </div>
 
-{% else %}
-<!-- Authenticated User View -->
-<div class="row mb-4">
-    <div class="col-md-8">
-        <h1>
-            <i class="fas fa-home"></i> Welcome Back, {{ current_user.name }}!
-        </h1>
-        <p class="text-muted">You're logged in as <strong>{{ current_user.role|title }}</strong></p>
-    </div>
-    <div class="col-md-4 text-end">
-        <small class="text-muted d-block">Last login: {{ current_user.last_login|format_date('%b %d, %Y at %I:%M %p') if
-            current_user.last_login else 'First login' }}</small>
-    </div>
-</div>
-
-<!-- Quick Access Cards -->
-<div class="row mb-5">
-    {% if current_user.role == 'student' %}
-    <div class="col-md-3 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-tasks text-primary" style="font-size: 2rem;"></i>
-                <h6 class="card-title mt-3">Active Assignments</h6>
-                <h3 class="mb-3">{{ quick_stats.active_assignments }}</h3>
-                <a href="{{ url_for('student.assignments') }}" class="btn btn-sm btn-primary">Browse</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-file-upload text-success" style="font-size: 2rem;"></i>
-                <h6 class="card-title mt-3">My Submissions</h6>
-                <h3 class="mb-3">{{ quick_stats.total_submissions }}</h3>
-                <a href="{{ url_for('student.dashboard') }}" class="btn btn-sm btn-success">View</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-star text-warning" style="font-size: 2rem;"></i>
-                <h6 class="card-title mt-3">Average Score</h6>
-                <h3 class="mb-3">{{ "%.1f"|format(quick_stats.average_score) }}%</h3>
-                <a href="{{ url_for('student.profile') }}" class="btn btn-sm btn-warning">Profile</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-history text-info" style="font-size: 2rem;"></i>
-                <h6 class="card-title mt-3">Pending Feedback</h6>
-                <h3 class="mb-3">{{ quick_stats.pending_feedback }}</h3>
-                <a href="{{ url_for('student.dashboard') }}?status=pending" class="btn btn-sm btn-info">Check</a>
-            </div>
-        </div>
-    </div>
-    {% elif current_user.role == 'instructor' %}
-    <div class="col-md-3 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-book text-primary" style="font-size: 2rem;"></i>
-                <h6 class="card-title mt-3">Assignments</h6>
-                <h3 class="mb-3">{{ quick_stats.assignments_created }}</h3>
-                <a href="{{ url_for('instructor.dashboard') }}" class="btn btn-sm btn-primary">Manage</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-hourglass-half text-warning" style="font-size: 2rem;"></i>
-                <h6 class="card-title mt-3">Pending Review</h6>
-                <h3 class="mb-3">{{ quick_stats.pending_submissions }}</h3>
-                <a href="{{ url_for('instructor.dashboard') }}" class="btn btn-sm btn-warning">Review</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-chart-line text-success" style="font-size: 2rem;"></i>
-                <h6 class="card-title mt-3">Class Average</h6>
-                <h3 class="mb-3">{{ "%.1f"|format(quick_stats.class_average) }}%</h3>
-                <a href="{{ url_for('instructor.analytics') }}" class="btn btn-sm btn-success">Analytics</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="fas fa-exclamation-triangle text-danger" style="font-size: 2rem;"></i>
-                <h6 class="card-title mt-3">Plagiarism Flags</h6>
-                <h3 class="mb-3">{{ quick_stats.plagiarism_flags }}</h3>
-                <a href="#" class="btn btn-sm btn-danger">Check</a>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-</div>
-
-<!-- Recent Activity -->
-<div class="row">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header bg-secondary text-white">
-                <h5 class="mb-0">Recent Activity</h5>
-            </div>
-            <div class="card-body">
-                {% if recent_activity %}
-                <div class="timeline">
-                    {% for activity in recent_activity %}
-                    <div class="timeline-item mb-3 pb-3 border-bottom">
-                        <div class="row">
-                            <div class="col-auto">
-                                <div class="avatar" style="width: 40px; height: 40px; border-radius: 50%; 
-                                                                       background: #007bff; color: white; display: flex; 
-                                                                       align-items: center; justify-content: center;">
-                                    <i class="fas fa-{{ activity.icon }}"></i>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <h6 class="mb-1">{{ activity.title }}</h6>
-                                <p class="mb-0 small text-muted">{{ activity.description }}</p>
-                                <small class="text-muted">{{ activity.timestamp|format_date('%b %d at %I:%M %p')
-                                    }}</small>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <p class="text-muted text-center py-4">No recent activity</p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <!-- Shortcuts -->
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Shortcuts</h5>
-            </div>
-            <div class="card-body">
-                <div class="list-group">
-                    <a href="{{ url_for('student.assignments') }}" class="list-group-item list-group-item-action">
-                        <i class="fas fa-list"></i> Browse Assignments
-                    </a>
-                    {% if current_user.role == 'instructor' %}
-                    <a href="#" class="list-group-item list-group-item-action">
-                        <i class="fas fa-plus"></i> Create Assignment
-                    </a>
-                    <a href="{{ url_for('instructor.analytics') }}" class="list-group-item list-group-item-action">
-                        <i class="fas fa-chart-bar"></i> View Analytics
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action">
-                        <i class="fas fa-eye"></i> Plagiarism Report
-                    </a>
-                    {% endif %}
-                    <a href="{{ url_for('student.profile') }}" class="list-group-item list-group-item-action">
-                        <i class="fas fa-user"></i> My Profile
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 {% endif %}
 {% endblock %}

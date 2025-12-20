@@ -40,3 +40,15 @@ data/*.db
 
 .coverage
 htmlcov/
+
+
+*.backup
+*.bak
+
+# Temporary files and reports
+sandbox/
+detailed_coverage.txt
+repo_coverage.txt
+repo_coverage_all.txt
+summary_report.txt
+test_results.txt

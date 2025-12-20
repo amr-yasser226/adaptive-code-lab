@@ -1,4 +1,6 @@
 import pytest
+import sqlite3
+from unittest.mock import Mock
 from core.entities.audit_log import AuditLog
 
 
@@ -46,6 +48,10 @@ class TestAuditLogRepo:
         
         assert retrieved is not None
         assert retrieved.action == "UPDATE"
+
+    def test_get_by_id_not_found(self, audit_log_repo):
+        """Line 19: get_by_id returns None for non-existent ID"""
+        assert audit_log_repo.get_by_id(9999) is None
     
     def test_list_by_user(self, sample_user, audit_log_repo):
         """Test listing audit logs by user"""
@@ -105,3 +111,20 @@ class TestAuditLogRepo:
         assert result is True
         retrieved = audit_log_repo.get_by_id(saved.get_id())
         assert retrieved is None
+
+    def test_save_error(self, audit_log_repo, sample_user):
+        """Line 57-59: save handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        audit_log_repo.db = mock_db
+        audit = AuditLog(None, sample_user.get_id(), "A", "E", 1, "D", "I", "U", None)
+        assert audit_log_repo.save(audit) is None
+        mock_db.rollback.assert_called_once()
+
+    def test_delete_error(self, audit_log_repo):
+        """Line 114-116: delete handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        audit_log_repo.db = mock_db
+        assert audit_log_repo.delete(1) is False
+        mock_db.rollback.assert_called_once()

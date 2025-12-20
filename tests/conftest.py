@@ -32,32 +32,16 @@ def project_root_path():
     return project_root
 
 
-@pytest.fixture(scope="session")
-def src_path_fixture():
-    """Return the src directory path"""
-    return src_path
+from core.entities.user import User
+from core.entities.student import Student
+from core.entities.instructor import Instructor
+from core.entities.admin import Admin
+from core.entities.course import Course
+from core.entities.assignment import Assignment
+from core.entities.submission import Submission
 
-
-# Import these after path is set
+from web.app import create_app
 from infrastructure.repositories.database import Database
-from infrastructure.repositories.user_repository import UserRepository as User_repo
-from infrastructure.repositories.student_repository import StudentRepository as Student_repo
-from infrastructure.repositories.instructor_repository import InstructorRepository as Instructor_repo
-from infrastructure.repositories.admin_repository import AdminRepository
-from infrastructure.repositories.course_repository import CourseRepository as Course_repo
-from infrastructure.repositories.assignment_repository import AssignmentRepository as Assignments_repo
-from infrastructure.repositories.submission_repository import SubmissionRepository as Submission_repo
-from infrastructure.repositories.test_case_repository import TestCaseRepository as Testcase_repo
-from infrastructure.repositories.result_repository import ResultRepository
-from infrastructure.repositories.enrollment_repository import EnrollmentRepository as Enrollment_repo
-from infrastructure.repositories.notification_repository import NotificationRepository as Notification_repo
-from infrastructure.repositories.hint_repository import HintRepository
-from infrastructure.repositories.file_repository import FileRepository
-from infrastructure.repositories.embedding_repository import EmbeddingRepository
-from infrastructure.repositories.peer_review_repository import PeerReviewRepository as PeerReview_repo
-from infrastructure.repositories.similarity_flag_repository import SimilarityFlagRepository as SimilarityFlag_repo
-from infrastructure.repositories.similarity_comparison_repository import SimilarityComparisonRepository
-from infrastructure.repositories.audit_log_repository import AuditLogRepository
 
 
 @pytest.fixture(scope="session")
@@ -98,6 +82,9 @@ def setup_test_database(test_db_path):
 @pytest.fixture(scope="function")
 def db_connection(setup_test_database):
     """Provide a fresh database connection for each test"""
+    from infrastructure.database.connection import DatabaseManager
+    DatabaseManager._reset_instance()
+    
     db = Database()
     db.connect()
     yield db
@@ -112,7 +99,7 @@ def clean_db(db_connection):
     tables = [
         'audit_logs', 'peer_reviews', 'similarity_comparisons',
         'similarity_flags', 'results', 'hints', 'embeddings',
-        'files', 'test_cases', 'submissions', 'enrollments',
+        'files', 'test_cases', 'submissions', 'enrollments', 'drafts',
         'assignments', 'courses', 'notifications', 'admins',
         'instructors', 'students', 'users'
     ]
@@ -126,7 +113,42 @@ def clean_db(db_connection):
     return db_connection
 
 
+@pytest.fixture(scope="function")
+def app(setup_test_database):
+    """Create and configure a new app instance for each test session"""
+    app = create_app({
+        'TESTING': True,
+        'WTF_CSRF_ENABLED': False,
+        'SECRET_KEY': 'test_secret_key'
+    })
+    return app
+
+
+@pytest.fixture(scope="function")
+def client(app, clean_db):
+    """A test client for the app."""
+    return app.test_client()
+
+
 # Repository fixtures
+from infrastructure.repositories.user_repository import UserRepository as User_repo
+from infrastructure.repositories.student_repository import StudentRepository as Student_repo
+from infrastructure.repositories.instructor_repository import InstructorRepository as Instructor_repo
+from infrastructure.repositories.admin_repository import AdminRepository
+from infrastructure.repositories.course_repository import CourseRepository as Course_repo
+from infrastructure.repositories.assignment_repository import AssignmentRepository as Assignments_repo
+from infrastructure.repositories.submission_repository import SubmissionRepository as Submission_repo
+from infrastructure.repositories.test_case_repository import TestCaseRepository as Testcase_repo
+from infrastructure.repositories.result_repository import ResultRepository
+from infrastructure.repositories.enrollment_repository import EnrollmentRepository as Enrollment_repo
+from infrastructure.repositories.notification_repository import NotificationRepository as Notification_repo
+from infrastructure.repositories.hint_repository import HintRepository
+from infrastructure.repositories.file_repository import FileRepository
+from infrastructure.repositories.embedding_repository import EmbeddingRepository
+from infrastructure.repositories.peer_review_repository import PeerReviewRepository as PeerReview_repo
+from infrastructure.repositories.similarity_flag_repository import SimilarityFlagRepository as SimilarityFlag_repo
+from infrastructure.repositories.similarity_comparison_repository import SimilarityComparisonRepository
+from infrastructure.repositories.audit_log_repository import AuditLogRepository
 @pytest.fixture
 def user_repo(clean_db):
     return User_repo(clean_db)
@@ -250,7 +272,7 @@ def sample_student(user_repo, student_repo):
         role="student",
         is_active=True
     )
-    saved_user = user_repo.save_user(user)
+    saved_user = user_repo.create(user)
     
     student = Student(
         id=saved_user.get_id(),
@@ -277,7 +299,7 @@ def sample_instructor(user_repo, instructor_repo):
         role="instructor",
         is_active=True
     )
-    saved_user = user_repo.save_user(user)
+    saved_user = user_repo.create(user)
     
     instructor = Instructor(
         id=saved_user.get_id(),

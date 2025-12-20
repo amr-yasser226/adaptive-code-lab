@@ -9,7 +9,7 @@ class SubmissionRepository:
         query = """
             SELECT 
                 id, assignment_id, student_id, version, language,
-                status, score, is_late, created_at,
+                status, score, content, file_id, is_late, created_at,
                 updated_at, grade_at
             FROM submissions
             WHERE id = :id
@@ -26,6 +26,8 @@ class SubmissionRepository:
             language=row.language,
             status=row.status,
             score=row.score,
+            content=row.content,
+            file_id=row.file_id,
             is_late=row.is_late,
             created_at=row.created_at,
             updated_at=row.updated_at,
@@ -37,12 +39,12 @@ class SubmissionRepository:
             query = """
                 INSERT INTO submissions (
                     assignment_id, student_id, version, language,
-                    status, score, is_late, created_at,
+                    status, score, content, file_id, is_late, created_at,
                     updated_at, grade_at
                 )
                 VALUES (
                     :assignment_id, :student_id, :version, :language,
-                    :status, :score, :is_late, CURRENT_TIMESTAMP,
+                    :status, :score, :content, :file_id, :is_late, CURRENT_TIMESTAMP,
                     CURRENT_TIMESTAMP, :grade_at
                 )
             """
@@ -53,6 +55,8 @@ class SubmissionRepository:
                 "language": submission.language,
                 "status": submission.status,
                 "score": submission.score,
+                "content": submission.content,
+                "file_id": submission.file_id,
                 "is_late": int(submission.is_late),
                 "grade_at": submission.grade_at
             })
@@ -72,6 +76,8 @@ class SubmissionRepository:
                     language = :language,
                     status = :status,
                     score = :score,
+                    content = :content,
+                    file_id = :file_id,
                     is_late = :is_late,
                     updated_at = CURRENT_TIMESTAMP,
                     grade_at = :grade_at
@@ -83,6 +89,8 @@ class SubmissionRepository:
                 "language": submission.language,
                 "status": submission.status,
                 "score": submission.score,
+                "content": submission.content,
+                "file_id": submission.file_id,
                 "is_late": int(submission.is_late),
                 "grade_at": submission.grade_at
             })
@@ -100,6 +108,40 @@ class SubmissionRepository:
         except sqlite3.Error:
             self.db.rollback()
             return False
+
+    def get_all(self):
+        """Get all submissions for export"""
+        query = """
+            SELECT id, assignment_id, student_id, version, language,
+                   status, score, is_late, created_at, updated_at, grade_at,
+                   content, file_id
+            FROM submissions
+            ORDER BY created_at DESC
+        """
+        result = self.db.execute(query)
+        rows = result.fetchall()
+        submissions = []
+        for row in rows:
+            try:
+                submissions.append(Submission(
+                    id=row.id,
+                    assignment_id=row.assignment_id,
+                    student_id=row.student_id,
+                    version=row.version,
+                    language=row.language,
+                    status=row.status,
+                    score=row.score,
+                    content=row.content,
+                    file_id=row.file_id,
+                    is_late=row.is_late,
+                    created_at=row.created_at,
+                    updated_at=row.updated_at,
+                    grade_at=row.grade_at
+                ))
+            except Exception as e:
+                # Log error if possible, or just continue
+                continue  # Skip invalid rows
+        return submissions
 
     def list_by_assignment(self, assignment_id: int):
         query = """
@@ -119,6 +161,8 @@ class SubmissionRepository:
                 language=row.language,
                 status=row.status,
                 score=row.score,
+                content=row.content,
+                file_id=row.file_id,
                 is_late=row.is_late,
                 created_at=row.created_at,
                 updated_at=row.updated_at,
@@ -145,6 +189,8 @@ class SubmissionRepository:
                 language=row.language,
                 status=row.status,
                 score=row.score,
+                content=row.content,
+                file_id=row.file_id,
                 is_late=row.is_late,
                 created_at=row.created_at,
                 updated_at=row.updated_at,
@@ -169,6 +215,8 @@ class SubmissionRepository:
                 language=row.language,
                 status=row.status,
                 score=row.score,
+                content=row.content,
+                file_id=row.file_id,
                 is_late=row.is_late,
                 created_at=row.created_at,
                 updated_at=row.updated_at,
@@ -200,6 +248,8 @@ class SubmissionRepository:
         language=row.language,
         status=row.status,
         score=row.score,
+        content=row.content,
+        file_id=row.file_id,
         is_late=row.is_late,
         created_at=row.created_at,
         updated_at=row.updated_at,
@@ -209,12 +259,11 @@ class SubmissionRepository:
 
     def get_grade_for_assignment (self , student_id : int , assignment_id : int ): 
         query ="""
-                SELECT score FROM submissions WHERE student_id = :sid  AND assignment_id=:aid  AND score IS NOT NULL ORDER BY grade_at DESC LIMIT 1    
-            
+                SELECT MAX(score) as best_score FROM submissions WHERE student_id = :sid  AND assignment_id=:aid  AND score IS NOT NULL
         """
         row  =self.db.execute(query,{"sid":student_id , "aid":assignment_id}).fetchone()
-        if row : 
-            return row.score 
+        if row and row.best_score is not None: 
+            return row.best_score 
         else : 
             return None
     

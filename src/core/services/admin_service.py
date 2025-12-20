@@ -13,7 +13,8 @@ class AdminService:
         course_repo=None,
         enrollment_repo=None,
         submission_repo=None,
-        db_path=None
+        db_path=None,
+        settings_repo=None
     ):
         self.user_repo = user_repo
         self.admin_repo = admin_repo
@@ -21,6 +22,7 @@ class AdminService:
         self.enrollment_repo = enrollment_repo
         self.submission_repo = submission_repo
         self.db_path = db_path
+        self.settings_repo = settings_repo
 
     def _ensure_admin(self, user):
         if not user or user.role != "admin":
@@ -38,11 +40,13 @@ class AdminService:
 
         if action == "activate":
             user.activate_account()
-            return self.user_repo.Update_data(user)
+            return self.user_repo.update(user)
+
 
         if action == "deactivate":
             user.deactivate_account()
-            return self.user_repo.Update_data(user)
+            return self.user_repo.update(user)
+
 
         if action == "delete":
             self.user_repo.delete(target_user_id)
@@ -58,7 +62,8 @@ class AdminService:
         self._ensure_admin(admin_user)
 
         if report_type == "users":
-            return self.user_repo.findALL()
+            return self.user_repo.list_all()
+
 
         if report_type == "courses" and self.course_repo:
             return self.course_repo.list_all()
@@ -67,7 +72,7 @@ class AdminService:
             return self.enrollment_repo.list_all()
 
         if report_type == "submissions" and self.submission_repo:
-            return self.submission_repo.list_all()
+            return self.submission_repo.get_all()
 
         raise ValidationError("Invalid or unsupported report type")
 
@@ -78,10 +83,16 @@ class AdminService:
         if not key:
             raise ValidationError("Setting key is required")
 
-        if settings_repo:
-            return settings_repo.set(key, value)
+        # Prioritize the passed repo, then the class-level repo
+        repo = settings_repo or self.settings_repo
 
-        # fallback simple config
+        if repo:
+            success = repo.set(key, value)
+            if not success:
+                raise ValidationError(f"Failed to update setting: {key}")
+            return True
+
+        # fallback simple config (deprecated)
         return {
             "key": key,
             "value": value,
@@ -90,17 +101,25 @@ class AdminService:
 
 
     def export_db_dump(self, admin_user, output_path):
+        import sqlite3
         self._ensure_admin(admin_user)
 
         if not self.db_path:
             raise ValidationError("Database path not configured")
 
         try:
-            shutil.copy(self.db_path, output_path)
+            # Use SQLite's native VACUUM INTO for a safe, live backup
+            conn = sqlite3.connect(self.db_path)
+            # Ensure output_path is safe for the query
+            conn.execute(f"VACUUM INTO '{output_path}'")
+            conn.close()
+            
             return {
                 "status": "success",
                 "output_path": output_path,
                 "exported_at": datetime.utcnow()
             }
+        except sqlite3.Error as e:
+            raise ValidationError(f"Database export failed (SQL): {str(e)}")
         except Exception as e:
-            raise ValidationError(f"Database export failed: {e}")
+            raise ValidationError(f"Database export failed: {str(e)}")

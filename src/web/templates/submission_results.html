@@ -1,349 +1,267 @@
 {% extends "base.html" %}
 
-{% block title %}Submission History - ACCL{% endblock %}
+{% block title %}Submission Results - {{ assignment.title }} - ACCL{% endblock %}
 
 {% block content %}
-<!-- Blue Gradient Header -->
-<div class="results-header mb-5">
-    <div class="container-fluid">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="results-title">
-                    <i class="fas fa-history"></i> Submission History
-                </h1>
-            </div>
-            <div class="col-md-4 text-end">
-                <button class="btn btn-outline-light me-2"><i class="fas fa-home"></i> Home</button>
-                <button class="btn btn-outline-light me-2"><i class="fas fa-list"></i> Assignments</button>
-                <button class="btn btn-outline-light me-2"><i class="fas fa-history"></i> History</button>
-                <button class="btn btn-outline-light"><i class="fas fa-download"></i> Export</button>
-                <button class="btn btn-light ms-3"><i class="fas fa-user"></i></button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Search and Filter Bar -->
-<div class="search-filter-bar mb-4">
-    <div class="input-group mb-3">
-        <span class="input-group-text bg-light border-0"><i class="fas fa-search"></i></span>
-        <input type="text" class="form-control border-0" placeholder="Search assignments by name, date, or status...">
-    </div>
-
-    <div class="filter-buttons">
-        <button class="btn btn-primary">All (47)</button>
-        <button class="btn btn-outline-secondary">Recent</button>
-        <button class="btn btn-outline-secondary"><i class="fas fa-check"></i> Passed (32)</button>
-        <button class="btn btn-outline-secondary"><i class="fas fa-times"></i> Failed (15)</button>
-        <div class="ms-auto">
-            <a href="{{ url_for('student.dashboard') }}" class="btn btn-outline-secondary"><i class="fas fa-sort"></i>
-                Sort: Newest First</a>
-        </div>
-    </div>
-</div>
-
-<!-- Submission Cards -->
-<div class="row">
-    <div class="col-md-12">
-        <!-- Passed Submission (Green Border) -->
-        <div class="submission-card submission-card-passed mb-3">
-            <div class="submission-card-header">
-                <div class="submission-status-icon">
-                    <i class="fas fa-check"></i>
-                </div>
-                <div class="submission-info">
-                    <h3>Assignment #3: Data Structures - Binary Trees</h3>
-                    <p class="submission-date"><i class="far fa-calendar"></i> Submitted: November 15, 2025 at 2:34 PM
-                    </p>
-                </div>
-                <div class="submission-score">
-                    <span class="score-badge score-badge-green">Score: 95/100</span>
-                </div>
-            </div>
-            <div class="submission-card-body">
-                <div class="submission-stats">
-                    <div class="stat-item">
-                        <i class="fas fa-clock"></i> Time: 45 minutes
-                    </div>
-                    <div class="stat-item">
-                        <i class="fas fa-redo"></i> Attempts: 2
-                    </div>
-                </div>
-            </div>
-            <div class="submission-card-footer">
-                <button class="btn btn-sm btn-outline-success"><i class="fas fa-eye"></i> View Details</button>
-                <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-download"></i> Download Code</button>
-            </div>
-        </div>
-
-        <!-- In Progress Submission (Orange Border) -->
-        <div class="submission-card submission-card-warning mb-3">
-            <div class="submission-card-header">
-                <div class="submission-status-icon">
-                    <i class="fas fa-exclamation"></i>
-                </div>
-                <div class="submission-info">
-                    <h3>Assignment #2: Algorithms - Sorting & Searching</h3>
-                    <p class="submission-date"><i class="far fa-calendar"></i> Submitted: November 12, 2025 at 4:18 PM
-                    </p>
-                </div>
-                <div class="submission-score">
-                    <span class="score-badge score-badge-warning">Score: 68/100</span>
-                </div>
-            </div>
-            <div class="submission-card-body">
-                <div class="submission-stats">
-                    <div class="stat-item">
-                        <i class="fas fa-clock"></i> Time: 62 minutes
-                    </div>
-                    <div class="stat-item">
-                        <i class="fas fa-redo"></i> Attempts: 3
-                    </div>
-                </div>
-            </div>
-            <div class="submission-card-footer">
-                <button class="btn btn-sm btn-outline-warning"><i class="fas fa-eye"></i> View Details</button>
-                <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-download"></i> Download Code</button>
-            </div>
-        </div>
-
-        <!-- Failed Submission (Red Border) -->
-        <div class="submission-card submission-card-failed mb-3">
-            <div class="submission-card-header">
-                <div class="submission-status-icon">
-                    <i class="fas fa-times"></i>
-                </div>
-                <div class="submission-info">
-                    <h3>Assignment #1: Python Basics - Control Flow</h3>
-                    <p class="submission-date"><i class="far fa-calendar"></i> Submitted: November 8, 2025 at 11:05 AM
-                    </p>
-                </div>
-                <div class="submission-score">
-                    <span class="score-badge score-badge-danger">Score: 42/100</span>
-                </div>
-            </div>
-            <div class="submission-card-body">
-                <div class="submission-stats">
-                    <div class="stat-item">
-                        <i class="fas fa-clock"></i> Time: 38 minutes
-                    </div>
-                    <div class="stat-item">
-                        <i class="fas fa-redo"></i> Attempts: 1
-                    </div>
-                </div>
-            </div>
-            <div class="submission-card-footer">
-                <button class="btn btn-sm btn-outline-danger"><i class="fas fa-eye"></i> View Details</button>
-                <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-download"></i> Download Code</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Load More Button -->
-<div class="text-center mb-4">
-    <button class="btn btn-light border"><i class="fas fa-folder-open"></i> Load 12 More Submissions...</button>
-</div>
-
-<!-- Overall Statistics Section -->
-<div class="card border-0 bg-light">
-    <div class="card-body p-4">
-        <h3><i class="fas fa-chart-bar"></i> Overall Statistics & Analytics</h3>
-        <div class="row mt-4">
-            <div class="col-md-2">
-                <div class="stat-box">
-                    <h6>Total Submissions</h6>
-                    <h3>47</h3>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="stat-box">
-                    <h6><i class="fas fa-check"></i> Passed</h6>
-                    <h3 class="text-success">32 (68%)</h3>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="stat-box">
-                    <h6><i class="fas fa-times"></i> Failed</h6>
-                    <h3 class="text-danger">15 (32%)</h3>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="stat-box">
-                    <h6>Average Score</h6>
-                    <h3>78.5%</h3>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="stat-box">
-                    <h6>Total Time Invested</h6>
-                    <h3>24.5 hrs</h3>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<nav aria-label="breadcrumb">
+<!-- Breadcrumb Navigation -->
+<nav aria-label="breadcrumb" class="mb-4">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
-        <li class="breadcrumb-item"><a href="{{ url_for('student.assignments') }}">Assignments</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('student.assignments') }}"><i class="fas fa-list"></i>
+                Assignments</a></li>
+        <li class="breadcrumb-item"><a
+                href="{{ url_for('student.assignment_detail', assignment_id=assignment.get_id()) }}">{{ assignment.title
+                }}</a></li>
         <li class="breadcrumb-item active" aria-current="page">Submission Results</li>
     </ol>
 </nav>
-<div class="col-md-3">
-    <div class="card text-center">
-        <div class="card-body">
-            <h6 class="card-title text-muted">Failed</h6>
-            <h3 class="text-danger">{{ failed_count }}</h3>
+
+<!-- Result Header -->
+<div
+    class="results-header mb-4 p-4 rounded shadow-sm {% if submission.status == 'graded' and submission.score >= 70 %}bg-success text-white{% elif submission.status == 'graded' and submission.score < 70 %}bg-warning text-dark{% elif submission.status == 'failed' or submission.status == 'error' %}bg-danger text-white{% else %}bg-info text-white{% endif %}">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h2 class="mb-1">
+                {% if submission.status == 'graded' %}
+                {% if submission.score >= 70 %}
+                <i class="fas fa-check-circle"></i> Submission Passed
+                {% else %}
+                <i class="fas fa-exclamation-circle"></i> Submission Graded
+                {% endif %}
+                {% elif submission.status == 'failed' or submission.status == 'error' %}
+                <i class="fas fa-times-circle"></i> Submission Failed
+                {% else %}
+                <i class="fas fa-spinner fa-spin"></i> Processing Submission
+                {% endif %}
+            </h2>
+            <p class="mb-0 opacity-75">
+                Version {{ submission.version }} - {{ assignment.title }}
+            </p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            {% if submission.status == 'graded' %}
+            <div class="h3 mb-0">Score: {{ submission.score }}/100</div>
+            {% else %}
+            <div class="h3 mb-0">Status: {{ submission.status|capitalize }}</div>
+            {% endif %}
         </div>
     </div>
 </div>
-<div class="col-md-3">
-    <div class="card text-center">
-        <div class="card-body">
-            <h6 class="card-title text-muted">Pass Rate</h6>
-            <h3 class="text-info">{{ "%.1f"|format((passed_count / test_results|length * 100) if test_results else 0)
-                }}%</h3>
-        </div>
-    </div>
-</div>
-</div>
 
-<!-- Test Results Detailed -->
-<div class="card">
-    <div class="card-header bg-primary text-white">
-        <h5 class="mb-0"><i class="fas fa-flask"></i> Test Results</h5>
-    </div>
-    <div class="card-body">
-        {% if test_results %}
-        <div class="accordion" id="testAccordion">
-            {% for result in test_results %}
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button
-                        class="accordion-button {% if result.passed %}bg-light{% else %}bg-danger bg-opacity-10{% endif %}"
-                        type="button" data-bs-toggle="collapse" data-bs-target="#test{{ loop.index }}">
-                        <strong>
-                            {% if result.passed %}
-                            <i class="fas fa-check-circle text-success"></i>
-                            {% else %}
-                            <i class="fas fa-times-circle text-danger"></i>
-                            {% endif %}
-                            Test {{ loop.index }}
-                        </strong>
-                        <span class="ms-2">
-                            {% if result.passed %}
-                            <span class="badge bg-success">PASSED</span>
-                            {% else %}
-                            <span class="badge bg-danger">FAILED</span>
-                            {% endif %}
-                        </span>
-                        <span class="ms-auto text-muted small">({{ result.runtime_ms }}ms)</span>
-                    </button>
-                </h2>
-                <div id="test{{ loop.index }}" class="accordion-collapse collapse" data-bs-parent="#testAccordion">
-                    <div class="accordion-body">
-                        <!-- Input -->
-                        <div class="mb-3">
-                            <h6>Input</h6>
-                            <div class="bg-light p-2 rounded border"
-                                style="font-family: monospace; font-size: 0.9em; white-space: pre-wrap; word-break: break-all;">
-                                {{ result.test_case.input[:200] }}{% if result.test_case.input|length > 200 %}...{%
-                                endif %}
+<div class="row">
+    <!-- Main Results Column -->
+    <div class="col-lg-8">
+        <!-- Test Results Table/Accordion -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="fas fa-flask"></i> Test Cases</h5>
+            </div>
+            <div class="card-body">
+                {% if test_results %}
+                <div class="accordion" id="testAccordion">
+                    {% for result in test_results %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading{{ loop.index }}">
+                            <button
+                                class="accordion-button {% if not loop.first %}collapsed{% endif %} {% if result.passed %}bg-light{% else %}bg-danger bg-opacity-10{% endif %}"
+                                type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}">
+                                <div class="d-flex justify-content-between w-100 me-3">
+                                    <span>
+                                        {% if result.passed %}
+                                        <i class="fas fa-check-circle text-success me-2"></i>
+                                        {% else %}
+                                        <i class="fas fa-times-circle text-danger me-2"></i>
+                                        {% endif %}
+                                        Test Case #{{ loop.index }}
+                                    </span>
+                                    <span class="badge {% if result.passed %}bg-success{% else %}bg-danger{% endif %}">
+                                        {{ 'PASSED' if result.passed else 'FAILED' }}
+                                    </span>
+                                </div>
+                            </button>
+                        </h2>
+                        <div id="collapse{{ loop.index }}"
+                            class="accordion-collapse collapse {% if loop.first %}show{% endif %}"
+                            data-bs-parent="#testAccordion">
+                            <div class="accordion-body">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <h6>Input:</h6>
+                                        <pre
+                                            class="bg-light p-2 rounded"><code>{{ result.test_case.input if result.test_case else 'N/A' }}</code></pre>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Expected Output:</h6>
+                                        <pre
+                                            class="bg-light p-2 rounded"><code>{{ result.test_case.expected_output if result.test_case else 'N/A' }}</code></pre>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Your Output:</h6>
+                                        <pre
+                                            class="{% if result.passed %}bg-light{% else %}bg-danger bg-opacity-10{% endif %} p-2 rounded"><code>{{ result.stdout if result.stdout else '(no output)' }}</code></pre>
+                                    </div>
+                                    {% if result.stderr %}
+                                    <div class="col-12">
+                                        <h6 class="text-danger">Error:</h6>
+                                        <pre
+                                            class="bg-dark text-white p-2 rounded"><code>{{ result.stderr }}</code></pre>
+                                    </div>
+                                    {% endif %}
+                                    <div class="col-12 mt-2">
+                                        <small class="text-muted"><i class="fas fa-clock"></i> Runtime: {{
+                                            result.runtime_ms }}ms</small>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-
-                        <!-- Expected Output -->
-                        <div class="mb-3">
-                            <h6>Expected Output</h6>
-                            <div class="bg-light p-2 rounded border"
-                                style="font-family: monospace; font-size: 0.9em; white-space: pre-wrap; word-break: break-all;">
-                                {{ result.test_case.expected_output[:200] }}{% if
-                                result.test_case.expected_output|length > 200 %}...{% endif %}
-                            </div>
-                        </div>
-
-                        <!-- Actual Output -->
-                        <div class="mb-3">
-                            <h6>Your Output</h6>
-                            <div class="bg-light p-2 rounded border {% if result.passed %}border-success{% else %}border-danger{% endif %}"
-                                style="font-family: monospace; font-size: 0.9em; white-space: pre-wrap; word-break: break-all;">
-                                {{ result.stdout[:200] }}{% if result.stdout|length > 200 %}...{% endif %}
-                            </div>
-                        </div>
-
-                        <!-- Error Output (if any) -->
-                        {% if result.stderr %}
-                        <div class="mb-3">
-                            <h6 class="text-danger">Error Output</h6>
-                            <div class="bg-danger bg-opacity-10 p-2 rounded border border-danger"
-                                style="font-family: monospace; font-size: 0.85em; white-space: pre-wrap; word-break: break-all;">
-                                {{ result.stderr[:300] }}
-                            </div>
-                        </div>
-                        {% endif %}
-
-                        <!-- Runtime -->
-                        <div class="mb-0">
-                            <small class="text-muted">Runtime: <strong>{{ result.runtime_ms }}ms</strong></small>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-info-circle fa-2x text-muted mb-2"></i>
+                    <p class="text-muted">No specific test results available. If this assignment is auto-graded, results
+                        will appear here shortly.</p>
+                </div>
+                {% endif %}
             </div>
-            {% endfor %}
         </div>
-        {% else %}
-        <p class="text-muted">No test results available yet. Submission is being processed.</p>
+
+        <!-- AI Recommendations / Hints -->
+        {% if submission.hints or submission.status == 'failed' %}
+        <div class="card mb-4 border-0 shadow-sm bg-light">
+            <div class="card-header bg-warning text-dark border-0">
+                <h5 class="mb-0"><i class="fas fa-lightbulb"></i> Learning Resources & Hints</h5>
+            </div>
+            <div class="card-body">
+                {% if submission.hints %}
+                {% for hint in submission.hints %}
+                <div class="alert alert-info border-0 shadow-sm">
+                    <h6>Hint (Level {{ hint.level }})</h6>
+                    <p class="mb-0">{{ hint.content }}</p>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p>Based on your submission, we recommend checking your logic for common edge cases. Visit your <a
+                        href="{{ url_for('remediation.list_remediations') }}">Learning Resources</a> for personalized
+                    content.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Peer Review Form (for assigned reviewers) -->
+        {% if assigned_review and not is_owner %}
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-user-edit"></i> Peer Review</h5>
+            </div>
+            <div class="card-body">
+                <form
+                    action="{{ url_for('peer_review.update_review' if assigned_review.rubric_score or assigned_review.comments else 'peer_review.create_review', submission_id=submission.get_id()) }}"
+                    method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold">Rubric Score (0-10)</label>
+                        <input type="number" name="rubric_score" class="form-control" min="0" max="10" step="1"
+                            value="{{ assigned_review.rubric_score if assigned_review.rubric_score is number else '' }}"
+                            required>
+                        <small class="text-muted">Provide an overall score based on the assignment requirements.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold">Comments & Feedback</label>
+                        <textarea name="comments" class="form-control" rows="5"
+                            placeholder="What did they do well? What could be improved?"
+                            required>{{ assigned_review.comments or '' }}</textarea>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" name="action" value="save" class="btn btn-primary px-4">
+                            <i class="fas fa-save me-1"></i> Save Draft
+                        </button>
+                        {% if not assigned_review.is_submitted %}
+                        <button type="submit" name="action" value="submit" class="btn btn-success px-4"
+                            onclick="return confirm('Are you sure you want to submit? This cannot be edited later.');">
+                            <i class="fas fa-check-circle me-1"></i> Submit Review
+                        </button>
+                        {% endif %}
+                    </div>
+                </form>
+
+                {% if assigned_review.is_submitted %}
+                <div class="alert alert-success mt-3 mb-0">
+                    <i class="fas fa-check-double me-2"></i> This review has been submitted and can no longer be edited.
+                </div>
+                {% endif %}
+            </div>
+        </div>
         {% endif %}
     </div>
-</div>
 
-<!-- AI Hints Section -->
-{% if submission.hints %}
-<div class="card mt-4">
-    <div class="card-header bg-warning text-dark">
-        <h5 class="mb-0"><i class="fas fa-lightbulb"></i> AI Hints</h5>
-    </div>
-    <div class="card-body">
-        {% for hint in submission.hints %}
-        <div class="alert alert-info mb-3">
-            <h6>Hint Level {{ hint.level }}</h6>
-            <p class="mb-0">{{ hint.content }}</p>
+    <!-- Sidebar Column -->
+    <div class="col-lg-4">
+        <!-- Submission details -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Info</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-5">Status</dt>
+                    <dd class="col-7"><span
+                            class="badge {% if submission.status == 'graded' %}bg-success{% else %}bg-info{% endif %}">{{
+                            submission.status|capitalize }}</span></dd>
+
+                    <dt class="col-5">Language</dt>
+                    <dd class="col-7">{{ submission.language|capitalize }}</dd>
+
+                    <dt class="col-5">Submitted</dt>
+                    <dd class="col-7 small">{{ submission.created_at|format_date('%b %d, %Y %I:%M %p') if
+                        submission.created_at else 'N/A' }}</dd>
+
+                    {% if submission.grade_at %}
+                    <dt class="col-5">Graded At</dt>
+                    <dd class="col-7 small">{{ submission.grade_at|format_date('%b %d, %Y %I:%M %p') }}</dd>
+                    {% endif %}
+
+                    <dt class="col-5">Points</dt>
+                    <dd class="col-7"><strong>{{ submission.score or 0 }}/100</strong></dd>
+                </dl>
+            </div>
+            <div class="card-footer bg-white border-top-0">
+                <a href="{{ url_for('student.submit_code', assignment_id=assignment.get_id()) }}"
+                    class="btn btn-primary w-100 mb-2">
+                    <i class="fas fa-redo"></i> Submit New Version
+                </a>
+                <a href="{{ url_for('student.assignment_detail', assignment_id=assignment.get_id()) }}"
+                    class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-arrow-left"></i> Back to Assignment
+                </a>
+            </div>
         </div>
-        {% endfor %}
-    </div>
-</div>
-{% endif %}
 
-<!-- Action Buttons -->
-<div class="row mt-4">
-    <div class="col-md-12">
-        <div class="d-flex gap-2">
-            {% if submission.status != 'graded' and current_user.role == 'instructor' %}
-            <form method="POST" action="#" style="display: inline;">
-                <button type="submit" class="btn btn-primary" disabled>
-                    <i class="fas fa-sync"></i> Re-grade (WIP)
-                </button>
-            </form>
-            {% endif %}
-
-            <a href="#" class="btn btn-outline-primary">
-                <i class="fas fa-code"></i> View Code (WIP)
-            </a>
-
-            {% if current_user.role == 'student' %}
-            <a href="{{ url_for('student.submit_code', assignment_id=submission.assignment.id) }}"
-                class="btn btn-success">
-                <i class="fas fa-arrow-up"></i> Submit New Version
-            </a>
-            {% endif %}
-
-            <a href="{{ url_for('student.assignment_detail', assignment_id=submission.assignment.id) }}"
-                class="btn btn-outline-secondary">
-                Back to Assignment
-            </a>
+        <!-- Code Preview (Simplified) -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-code"></i> Submitted Code</h5>
+                <button class="btn btn-sm btn-outline-primary" onclick="copyCode()">Copy</button>
+            </div>
+            <div class="card-body p-0">
+                <pre class="mb-0 p-3 bg-dark text-white"
+                    style="max-height: 400px; overflow-y: auto; font-size: 0.85rem;"><code id="submittedCode">{{ submission.content or '# No code content stored' }}</code></pre>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    function copyCode() {
+        const code = document.getElementById('submittedCode').textContent;
+        navigator.clipboard.writeText(code).then(() => {
+            alert('Code copied to clipboard!');
+        });
+    }
+</script>
 {% endblock %}

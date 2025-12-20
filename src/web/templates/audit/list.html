@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Audit Logs - ACCL{% endblock %}
+
+{% block content %}
+<div class="results-header mb-4">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="results-title">
+                    <i class="fas fa-history"></i> Audit Logs
+                </h1>
+                <p class="text-light mb-0">Recent system activity</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left"></i> Back to Admin
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Recent Entries</h5>
+        </div>
+        <div class="card-body">
+            {% if entries %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Action</th>
+                            <th>User</th>
+                            <th>Details</th>
+                            <th>Timestamp</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in entries %}
+                        <tr>
+                            <td>#{{ entry.id if entry.id else entry.get_id() if entry.get_id else 'N/A' }}</td>
+                            <td><span class="badge bg-info">{{ entry.action if entry.action else 'N/A' }}</span></td>
+                            <td>{{ entry.user_id if entry.user_id else 'System' }}</td>
+                            <td>{{ (entry.details[:50] + '...' if entry.details and entry.details|length > 50 else
+                                entry.details) if entry.details else 'N/A' }}</td>
+                            <td>{{ entry.created_at|format_date('%Y-%m-%d %H:%M') if entry.created_at else 'N/A' }}</td>
+                            <td>
+                                <a href="{{ url_for('audit.audit_detail', audit_id=entry.id if entry.id else entry.get_id()) }}"
+                                    class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <form method="POST"
+                                    action="{{ url_for('audit.delete_audit', audit_id=entry.id if entry.id else entry.get_id()) }}"
+                                    style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        onclick="return confirm('Delete this entry?')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0"><i class="fas fa-info-circle"></i> No audit entries found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

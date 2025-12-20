@@ -1,4 +1,6 @@
 import pytest
+import sqlite3
+from unittest.mock import Mock
 from core.entities.enrollment import Enrollment
 
 
@@ -43,6 +45,10 @@ class TestEnrollmentRepo:
         
         assert retrieved is not None
         assert retrieved.status == "enrolled"
+
+    def test_get_not_found(self, enrollment_repo):
+        """Line 18: get returns None for non-existent enrollment"""
+        assert enrollment_repo.get(999, 999) is None
     
     def test_update_enrollment(self, sample_student, sample_course, enrollment_repo):
         """Test updating enrollment"""
@@ -81,6 +87,33 @@ class TestEnrollmentRepo:
         )
         
         assert result is True
+        assert enrollment_repo.get(sample_student.get_id(), sample_course.get_id()) is None
+
+    def test_enroll_error(self, enrollment_repo, sample_student, sample_course):
+        """Line 51-53: enroll handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        enrollment_repo.db = mock_db
+        enrollment = Enrollment(sample_student.get_id(), sample_course.get_id(), "enrolled", None, None, None)
+        assert enrollment_repo.enroll(enrollment) is None
+        mock_db.rollback.assert_called_once()
+
+    def test_update_error(self, enrollment_repo, sample_student, sample_course):
+        """Line 76-78: update handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        enrollment_repo.db = mock_db
+        enrollment = Enrollment(sample_student.get_id(), sample_course.get_id(), "enrolled", None, None, None)
+        assert enrollment_repo.update(enrollment) is None
+        mock_db.rollback.assert_called_once()
+
+    def test_delete_error(self, enrollment_repo):
+        """Line 88-90: delete handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        enrollment_repo.db = mock_db
+        assert enrollment_repo.delete(1, 1) is False
+        mock_db.rollback.assert_called_once()
     
     def test_list_by_student(self, sample_student, sample_course, enrollment_repo):
         """Test listing enrollments by student"""

@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS idx_drafts_saved_at ON drafts(saved_at);

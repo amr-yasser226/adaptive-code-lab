@@ -30,6 +30,9 @@ from infrastructure.repositories.peer_review_repository import PeerReviewReposit
 from infrastructure.repositories.similarity_flag_repository import SimilarityFlagRepository as SimilarityFlag_repo
 from infrastructure.repositories.similarity_comparison_repository import SimilarityComparisonRepository
 from infrastructure.repositories.audit_log_repository import AuditLogRepository
+from infrastructure.repositories.remediation_repository import RemediationRepository
+from infrastructure.repositories.sandbox_job_repository import SandboxJobRepository
+from infrastructure.repositories.draft_repository import DraftRepository
 
 from core.entities.user import User
 from core.entities.student import Student
@@ -114,7 +117,7 @@ def clean_db(db_connection):
         'similarity_flags', 'results', 'hints', 'embeddings',
         'files', 'test_cases', 'submissions', 'enrollments',
         'assignments', 'courses', 'notifications', 'admins',
-        'instructors', 'students', 'users'
+        'instructors', 'students', 'users', 'drafts'
     ]
     
     db_connection.execute("PRAGMA foreign_keys = OFF")
@@ -217,6 +220,21 @@ def audit_log_repo(clean_db):
     return AuditLogRepository(clean_db)
 
 
+@pytest.fixture
+def remediation_repo(clean_db):
+    return RemediationRepository(clean_db)
+
+
+@pytest.fixture
+def sandbox_job_repo(clean_db):
+    return SandboxJobRepository(clean_db)
+
+
+@pytest.fixture
+def draft_repo(clean_db):
+    return DraftRepository(clean_db)
+
+
 # Sample data fixtures
 @pytest.fixture
 def sample_user(user_repo):
@@ -229,7 +247,7 @@ def sample_user(user_repo):
         role="student",
         is_active=True
     )
-    saved_user = user_repo.save_user(user)
+    saved_user = user_repo.create(user)
     return saved_user
 
 
@@ -244,7 +262,7 @@ def sample_student(user_repo, student_repo):
         role="student",
         is_active=True
     )
-    saved_user = user_repo.save_user(user)
+    saved_user = user_repo.create(user)
     
     student = Student(
         id=saved_user.get_id(),
@@ -272,7 +290,7 @@ def sample_instructor(user_repo, instructor_repo):
         role="instructor",
         is_active=True
     )
-    saved_user = user_repo.save_user(user)
+    saved_user = user_repo.create(user)
     
     instructor = Instructor(
         id=saved_user.get_id(),

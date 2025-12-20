@@ -73,3 +73,43 @@ class TestEnrollment:
                 student_id=1, course_id=1, status="invalid_status",
                 enrolled_at=datetime.now(), dropped_at=None, final_grade=None
             )
+
+    def test_drop(self):
+        """Test drop method updates status and dropped_at"""
+        enrollment = Enrollment(
+            student_id=1, course_id=1, status="enrolled",
+            enrolled_at=datetime.now(), dropped_at=None, final_grade=None
+        )
+        now = datetime.now()
+        enrollment.drop(now)
+        
+        assert enrollment.status == "dropped"
+        assert enrollment.dropped_at == now
+
+    def test_complete(self):
+        """Test complete method updates status and grade"""
+        enrollment = Enrollment(
+            student_id=1, course_id=1, status="enrolled",
+            enrolled_at=datetime.now(), dropped_at=None, final_grade=None
+        )
+        enrollment.complete(85.5)
+        
+        assert enrollment.status == "completed"
+        assert enrollment.final_grade == 85.5
+
+    def test_calculate_grade(self):
+        """Test calculate_grade method"""
+        enrollment = Enrollment(
+            student_id=1, course_id=1, status="completed",
+            enrolled_at=datetime.now(), dropped_at=None, final_grade=90.0
+        )
+        assert enrollment.calculate_grade() == 90.0
+
+    def test_get_progress(self):
+        """Test get_progress method"""
+        enrollment = Enrollment(
+            student_id=1, course_id=1, status="enrolled",
+            enrolled_at=datetime.now(), dropped_at=None, final_grade=None
+        )
+        # Placeholder behavior
+        assert enrollment.get_progress() == 0.0

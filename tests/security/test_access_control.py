@@ -62,7 +62,7 @@ class TestAccessControl:
             role="admin",
             is_active=True
         )
-        saved_user = user_repo.save_user(user)
+        saved_user = user_repo.create(user)
         
         # Create admin record
         admin = Admin(

@@ -6,16 +6,23 @@ from core.entities.assignment import Assignment
 
 
 class InstructorService:
-    def __init__(self, instructor_repo, course_repo, assignment_repo, enrollment_repo, submission_repo, flag_repo):
+    def __init__(self, instructor_repo, course_repo, assignment_repo, enrollment_repo, submission_repo, flag_repo, user_repo=None):
         self.instructor_repo = instructor_repo
         self.course_repo = course_repo
         self.assignment_repo = assignment_repo
         self.enrollment_repo = enrollment_repo
         self.submission_repo = submission_repo
         self.flag_repo = flag_repo
+        self.user_repo = user_repo  # Added for course creation fix
 
 
     def get_instructor(self, instructor_id):
+        # First try user_repo (works for all instructors)
+        if self.user_repo:
+            instructor = self.user_repo.get_by_id(instructor_id)
+            if instructor and instructor.role == 'instructor':
+                return instructor
+        # Fallback to instructor_repo (requires instructors table entry)
         instructor = self.instructor_repo.get_by_id(instructor_id)
         if not instructor:
             raise ValidationError("Instructor not found")
@@ -36,7 +43,7 @@ class InstructorService:
             semester=semester,
             max_students=max_students,
             created_at=datetime.now(),
-            status="inactive",     # by system rule: new courses are inactive
+            status="active",     # by system rule: new courses are inactive
             updated_at=datetime.now(),
             credits=credits
         )

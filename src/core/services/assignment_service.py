@@ -36,7 +36,8 @@ class AssignmentService:
         due_date,
         max_points,
         allow_late_submissions=False,
-        late_submission_penalty=None
+        late_submission_penalty=None,
+        is_published=True
     ):
         if instructor.role != "instructor":
             raise AuthError("Only instructors can create assignments")
@@ -56,7 +57,7 @@ class AssignmentService:
             release_date=release_date,
             due_date=due_date,
             max_points=max_points,
-            is_published=False,
+            is_published=is_published,
             allow_late_submissions=allow_late_submissions,
             late_submission_penalty=late_submission_penalty,
             created_at=datetime.now(),

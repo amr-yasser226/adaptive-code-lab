@@ -19,11 +19,28 @@ class Testcase:
     def get_assignment_id(self):
         return self.__assignment_id
 
-    # def run_on(self, submission_id):
-    #     pass
+    def run_on(self, submission_id):
+        raise NotImplementedError("Execution handled by sandbox service")
 
-    # def validate(self):
-    #     pass
+    def validate(self):
+        if not self.name:
+            raise ValueError("Test case name cannot be empty")
+        if self.points < 0:
+            raise ValueError("Points cannot be negative")
+        return True
 
-    # def clone(self):
-    #     pass
+    def clone(self):
+        return Testcase(
+            id=None,
+            assignment_id=self.__assignment_id,
+            name=f"{self.name} (Copy)",
+            stdin=self.stdin,
+            descripion=self.descripion,
+            expected_out=self.expected_out,
+            timeout_ms=self.timeout_ms,
+            memory_limit_mb=self.memory_limit_mb,
+            points=self.points,
+            is_visible=self.is_visible,
+            sort_order=self.sort_order,
+            created_at=self.created_at
+        )

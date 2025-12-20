@@ -1,6 +1,8 @@
+import sqlite3
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from core.exceptions.auth_error import AuthError
 from web.utils import get_service
+import re
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -23,10 +25,12 @@ def login():
                 return redirect(url_for('student.dashboard'))
             elif user.role == 'instructor':
                 return redirect(url_for('instructor.dashboard'))
+            elif user.role == 'admin':
+                return redirect(url_for('admin.dashboard'))
             else:
                 return redirect(url_for('index'))
                 
-        except AuthError as e:
+        except (AuthError, sqlite3.Error) as e:
             flash(str(e), 'error')
             
     return render_template('auth/login.html')
@@ -34,17 +38,33 @@ def login():
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        name = request.form.get('name')
-        email = request.form.get('email')
-        password = request.form.get('password')
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
         role = request.form.get('role', 'student')
+        
+        # Input validation
+        if not name or len(name) < 2:
+            flash('Name must be at least 2 characters', 'error')
+            return render_template('auth/register.html')
+        
+        # Email validation
+        email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_regex, email):
+            flash('Invalid email format', 'error')
+            return render_template('auth/register.html')
+        
+        # Password validation
+        if len(password) < 8:
+            flash('Password must be at least 8 characters', 'error')
+            return render_template('auth/register.html')
         
         auth_service = get_service('auth_service')
         try:
             auth_service.register(name, email, password, role)
             flash('Registration successful! Please log in.', 'success')
             return redirect(url_for('auth.login'))
-        except AuthError as e:
+        except (AuthError, sqlite3.Error) as e:
             flash(str(e), 'error')
             
     return render_template('auth/register.html')

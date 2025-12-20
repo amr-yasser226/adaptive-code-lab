@@ -130,3 +130,17 @@ class TestNotificationService:
 
         with pytest.raises(AuthError, match="You cannot delete this notification"):
             notification_service.delete(user, 1)
+
+    def test_mark_as_unread_not_found(self, notification_service, user, mock_notification_repo):
+        """Line 46: ValidationError when notification to mark as unread is not found"""
+        mock_notification_repo.get_by_id.return_value = None
+        with pytest.raises(ValidationError, match="Notification not found"):
+            notification_service.mark_as_unread(user, 999)
+
+    def test_mark_as_unread_not_owner(self, notification_service, user, mock_notification_repo):
+        """Line 49: AuthError when marking another user's notification as unread"""
+        notif = Mock()
+        notif.get_user_id.return_value = 999
+        mock_notification_repo.get_by_id.return_value = notif
+        with pytest.raises(AuthError, match="You cannot modify this notification"):
+            notification_service.mark_as_unread(user, 1)

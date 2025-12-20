@@ -98,3 +98,48 @@ class TestTestcase:
         )
         assert testcase.timeout_ms is None
         assert testcase.memory_limit_mb is None
+
+    def test_validate_success(self):
+        """Test validate returns True for valid test case"""
+        testcase = Testcase(
+            id=1, assignment_id=1, name="Test", stdin="", descripion="", 
+            expected_out="out", timeout_ms=1000, memory_limit_mb=256,
+            points=10, is_visible=True, sort_order=0, created_at=datetime.now()
+        )
+        assert testcase.validate() is True
+
+    def test_validate_empty_name(self):
+        """Test validate raises error for empty name"""
+        testcase = Testcase(
+            id=1, assignment_id=1, name="", stdin="", descripion="", 
+            expected_out="out", timeout_ms=1000, memory_limit_mb=256,
+            points=10, is_visible=True, sort_order=0, created_at=datetime.now()
+        )
+        with pytest.raises(ValueError, match="Test case name cannot be empty"):
+            testcase.validate()
+
+    def test_clone(self):
+        """Test clone creates a copy with new ID"""
+        original = Testcase(
+            id=1, assignment_id=5, name="Original", stdin="in", descripion="desc", 
+            expected_out="out", timeout_ms=1000, memory_limit_mb=256,
+            points=10, is_visible=True, sort_order=1, created_at=datetime.now()
+        )
+        
+        clone = original.clone()
+        
+        assert clone.get_id() is None
+        assert clone.get_assignment_id() == 5
+        assert clone.name == "Original (Copy)"
+        assert clone.stdin == "in"
+        assert clone.points == 10
+
+    def test_run_on_raises_error(self):
+        """Test run_on raises NotImplementedError"""
+        testcase = Testcase(
+            id=1, assignment_id=1, name="Test", stdin="", descripion="", 
+            expected_out="", timeout_ms=1000, memory_limit_mb=256,
+            points=10, is_visible=True, sort_order=0, created_at=datetime.now()
+        )
+        with pytest.raises(NotImplementedError):
+            testcase.run_on(123)

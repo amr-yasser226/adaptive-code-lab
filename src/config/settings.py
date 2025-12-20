@@ -37,3 +37,8 @@ SANDBOX_MEMORY_LIMIT_MB = int(os.getenv("SANDBOX_MEMORY_LIMIT_MB", "256"))
 # Environment
 APP_ENV = os.getenv("APP_ENV", "development")
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+# Autosave settings (FR-15)
+# Interval in seconds between automatic saves
+AUTOSAVE_INTERVAL_SECONDS = int(os.getenv("AUTOSAVE_INTERVAL_SECONDS", "10"))
+# Draft retention (days). Drafts older than this will be removed by cleanup job.
+DRAFT_RETENTION_DAYS = int(os.getenv("DRAFT_RETENTION_DAYS", "30"))

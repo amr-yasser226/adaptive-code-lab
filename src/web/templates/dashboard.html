@@ -3,18 +3,28 @@
 {% block title %}Dashboard - ACCL{% endblock %}
 
 {% block content %}
-<!-- Orange Gradient Header -->
+<!-- Educational Blue/Purple Gradient Header -->
 <div class="dashboard-header mb-5">
     <div class="container-fluid">
         <div class="row align-items-center">
-            <div class="col-md-8">
+            <div class="col-md-9">
                 <h1 class="dashboard-title">
-                    <i class="fas fa-chart-pie"></i> Assignment Dashboard
+                    <i class="fas fa-rocket"></i> Learning Progress
                 </h1>
-                <p class="dashboard-subtitle">Track your progress and manage submissions</p>
+                <p class="dashboard-subtitle">Track your assignments, grades, and academic growth.</p>
             </div>
             <div class="col-md-4 text-end">
-                <i class="fas fa-thumbs-up dashboard-icon-large"></i>
+                {% if user and user.role == 'instructor' %}
+                <div class="mb-2">
+                    <a href="{{ url_for('course.create_course') }}" class="btn btn-light btn-sm me-2">
+                        <i class="fas fa-plus-circle"></i> Create Course
+                    </a>
+                    <a href="{{ url_for('assignment.create_assignment') }}" class="btn btn-warning btn-sm">
+                        <i class="fas fa-plus"></i> Create Assignment
+                    </a>
+                </div>
+                {% endif %}
+                <i class="fas fa-graduation-cap" style="font-size: 4rem; opacity: 0.7;"></i>
             </div>
         </div>
     </div>
@@ -22,13 +32,44 @@
 
 <!-- Tab Navigation -->
 <div class="assignment-tabs mb-4">
-    <a href="#" class="tab-link active">All Assignments</a>
-    <a href="#" class="tab-link">In Progress</a>
-    <a href="#" class="tab-link">Completed</a>
-    <a href="#" class="tab-link">Overdue</a>
-    <div class="ms-auto">
-        <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-filter"></i> Filter</button>
-        <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-sort"></i> Sort</button>
+    <div class="d-flex align-items-center w-100 flex-wrap">
+        <div class="mb-2 mb-md-0">
+            <a href="?filter=all&search={{ request.args.get('search', '') }}&sort={{ request.args.get('sort', 'due_date') }}"
+                class="tab-link {% if not request.args.get('filter') or request.args.get('filter') == 'all' %}active{% endif %}">All
+                Assignments</a>
+            <a href="?filter=in_progress&search={{ request.args.get('search', '') }}&sort={{ request.args.get('sort', 'due_date') }}"
+                class="tab-link {% if request.args.get('filter') == 'in_progress' %}active{% endif %}">In Progress</a>
+            <a href="?filter=completed&search={{ request.args.get('search', '') }}&sort={{ request.args.get('sort', 'due_date') }}"
+                class="tab-link {% if request.args.get('filter') == 'completed' %}active{% endif %}">Completed</a>
+            <a href="?filter=overdue&search={{ request.args.get('search', '') }}&sort={{ request.args.get('sort', 'due_date') }}"
+                class="tab-link {% if request.args.get('filter') == 'overdue' %}active{% endif %}">Overdue</a>
+        </div>
+
+        <div class="ms-md-auto d-flex align-items-center">
+            <form action="{{ url_for('student.dashboard') }}" method="GET" class="d-flex me-2">
+                <input type="hidden" name="filter" value="{{ request.args.get('filter', 'all') }}">
+                <input type="hidden" name="sort" value="{{ request.args.get('sort', 'due_date') }}">
+                <div class="input-group input-group-sm">
+                    <input type="text" name="search" class="form-control" placeholder="Search..."
+                        value="{{ request.args.get('search', '') }}">
+                    <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+                </div>
+            </form>
+            <div class="dropdown me-2">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                    data-bs-toggle="dropdown">
+                    <i class="fas fa-sort"></i> Sort
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item"
+                            href="?sort=due_date&filter={{ request.args.get('filter', 'all') }}&search={{ request.args.get('search', '') }}">Due
+                            Date</a></li>
+                    <li><a class="dropdown-item"
+                            href="?sort=title&filter={{ request.args.get('filter', 'all') }}&search={{ request.args.get('search', '') }}">Title</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -42,7 +83,7 @@
             </div>
             <h3>{{ stats.total_assignments }}</h3>
             <p>Total Assignments</p>
-            <small>Across 6 courses</small>
+            <small>Visible in your courses</small>
         </div>
     </div>
 
@@ -54,7 +95,7 @@
             </div>
             <h3>{{ stats.active_assignments }}</h3>
             <p>In Progress</p>
-            <small>Due this week: 3</small>
+            <small>Active & Upcoming</small>
         </div>
     </div>
 
@@ -66,7 +107,7 @@
             </div>
             <h3>{{ stats.passed_tests }}</h3>
             <p>Completed</p>
-            <small>Avg score: 92%</small>
+            <small>Avg score: {{ stats.average_score }}%</small>
         </div>
     </div>
 
@@ -76,50 +117,13 @@
             <div class="stat-icon">
                 <i class="fas fa-exclamation-triangle"></i>
             </div>
-            <h3>2</h3>
+            <h3>{{ stats.pending_submissions }}</h3>
             <p>Overdue</p>
             <small>Requires attention</small>
         </div>
     </div>
     {% if current_user.role == 'instructor' %}
-    <!-- Instructor Stats -->
-    <div class="col-md-3 mb-3">
-        <div class="stat-card">
-            <i class="fas fa-book"></i>
-            <h3>{{ stats.total_assignments }}</h3>
-            <p>Assignments Created</p>
-        </div>
-    </div>
-
-    <div class="col-md-3 mb-3">
-        <div class="stat-card">
-            <div class="card-body">
-                <h5 class="card-title">Submissions</h5>
-                <h2 class="text-warning">{{ stats.pending_submissions }}</h2>
-                <p class="text-muted small">Pending review</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <h5 class="card-title">Class Average</h5>
-                <h2 class="text-info">{{ "%.1f"|format(stats.class_average) }}%</h2>
-                <p class="text-muted small">Overall performance</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <h5 class="card-title">Plagiarism Flags</h5>
-                <h2 class="text-danger">{{ stats.plagiarism_flags }}</h2>
-                <p class="text-muted small">Needs review</p>
-            </div>
-        </div>
-    </div>
+    <!-- Instructor Stats (Simplified) -->
     {% endif %}
 </div>
 
@@ -131,11 +135,31 @@
         <div class="card">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">
-                    <i class="fas fa-tasks"></i> Active Assignments
+                    <i class="fas fa-tasks"></i> Assignments ({{ assignments_with_status|length }})
                 </h5>
             </div>
             <div class="card-body">
-                {% if assignments %}
+                <!-- Enrollment CTA for new students -->
+                {% if not enrolled_courses %}
+                <div class="alert alert-warning border-0 shadow-sm p-4 mb-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-warning text-white rounded-circle p-3">
+                            <i class="fas fa-search-plus fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5 class="alert-heading font-weight-bold mb-1">Getting Started?</h5>
+                            <p class="mb-0 text-dark">You aren't enrolled in any courses yet. Explore our course catalog
+                                to find your first challenge!</p>
+                            <a href="{{ url_for('course.list_courses') }}"
+                                class="btn btn-warning btn-sm mt-3 px-4 rounded-pill font-weight-bold text-white shadow-sm">
+                                Explore Courses
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if assignments_with_status %}
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead class="table-light">
@@ -148,35 +172,38 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for assignment in assignments %}
+                            {% for item in assignments_with_status %}
+                            {% set assignment = item.entity %}
                             <tr>
                                 <td>
                                     <strong>{{ assignment.title }}</strong>
                                     <br>
-                                    <small class="text-muted">{{ assignment.description[:50] }}...</small>
+                                    <small class="text-muted">{{ (assignment.description or '')[:50] }}...</small>
                                 </td>
                                 <td>
                                     <i class="fas fa-calendar"></i>
                                     {{ assignment.due_date|format_date('%m/%d/%Y') }}
                                 </td>
                                 <td>
-                                    {% if assignment.status == 'submitted' %}
-                                    <span class="badge bg-success">Submitted</span>
-                                    {% elif assignment.status == 'graded' %}
-                                    <span class="badge bg-info">Graded</span>
+                                    {% if item.status == 'completed' %}
+                                    <span class="badge bg-success">Completed</span>
+                                    {% elif item.status == 'overdue' %}
+                                    <span class="badge bg-danger">Overdue</span>
+                                    {% elif item.status == 'in_progress' %}
+                                    <span class="badge bg-info">In Progress</span>
                                     {% else %}
-                                    <span class="badge bg-warning">In Progress</span>
+                                    <span class="badge bg-warning">Pending</span>
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {% if assignment.score %}
-                                    <strong>{{ assignment.score }}/100</strong>
+                                    {% if item.score is not none %}
+                                    <strong>{{ item.score }}/100</strong>
                                     {% else %}
                                     <span class="text-muted">N/A</span>
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <a href="{{ url_for('student.assignment_detail', assignment_id=assignment.id) }}"
+                                    <a href="{{ url_for('student.assignment_detail', assignment_id=assignment.get_id()) }}"
                                         class="btn btn-sm btn-primary">
                                         View
                                     </a>
@@ -188,45 +215,148 @@
                 </div>
                 {% else %}
                 <div class="alert alert-info" role="alert">
-                    <i class="fas fa-info-circle"></i> No active assignments at the moment.
+                    <i class="fas fa-info-circle"></i> No assignments found matching your criteria.
                 </div>
                 {% endif %}
             </div>
         </div>
     </div>
 
-    <!-- Recent Submissions -->
+    <!-- Recent Submissions & Community -->
     <div class="col-lg-4">
+        <!-- Pending Peer Reviews -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="fas fa-users"></i> Pending Peer Reviews
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                {% if pending_reviews %}
+                <div class="list-group list-group-flush">
+                    {% for review in pending_reviews %}
+                    <a href="{{ url_for('student.submission_results', submission_id=review.get_submission_id()) }}"
+                        class="list-group-item list-group-item-action p-3">
+                        <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                            <h6 class="mb-0 font-weight-bold">{{ review.submission.assignment.title if review.submission
+                                and review.submission.assignment else 'Assignment' }}</h6>
+                            <span class="badge bg-soft-warning text-warning small rounded-pill">Draft</span>
+                        </div>
+                        <p class="mb-0 small text-muted">Reviewing peer's submission #{{ review.get_submission_id() }}
+                        </p>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="p-4 text-center text-muted small">
+                    <i class="fas fa-check-double fa-2x opacity-25 mb-2"></i>
+                    <p class="mb-0">No pending peer reviews.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
         <div class="card">
             <div class="card-header bg-success text-white">
                 <h5 class="mb-0">
                     <i class="fas fa-history"></i> Recent Submissions
                 </h5>
             </div>
-            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+            <div class="card-body p-0" style="max-height: 400px; overflow-y: auto;">
                 {% if recent_submissions %}
                 <div class="list-group list-group-flush">
                     {% for submission in recent_submissions %}
-                    <a href="{{ url_for('student.submission_results', submission_id=submission.id) }}"
-                        class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">{{ submission.assignment.title }}</h6>
-                            <small>{{ submission.submitted_at|format_date('%m/%d') }}</small>
+                    <a href="{{ url_for('student.submission_results', submission_id=submission.get_id()) }}"
+                        class="list-group-item list-group-item-action p-3">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                            <h6 class="mb-0 font-weight-bold">{{ submission.assignment.title }}</h6>
+                            <small class="text-muted">{{ submission.created_at|format_date('%m/%d') if
+                                submission.created_at else 'N/A'
+                                }}</small>
                         </div>
-                        <p class="mb-1 small text-muted">Version {{ submission.version_number }}</p>
+                        <p class="mb-0 small text-muted">Version {{ submission.version }}</p>
                     </a>
                     {% endfor %}
                 </div>
                 {% else %}
-                <p class="text-muted text-center">No recent submissions</p>
+                <p class="text-muted text-center p-4">No recent submissions</p>
                 {% endif %}
             </div>
         </div>
     </div>
 
     {% elif current_user.role == 'instructor' %}
-    <!-- Recent Submissions for Grading -->
+    <!-- Instructor Content -->
     <div class="col-lg-8">
+        <!-- Your Courses -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-university"></i> Your Courses</h5>
+            </div>
+            <div class="card-body">
+                {% if courses %}
+                <div class="list-group">
+                    {% for course in courses %}
+                    <a href="{{ url_for('course.course_detail', course_id=course.get_id()) }}"
+                        class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ course.title }} ({{ course.code }})</h6>
+                            <span class="badge bg-secondary">{{ course.status }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No courses created yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Your Assignments -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-tasks"></i> Your Assignments</h5>
+            </div>
+            <div class="card-body">
+                {% if assignments %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Assignment</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for assignment in assignments %}
+                            <tr>
+                                <td>{{ assignment.title }}</td>
+                                <td>{{ assignment.due_date|format_date }}</td>
+                                <td>
+                                    {% if assignment.is_published %}
+                                    <span class="badge bg-success">Published</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">Draft</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('assignment.view_submissions', assignment_id=assignment.get_id()) }}"
+                                        class="btn btn-sm btn-outline-primary">Submissions</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No assignments created yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Pending Submissions for Grading -->
         <div class="card">
             <div class="card-header bg-warning text-dark">
                 <h5 class="mb-0">
@@ -260,7 +390,8 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <a href="#" class="btn btn-sm btn-info">
+                                    <a href="{{ url_for('submission.view_submission', submission_id=submission.get_id()) }}"
+                                        class="btn btn-sm btn-info">
                                         Review
                                     </a>
                                 </td>
@@ -288,16 +419,16 @@
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
-                    <a href="#" class="btn btn-primary">
+                    <a href="{{ url_for('assignment.create_assignment') }}" class="btn btn-primary">
                         <i class="fas fa-plus"></i> New Assignment
                     </a>
-                    <a href="{{ url_for('student.assignments') }}" class="btn btn-outline-primary">
-                        <i class="fas fa-list"></i> View All Assignments
+                    <a href="{{ url_for('course.list_courses') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-list"></i> View All Courses
                     </a>
                     <a href="{{ url_for('instructor.analytics') }}" class="btn btn-outline-primary">
                         <i class="fas fa-chart-bar"></i> View Analytics
                     </a>
-                    <a href="#" class="btn btn-outline-danger">
+                    <a href="{{ url_for('instructor.plagiarism_dashboard') }}" class="btn btn-outline-danger">
                         <i class="fas fa-exclamation-triangle"></i> Plagiarism Report
                     </a>
                 </div>

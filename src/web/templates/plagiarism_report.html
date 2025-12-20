@@ -25,7 +25,9 @@
     <i class="fas fa-exclamation-circle"></i>
     <strong>Potential Academic Integrity Violations Detected</strong>
     <p class="mb-0">3 submissions flagged with high similarity scores requiring review</p>
-    <button type="button" class="btn btn-sm btn-danger float-end"><i class="fas fa-arrow-right"></i> Review All
+    <button type="button" class="btn btn-sm btn-danger float-end"
+        onclick="document.querySelector('.similarity-card').scrollIntoView({behavior: 'smooth'})"><i
+            class="fas fa-arrow-right"></i> Review All
         →</button>
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 </div>
@@ -70,16 +72,25 @@
     <div class="row align-items-center">
         <div class="col-md-8">
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-primary active">All</button>
-                <button type="button" class="btn btn-outline-primary">High</button>
-                <button type="button" class="btn btn-outline-primary">Medium</button>
-                <button type="button" class="btn btn-outline-primary">Low</button>
+                <a href="{{ url_for('instructor.plagiarism_dashboard') }}"
+                    class="btn btn-{{ 'primary' if not request.args.get('severity') else 'outline-primary' }}">All</a>
+                <a href="{{ url_for('instructor.plagiarism_dashboard', severity='high') }}"
+                    class="btn btn-{{ 'primary' if request.args.get('severity') == 'high' else 'outline-primary' }}">High</a>
+                <a href="{{ url_for('instructor.plagiarism_dashboard', severity='medium') }}"
+                    class="btn btn-{{ 'primary' if request.args.get('severity') == 'medium' else 'outline-primary' }}">Medium</a>
+                <a href="{{ url_for('instructor.plagiarism_dashboard', severity='low') }}"
+                    class="btn btn-{{ 'primary' if request.args.get('severity') == 'low' else 'outline-primary' }}">Low</a>
             </div>
         </div>
         <div class="col-md-4 text-end">
-            <button class="btn btn-outline-secondary"><i class="fas fa-sort"></i> Sort by Score</button>
-            <button class="btn btn-outline-secondary"><i class="fas fa-download"></i> Export Report</button>
-            <button class="btn btn-outline-secondary"><i class="fas fa-cog"></i> Settings</button>
+            <a href="{{ url_for('instructor.plagiarism_dashboard', sort='score') }}"
+                class="btn btn-outline-secondary"><i class="fas fa-sort"></i> Sort by Score</a>
+            <button class="btn btn-outline-secondary"
+                onclick="alert('Export feature coming soon. Use browser print (Ctrl+P) for now.')"><i
+                    class="fas fa-download"></i> Export Report</button>
+            <button class="btn btn-outline-secondary"
+                onclick="alert('Similarity threshold settings: High >80%, Medium 50-80%, Low <50%')"><i
+                    class="fas fa-cog"></i> Settings</button>
         </div>
     </div>
 </div>
@@ -87,65 +98,78 @@
 <!-- Similarity Detection Cards -->
 <div class="row">
     <div class="col-md-12">
-        <!-- High Similarity Detection (Red) -->
-        <div class="similarity-card similarity-card-high mb-3">
+        {% if flagged_pairs %}
+        {% for pair in flagged_pairs %}
+        <!-- Dynamic Similarity Card -->
+        <div
+            class="similarity-card {% if pair.similarity_score > 0.8 %}similarity-card-high{% elif pair.similarity_score > 0.5 %}similarity-card-medium{% else %}similarity-card-low{% endif %} mb-3">
             <div class="similarity-card-header">
                 <div class="similarity-badge">
+                    {% if pair.similarity_score > 0.8 %}
                     <i class="fas fa-exclamation-circle"></i> HIGH SIMILARITY DETECTED
-                </div>
-                <div class="similarity-score">93% Match</div>
-            </div>
-            <div class="similarity-card-body">
-                <div class="comparison-pair">
-                    <div class="submission-compared">
-                        <h6>Student A: Alex Martinez</h6>
-                        <p><i class="fas fa-file-code"></i> Assignment 1 - Data Structures</p>
-                        <p><i class="fas fa-calendar"></i> Submitted: Nov 15, 2025 at 11:47 PM</p>
-                    </div>
-                    <div class="vs-badge">VS</div>
-                    <div class="submission-compared">
-                        <h6>Student B: Sarah Johnson</h6>
-                        <p><i class="fas fa-file-code"></i> Assignment 1 - Data Structures</p>
-                        <p><i class="fas fa-calendar"></i> Submitted: Nov 12, 2025 at 1:23 AM</p>
-                    </div>
-                </div>
-                <p class="comparison-details">Matched Lines: 247/265 | Identical Blocks: 18 | Similar Functions: 12</p>
-            </div>
-            <div class="similarity-card-footer">
-                <button class="btn btn-sm btn-danger"><i class="fas fa-arrow-right"></i> View Detailed Comparison
-                    →</button>
-            </div>
-        </div>
-
-        <!-- Medium Similarity Detection (Orange) -->
-        <div class="similarity-card similarity-card-medium mb-3">
-            <div class="similarity-card-header">
-                <div class="similarity-badge">
+                    {% elif pair.similarity_score > 0.5 %}
                     <i class="fas fa-exclamation"></i> MEDIUM SIMILARITY DETECTED
+                    {% else %}
+                    <i class="fas fa-info-circle"></i> LOW SIMILARITY DETECTED
+                    {% endif %}
                 </div>
-                <div class="similarity-score">64% Match</div>
+                <div class="similarity-score">{{ "%.0f"|format(pair.similarity_score * 100) }}% Match</div>
             </div>
             <div class="similarity-card-body">
                 <div class="comparison-pair">
                     <div class="submission-compared">
-                        <h6>Student D: Emily Parker</h6>
-                        <p><i class="fas fa-file-code"></i> ML Project: Linear Regression</p>
-                        <p><i class="fas fa-calendar"></i> Submitted: Nov 10, 2025 at 9:38 AM</p>
+                        <h6>Student: {{ pair.student_name }}</h6>
+                        <p><i class="fas fa-file-code"></i> Submission ID: {{ pair.submission_id }}</p>
+                        <p><i class="fas fa-flag"></i> Status: <span
+                                class="badge {% if pair.status == 'pending' %}bg-warning{% else %}bg-info{% endif %}">{{
+                                pair.status|capitalize }}</span></p>
                     </div>
                     <div class="vs-badge">VS</div>
                     <div class="submission-compared">
-                        <h6>Student E: David Kim</h6>
-                        <p><i class="fas fa-file-code"></i> ML Project: Linear Regression</p>
-                        <p><i class="fas fa-calendar"></i> Submitted: Nov 11, 2025 at 3:15 PM</p>
+                        <h6>Matched Submission</h6>
+                        <p><i class="fas fa-file-code"></i> Submission ID: {{ pair.matched_submission_id }}</p>
+                        {% if pair.created_at %}
+                        <p><i class="fas fa-calendar"></i> Flagged: {{ pair.created_at }}</p>
+                        {% endif %}
                     </div>
                 </div>
-                <p class="comparison-details">Matched Lines: 131/205 | Identical Blocks: 8 | Similar Algorithms: 5</p>
             </div>
             <div class="similarity-card-footer">
-                <button class="btn btn-sm btn-warning"><i class="fas fa-arrow-right"></i> View Detailed Comparison
-                    →</button>
+                <a href="{{ url_for('instructor.plagiarism_compare', pair_id=pair.id) }}"
+                    class="btn btn-sm {% if pair.similarity_score > 0.8 %}btn-danger{% elif pair.similarity_score > 0.5 %}btn-warning{% else %}btn-success{% endif %}">
+                    <i class="fas fa-eye"></i> View Detailed Comparison
+                </a>
+                <!-- Review Actions -->
+                <div class="btn-group ms-2">
+                    <form action="{{ url_for('instructor.plagiarism_review', flag_id=pair.id) }}" method="POST"
+                        style="display: inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <input type="hidden" name="action" value="dismiss" />
+                        <button type="submit" class="btn btn-sm btn-outline-success"
+                            onclick="return confirm('Dismiss this flag?')">
+                            <i class="fas fa-check"></i> Dismiss
+                        </button>
+                    </form>
+                    <form action="{{ url_for('instructor.plagiarism_review', flag_id=pair.id) }}" method="POST"
+                        style="display: inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <input type="hidden" name="action" value="approve" />
+                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                            onclick="return confirm('Confirm this as plagiarism?')">
+                            <i class="fas fa-exclamation-triangle"></i> Confirm
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
+        {% endfor %}
+        {% else %}
+        <!-- No flags message -->
+        <div class="alert alert-success" role="alert">
+            <i class="fas fa-check-circle"></i> No similarity flags to review. All submissions appear to be original
+            work.
+        </div>
+        {% endif %}
     </div>
 </div>
 

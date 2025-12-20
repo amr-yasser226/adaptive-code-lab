@@ -18,15 +18,21 @@ class UserRepository:
         if row is None:
             return None
         # Correct column order: id, name, email, password_hash, role, is_active, created_at, updated_at
+        # Try to get bio (column may not exist in older schemas)
+        try:
+            bio_value = row[8]
+        except (IndexError, KeyError):
+            bio_value = None
         return User(
             id=row[0],           # id
             name=row[1],         # name
             email=row[2],        # email
             password=row[3],     # password_hash
             role=row[4],         # role
-            created_at=row[6],   # created_at
-            updated_at=row[7],   # updated_at
-            is_active=row[5]     # is_active
+            is_active=row[5],    # is_active
+            bio=row[6],          # bio
+            created_at=row[7],   # created_at
+            updated_at=row[8]    # updated_at
         )
     
     def get_by_email(self, email: str):
@@ -38,26 +44,27 @@ class UserRepository:
         row = result.fetchone()
         if row is None:
             return None
+        try:
+            bio_value = row[8]
+        except (IndexError, KeyError):
+            bio_value = None
         return User(
             id=row[0],
             name=row[1],
             email=row[2],
             password=row[3],
             role=row[4],
-            created_at=row[6],
-            updated_at=row[7],
-            is_active=row[5]
+            is_active=row[5],
+            bio=row[6],
+            created_at=row[7],
+            updated_at=row[8]
         )
     
-    def save_user(self, user: User):
+    def create(self, user: User):
         """
-        FIXED ISSUES:
-        1. Typo: begin_tansaction -> begin_transaction
-        2. Wrong method to get new ID (use last_insert_rowid)
-        3. Access is_active not _is_Active
+        Creates a new user record.
         """
         try:
-            
             if user.get_id() is None:
                 query = """
                     INSERT INTO users(name, email, password_hash, role, is_active)
@@ -68,10 +75,9 @@ class UserRepository:
                     "email": user.email,
                     "password_hash": user.get_password_hash(),
                     "role": user.role,
-                    "is_active": int(user.is_active)  # FIXED: was user._is_Active
+                    "is_active": int(user.is_active)
                 })
                 
-                # FIXED: Use last_insert_rowid() like other repos
                 new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
                 self.db.commit()
                 return self.get_by_id(new_id)
@@ -88,7 +94,7 @@ class UserRepository:
             self.db.rollback()
             raise
     
-    def findALL(self, filters: dict = None):
+    def list_all(self, filters: dict = None):
         base_query = "SELECT * FROM users"
         params = {}
         
@@ -102,21 +108,26 @@ class UserRepository:
         result = self.db.execute(base_query, params)
         users = []
         for row in result.fetchall():
+            try:
+                bio_value = row[8]
+            except (IndexError, KeyError):
+                bio_value = None
             users.append(
                 User(
-                    id=row.id,
-                    name=row.name,
-                    email=row.email,
-                    password=row.password_hash,
-                    role=row.role,
-                    created_at=row.created_at,
-                    updated_at=row.updated_at,
-                    is_active=row.is_active  # FIXED: was is_Active
+                    id=row[0],
+                    name=row[1],
+                    email=row[2],
+                    password=row[3],
+                    role=row[4],
+                    is_active=row[5],
+                    bio=row[6],
+                    created_at=row[7],
+                    updated_at=row[8]
                 )
             )
         return users
     
-    def Update_data(self, user: User):
+    def update(self, user: User):
         try:
             query = """
                 UPDATE users
@@ -126,6 +137,7 @@ class UserRepository:
                     password_hash = :password_hash,
                     role = :role,
                     is_active = :is_active,
+                    bio = :bio,
                     updated_at = CURRENT_TIMESTAMP
                 WHERE id = :id
             """
@@ -135,12 +147,13 @@ class UserRepository:
                 "email": user.email,
                 "password_hash": user.get_password_hash(),
                 "role": user.role,
-                "is_active": int(user.is_active)  # FIXED: was user._is_Active
+                "is_active": int(user.is_active),
+                "bio": user.bio
             })
             
             self.db.commit()
             return self.get_by_id(user.get_id())
-        except Exception as e:
+        except sqlite3.Error as e:
             self.db.rollback()
             print("Error updating user:", e)
             return None

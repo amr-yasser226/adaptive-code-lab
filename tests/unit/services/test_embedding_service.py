@@ -121,3 +121,14 @@ class TestEmbeddingService:
 
         with pytest.raises(ValidationError, match="Embedding not found and no code_text provided"):
             embedding_service.ensure_embedding(1)
+
+    def test_get_embedding_vector_deserialization_error(self, embedding_service, mock_embedding_repo):
+        """Line 23: ValidationError when pickle deserialization fails"""
+        import pickle
+        emb = Mock()
+        emb.vector_ref = b"invalid_pickle_data"
+        mock_embedding_repo.find_by_submission.return_value = emb
+        
+        with patch("pickle.loads", side_effect=Exception("Pickle error")):
+            with pytest.raises(ValidationError, match="Failed to deserialize embedding"):
+                embedding_service.get_embedding_vector(1)

@@ -1,4 +1,6 @@
 import pytest
+import sqlite3
+from unittest.mock import Mock
 from core.entities.hint import Hint
 
 
@@ -44,6 +46,10 @@ class TestHintRepo:
         
         assert retrieved is not None
         assert retrieved.confidence == 0.90
+
+    def test_get_by_id_not_found(self, hint_repo):
+        """Line 19: get_by_id returns None for non-existent ID"""
+        assert hint_repo.get_by_id(9999) is None
     
     def test_update_hint(self, sample_submission, hint_repo):
         """Test updating hint"""
@@ -135,3 +141,45 @@ class TestHintRepo:
         marked = hint_repo.mark_not_helpful(saved.get_id())
         
         assert marked.is_helpful is False
+
+    def test_create_error(self, hint_repo, sample_submission):
+        """Line 55-57: create handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        hint_repo.db = mock_db
+        hint = Hint(None, sample_submission.get_id(), "m", 0.5, "t", False, None, None)
+        assert hint_repo.create(hint) is None
+        mock_db.rollback.assert_called_once()
+
+    def test_update_error(self, hint_repo, sample_submission):
+        """Line 81-83: update handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        hint_repo.db = mock_db
+        hint = Hint(1, sample_submission.get_id(), "m", 0.5, "t", False, None, None)
+        assert hint_repo.update(hint) is None
+        mock_db.rollback.assert_called_once()
+
+    def test_delete_error(self, hint_repo):
+        """Line 90-92: delete handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        hint_repo.db = mock_db
+        assert hint_repo.delete(1) is False
+        mock_db.rollback.assert_called_once()
+
+    def test_mark_helpful_error(self, hint_repo):
+        """Line 122-124: mark_helpful handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        hint_repo.db = mock_db
+        assert hint_repo.mark_helpful(1) is None
+        mock_db.rollback.assert_called_once()
+
+    def test_mark_not_helpful_error(self, hint_repo):
+        """Line 131-133: mark_not_helpful handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        hint_repo.db = mock_db
+        assert hint_repo.mark_not_helpful(1) is None
+        mock_db.rollback.assert_called_once()

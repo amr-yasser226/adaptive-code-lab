@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}User Audit Log - ACCL{% endblock %}
+
+{% block content %}
+<div class="results-header mb-4">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="results-title">
+                    <i class="fas fa-user-clock"></i> User Audit Log
+                </h1>
+                <p class="text-light mb-0">Activity for User #{{ user_id }}</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{{ url_for('audit.recent_audit') }}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left"></i> Back to All Logs
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-list"></i> User Activity</h5>
+        </div>
+        <div class="card-body">
+            {% if entries %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Action</th>
+                            <th>Details</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in entries %}
+                        <tr>
+                            <td>#{{ entry.id if entry.id else entry.get_id() if entry.get_id else 'N/A' }}</td>
+                            <td><span class="badge bg-info">{{ entry.action if entry.action else 'N/A' }}</span></td>
+                            <td>{{ entry.details[:100] if entry.details else 'N/A' }}{% if entry.details and
+                                entry.details|length > 100 %}...{% endif %}</td>
+                            <td>{{ entry.created_at|format_date('%Y-%m-%d %H:%M') if entry.created_at else 'N/A' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0"><i class="fas fa-info-circle"></i> No audit entries found for this user.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

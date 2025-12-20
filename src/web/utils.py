@@ -19,8 +19,51 @@ def instructor_required(f):
     """Decorator to require instructor role"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if session.get('user_role') != 'instructor':
+        # Check login first
+        if 'user_id' not in session:
+            flash('Please log in first', 'warning')
+            return redirect(url_for('auth.login'))
+        # Then check role
+        if session.get('user_role') not in ['instructor', 'admin']:
             flash('Instructor access required', 'error')
             return redirect(url_for('index'))
         return f(*args, **kwargs)
     return decorated_function
+
+
+def student_required(f):
+    """Decorator to require student role"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Check login first
+        if 'user_id' not in session:
+            flash('Please log in first', 'warning')
+            return redirect(url_for('auth.login'))
+        # Then check role
+        if session.get('user_role') not in ['student', 'admin']:
+            flash('Student access required', 'error')
+            return redirect(url_for('index'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def admin_required(f):
+    """Decorator to require admin role"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Check login first
+        if 'user_id' not in session:
+            flash('Please log in first', 'warning')
+            return redirect(url_for('auth.login'))
+        # Then check role
+        if session.get('user_role') != 'admin':
+            flash('Admin access required', 'error')
+            return redirect(url_for('index'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+
+def get_current_user():
+    user_repo = get_service("user_repo")
+    return user_repo.get_by_id(session.get("user_id"))

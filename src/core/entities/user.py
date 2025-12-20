@@ -1,7 +1,7 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 
 class User:
-    def __init__(self, id, name, email, password, role, created_at=None, updated_at=None, is_active=True):
+    def __init__(self, id, name, email, password, role, created_at=None, updated_at=None, is_active=True, bio=None):
         self.__id = id
         self.name = name
         self.email = email
@@ -10,6 +10,7 @@ class User:
         self.created_at = created_at
         self.updated_at = updated_at
         self.is_active = bool(is_active)
+        self.bio = bio
 
     def get_id(self):
         return self.__id

@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}{{ remediation.remediation.resource_title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('student.dashboard') }}">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('remediation.list_remediations') }}">Learning Resources</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                {{ remediation.remediation.resource_title[:30] }}...
+            </li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <span
+                            class="badge bg-{{ 'success' if remediation.is_completed else 'warning' if remediation.is_viewed else 'primary' }} me-2">
+                            {% if remediation.is_completed %}
+                            <i class="fas fa-check me-1"></i> Completed
+                            {% elif remediation.is_viewed %}
+                            <i class="fas fa-eye me-1"></i> Viewed
+                            {% else %}
+                            <i class="fas fa-sparkles me-1"></i> New
+                            {% endif %}
+                        </span>
+                        <span class="badge bg-secondary">
+                            {{ remediation.remediation.resource_type | capitalize }}
+                        </span>
+                    </div>
+                    <span
+                        class="badge bg-{{ 'success' if remediation.remediation.difficulty_level == 'beginner' else 'warning' if remediation.remediation.difficulty_level == 'intermediate' else 'danger' }}">
+                        {{ remediation.remediation.difficulty_level | capitalize }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title mb-4">{{ remediation.remediation.resource_title }}</h2>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Why this resource?</strong><br>
+                        This was recommended because you encountered a
+                        <strong>{{ remediation.remediation.failure_pattern | replace('_', ' ') }}</strong>
+                        error in your code.
+                    </div>
+
+                    {% if remediation.remediation.resource_content %}
+                    <div class="mb-4">
+                        <h5>Description</h5>
+                        <p>{{ remediation.remediation.resource_content }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if remediation.remediation.resource_url %}
+                    <div class="mb-4">
+                        <h5>External Resource</h5>
+                        <a href="{{ remediation.remediation.resource_url }}" target="_blank" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt me-2"></i>
+                            Open Resource
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{{ url_for('remediation.list_remediations') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Back to Resources
+                        </a>
+                        {% if not remediation.is_completed %}
+                        <form action="{{ url_for('remediation.complete_remediation', remediation_id=remediation.id) }}"
+                            method="POST" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check me-1"></i> Mark as Completed
+                            </button>
+                        </form>
+                        {% else %}
+                        <span class="text-success">
+                            <i class="fas fa-check-circle me-1"></i>
+                            Completed {{ remediation.completed_at | format_date if remediation.completed_at else '' }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <i class="fas fa-info-circle me-2"></i> Details
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <strong><i class="fas fa-tag me-2"></i>Pattern:</strong><br>
+                            <span class="ms-4">{{ remediation.remediation.failure_pattern | replace('_', ' ') | title
+                                }}</span>
+                        </li>
+                        <li class="mb-2">
+                            <strong><i class="fas fa-code me-2"></i>Language:</strong><br>
+                            <span class="ms-4">{{ remediation.remediation.language | capitalize }}</span>
+                        </li>
+                        <li class="mb-2">
+                            <strong><i class="fas fa-calendar me-2"></i>Recommended:</strong><br>
+                            <span class="ms-4">{{ remediation.recommended_at | format_date }}</span>
+                        </li>
+                        {% if remediation.viewed_at %}
+                        <li class="mb-2">
+                            <strong><i class="fas fa-eye me-2"></i>First Viewed:</strong><br>
+                            <span class="ms-4">{{ remediation.viewed_at | format_date }}</span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

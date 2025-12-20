@@ -63,8 +63,7 @@ class CourseRepository:
             return self.get_by_id(new_id)
         except sqlite3.Error as e:
             self.db.rollback()
-            print("Error creating course:", e)
-            return None
+            raise e
 
     def update(self, course: Course):
         try:
@@ -99,8 +98,7 @@ class CourseRepository:
             return self.get_by_id(course.get_id())
         except sqlite3.Error as e:
             self.db.rollback()
-            print("Error updating course:", e)
-            return None
+            raise e
 
     def publish(self, id: int):
         try:
@@ -114,8 +112,7 @@ class CourseRepository:
             return self.get_by_id(id)
         except sqlite3.Error as e:
             self.db.rollback()
-            print("Error publishing course:", e)
-            return None
+            raise e
 
     def archive(self, id: int):
         try:
@@ -129,8 +126,7 @@ class CourseRepository:
             return self.get_by_id(id)
         except sqlite3.Error as e:
             self.db.rollback()
-            print("Error archiving course:", e)
-            return None
+            raise e
 
     def list_by_instructor(self, instructor_id: int):
         query = """
@@ -171,3 +167,29 @@ class CourseRepository:
         
         course_id = row.course_id
         return self.get_by_id(course_id)
+    def list_all(self):
+        query = """
+            SELECT *
+            FROM courses
+            ORDER BY created_at DESC
+        """
+        result = self.db.execute(query)
+        rows = result.fetchall()
+
+        return [
+            Course(
+                id=row.id,
+                instructor_id=row.instructor_id,
+                code=row.code,
+                title=row.title,
+                description=row.description,
+                year=row.year,
+                semester=row.semester,
+                max_students=row.max_students,
+                created_at=row.created_at,
+                status=row.status,
+                updated_at=row.updated_at,
+                credits=row.credits
+            )
+            for row in rows
+        ]

@@ -209,9 +209,103 @@ class TestPeerReviewService:
         assert result == 85.0
 
     def test_calculate_peer_average_no_reviews(self, peer_review_service, mock_peer_review_repo):
-        """Average with no reviews returns 0"""
+        """Average with no reviews returns 0 (covers line 164)"""
         mock_peer_review_repo.list_by_submission.return_value = []
+        result = peer_review_service.calculate_peer_average(1)
+        assert result == 0.0
+
+    def test_calculate_peer_average_no_submitted_scores(self, peer_review_service, mock_peer_review_repo):
+        """Average with no submitted reviews returns 0 (covers line 173)"""
+        review = Mock()
+        review.is_submitted = False
+        mock_peer_review_repo.list_by_submission.return_value = [review]
 
         result = peer_review_service.calculate_peer_average(1)
 
         assert result == 0.0
+
+    def test_verify_student_enrolled_denied(self, peer_review_service, mock_enrollment_repo):
+        """Line 28: AuthError when student is not enrolled"""
+        mock_enrollment_repo.get.return_value = None
+        with pytest.raises(AuthError, match="not enrolled"):
+            peer_review_service._verify_student_enrolled(5, 1)
+
+    def test_verify_submission_exists_not_found(self, peer_review_service, mock_submission_repo):
+        """Line 33: ValidationError when submission not found"""
+        mock_submission_repo.get_by_id.return_value = None
+        with pytest.raises(ValidationError, match="Submission not found"):
+            peer_review_service._verify_submission_exists(999)
+
+    def test_verify_assignment_course_assignment_not_found(self, peer_review_service, mock_assignment_repo):
+        """Line 41: ValidationError when assignment not found"""
+        sub = Mock()
+        sub.get_assignment_id.return_value = 1
+        mock_assignment_repo.get_by_id.return_value = None
+        with pytest.raises(ValidationError, match="Assignment not found"):
+            peer_review_service._verify_assignment_course(sub)
+
+    def test_verify_assignment_course_course_not_found(self, peer_review_service, mock_assignment_repo, mock_course_repo):
+        """Line 45: ValidationError when course not found"""
+        sub = Mock()
+        sub.get_assignment_id.return_value = 1
+        mock_assignment_repo.get_by_id.return_value = Mock(get_course_id=lambda: 1)
+        mock_course_repo.get_by_id.return_value = None
+        with pytest.raises(ValidationError, match="Course not found"):
+            peer_review_service._verify_assignment_course(sub)
+
+    def test_submit_review_not_found(self, peer_review_service, student_reviewer, mock_peer_review_repo):
+        """Line 126: ValidationError when review to submit is not found"""
+        mock_peer_review_repo.get.return_value = None
+        with pytest.raises(ValidationError, match="Peer review not found"):
+            peer_review_service.submit_review(student_reviewer, 1)
+
+    def test_submit_review_already_submitted(self, peer_review_service, student_reviewer, mock_peer_review_repo):
+        """Line 129: ValidationError when review is already submitted"""
+        review = Mock()
+        review.is_submitted = True
+        mock_peer_review_repo.get.return_value = review
+        with pytest.raises(ValidationError, match="already submitted"):
+            peer_review_service.submit_review(student_reviewer, 1)
+
+    def test_list_reviews_for_submission_instructor(self, peer_review_service, instructor_user, 
+                                                   mock_submission_repo, mock_assignment_repo, 
+                                                   mock_course_repo, mock_peer_review_repo):
+        """Lines 145-148: Instructor listing reviews success and failure"""
+        setup_valid_submission(mock_submission_repo, mock_assignment_repo, mock_course_repo, Mock())
+        
+        # Unauthorized (not owner)
+        instructor_user.get_id.return_value = 99
+        with pytest.raises(AuthError, match="Not authorized"):
+            peer_review_service.list_reviews_for_submission(instructor_user, 1)
+            
+        # Authorized
+        instructor_user.get_id.return_value = 10
+        mock_peer_review_repo.list_by_submission.return_value = []
+        result = peer_review_service.list_reviews_for_submission(instructor_user, 1)
+        assert result == []
+
+    def test_list_reviews_for_submission_student(self, peer_review_service, student_reviewer, 
+                                                mock_submission_repo, mock_assignment_repo, 
+                                                mock_course_repo, mock_peer_review_repo):
+        """Lines 151-154: Student listing reviews success and failure"""
+        setup_valid_submission(mock_submission_repo, mock_assignment_repo, mock_course_repo, Mock(), student_id=5)
+        
+        # Unauthorized (not their submission)
+        student_reviewer.get_id.return_value = 99
+        with pytest.raises(AuthError, match="cannot view reviews"):
+            peer_review_service.list_reviews_for_submission(student_reviewer, 1)
+            
+        # Authorized
+        student_reviewer.get_id.return_value = 5
+        mock_peer_review_repo.list_by_submission.return_value = []
+        result = peer_review_service.list_reviews_for_submission(student_reviewer, 1)
+        assert result == []
+
+    def test_list_reviews_for_submission_invalid_role(self, peer_review_service, mock_submission_repo, 
+                                                     mock_assignment_repo, mock_course_repo):
+        """Line 156: AuthError for invalid role"""
+        setup_valid_submission(mock_submission_repo, mock_assignment_repo, mock_course_repo, Mock())
+        user = Mock()
+        user.role = "guest"
+        with pytest.raises(AuthError, match="Unauthorized access"):
+            peer_review_service.list_reviews_for_submission(user, 1)

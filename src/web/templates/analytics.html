@@ -22,8 +22,8 @@
                 <select name="assignment" class="form-select" id="assignment">
                     <option value="">All Assignments</option>
                     {% for assignment in assignments %}
-                    <option value="{{ assignment.id }}" {% if request.args.get('assignment')==assignment.id|string
-                        %}selected{% endif %}>
+                    <option value="{{ assignment.get_id() }}" {% if
+                        request.args.get('assignment')==assignment.get_id()|string %}selected{% endif %}>
                         {{ assignment.title }}
                     </option>
                     {% endfor %}
@@ -48,8 +48,8 @@
                 <button type="submit" class="btn btn-primary w-100">
                     <i class="fas fa-filter"></i> Apply Filters
                 </button>
-                <a href="#" class="btn btn-success ms-2">
-                    <i class="fas fa-download"></i>
+                <a href="{{ url_for('instructor.export_csv') }}" class="btn btn-success ms-2" title="Export CSV">
+                    <i class="fas fa-download"></i> Export
                 </a>
             </div>
         </form>
@@ -159,7 +159,7 @@
                             </td>
                             <td><code class="text-muted">{{ assignment.median_submission_time }}</code></td>
                             <td>
-                                <a href="{{ url_for('student.assignment_detail', assignment_id=assignment.id) }}"
+                                <a href="{{ url_for('instructor.assignment_detail', assignment_id=assignment.id) }}"
                                     class="btn btn-sm btn-outline-primary">
                                     <i class="fas fa-eye"></i> View
                                 </a>

@@ -58,7 +58,7 @@ class FileRepository:
             new_id = self.db.execute("SELECT last_insert_rowid() as id").fetchone()[0]
             self.db.commit()
             return self.get_by_id(new_id)  # FIXED: was getById(new_id)
-        except Exception as e:
+        except sqlite3.Error as e:
             self.db.rollback()
             print("Error saving file:", e)
             return None
