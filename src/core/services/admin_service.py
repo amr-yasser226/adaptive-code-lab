@@ -75,21 +75,21 @@ class AdminService:
         raise ValidationError("Invalid or unsupported report type")
 
    
-    def configure_system_setting(self, admin_user, key, value, settings_repo=None):
-        self._ensure_admin(admin_user)
+    # def configure_system_setting(self, admin_user, key, value, settings_repo=None):
+    #     self._ensure_admin(admin_user)
 
-        if not key:
-            raise ValidationError("Setting key is required")
+    #     if not key:
+    #         raise ValidationError("Setting key is required")
 
-        if settings_repo:
-            return settings_repo.set(key, value)
+    #     if settings_repo:
+    #         return settings_repo.set(key, value)
 
-        # fallback simple config
-        return {
-            "key": key,
-            "value": value,
-            "updated_at": datetime.utcnow()
-        }
+    #     # fallback simple config
+    #     return {
+    #         "key": key,
+    #         "value": value,
+    #         "updated_at": datetime.utcnow()
+    #     }
 
 
     def export_db_dump(self, admin_user, output_path):
