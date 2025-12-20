@@ -1,0 +1,36 @@
+# Render.com Blueprint Configuration
+# Deploy with: https://dashboard.render.com/blueprints
+# Or connect repository and it will auto-detect this file
+#
+# NOTE: GitHub secrets (GROQ_API_KEY, GOOGLE_API_KEY) are for CI/CD only.
+#       You must add these same keys in the Render Dashboard under:
+#       Dashboard → Your Service → Environment → Add Environment Variable
+
+services:
+  - type: web
+    name: accl-app
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    region: oregon
+    healthCheckPath: /
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_DEBUG
+        value: 0
+      - key: AI_PROVIDER
+        value: groq
+      # These must be added manually in Render Dashboard after deployment
+      # Copy values from your GitHub secrets settings
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
+    disk:
+      name: accl-data
+      mountPath: /app/data
+      sizeGB: 1
