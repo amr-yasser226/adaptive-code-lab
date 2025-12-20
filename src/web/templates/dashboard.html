@@ -24,10 +24,15 @@
 
 <!-- Tab Navigation -->
 <div class="assignment-tabs mb-4">
-    <a href="#" class="tab-link active">All Assignments</a>
-    <a href="#" class="tab-link">In Progress</a>
-    <a href="#" class="tab-link">Completed</a>
-    <a href="#" class="tab-link">Overdue</a>
+    <a href="?filter=all"
+        class="tab-link {% if not request.args.get('filter') or request.args.get('filter') == 'all' %}active{% endif %}">All
+        Assignments</a>
+    <a href="?filter=in_progress"
+        class="tab-link {% if request.args.get('filter') == 'in_progress' %}active{% endif %}">In Progress</a>
+    <a href="?filter=completed"
+        class="tab-link {% if request.args.get('filter') == 'completed' %}active{% endif %}">Completed</a>
+    <a href="?filter=overdue"
+        class="tab-link {% if request.args.get('filter') == 'overdue' %}active{% endif %}">Overdue</a>
     <div class="ms-auto">
         <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-filter"></i> Filter</button>
         <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-sort"></i> Sort</button>

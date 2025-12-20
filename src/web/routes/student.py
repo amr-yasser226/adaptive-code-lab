@@ -168,13 +168,13 @@ def profile():
     student_service = get_service('student_service')
     user_repo = get_service('user_repo')
     
-    # Try to get student, fall back to basic user info
+    # Get the actual user entity from database
+    user = user_repo.get_by_id(user_id)
+    
+    # Try to get submissions
     try:
-        student = student_service.get_student(user_id)
         submissions = student_service.get_student_submissions(user_id)
     except Exception:
-        # User exists but may not have a student record
-        student = user_repo.get_by_id(user_id)
         submissions = []
     
     # Calculate stats
@@ -182,13 +182,6 @@ def profile():
     if submissions:
         scores = [s.score for s in submissions if hasattr(s, 'score') and s.score is not None]
         avg_score = sum(scores) / len(scores) if scores else 0
-    
-    # Create a user-like object for current_user template variable
-    current_user = {
-        'name': getattr(student, 'name', 'User'),
-        'email': getattr(student, 'email', ''),
-        'role': session.get('user_role', 'student')
-    }
     
     from markupsafe import Markup
     
@@ -216,14 +209,13 @@ def profile():
     
     stats = {
         'average_score': avg_score,
-        'class_average': 75.0,
-        'assignments_completed': len([s for s in submissions if hasattr(s, 'status') and s.status == 'completed']) if submissions else 0,
+        'total_submissions': len(submissions) if submissions else 0,
         'total_assignments': 10
     }
     
     return render_template('profile.html',
-        user=student,
-        current_user=type('User', (), current_user)(),
+        user=user,
+        current_user=user,  # Pass actual user entity
         form=StubForm(),
         notification_form=StubForm(),
         stats=stats,
@@ -235,27 +227,51 @@ def profile():
 def update_profile():
     user_id = session['user_id']
     auth_service = get_service('auth_service')
+    user_repo = get_service('user_repo')
     
-    current_password = request.form.get('current_password', '').strip()
+    # Get form data
+    name = request.form.get('name', '').strip()
+    email = request.form.get('email', '').strip()
+    bio = request.form.get('bio', '').strip()
     new_password = request.form.get('new_password', '').strip()
     confirm_password = request.form.get('confirm_password', '').strip()
     
-    # Validate input
-    if not current_password or not new_password:
-        flash('Please fill in all password fields', 'warning')
-        return redirect(url_for('student.profile'))
-    
-    if new_password != confirm_password:
-        flash('New passwords do not match', 'error')
-        return redirect(url_for('student.profile'))
-    
-    if len(new_password) < 8:
-        flash('New password must be at least 8 characters', 'error')
-        return redirect(url_for('student.profile'))
-    
     try:
-        auth_service.change_password(user_id, current_password, new_password)
-        flash('Password updated successfully!', 'success')
+        # Get current user
+        user = user_repo.get_by_id(user_id)
+        if not user:
+            flash('User not found', 'error')
+            return redirect(url_for('student.profile'))
+        
+        # Update profile info if provided
+        if name:
+            user.name = name
+        if email:
+            user.email = email
+        if bio is not None:
+            user.bio = bio
+        
+        # Save profile changes
+        user_repo.update(user)
+        
+        # Handle password change only if new password provided
+        if new_password:
+            if new_password != confirm_password:
+                flash('New passwords do not match', 'error')
+                return redirect(url_for('student.profile'))
+            
+            if len(new_password) < 8:
+                flash('New password must be at least 8 characters', 'error')
+                return redirect(url_for('student.profile'))
+            
+            # Update password in database
+            from werkzeug.security import generate_password_hash
+            user.password_hash = generate_password_hash(new_password)
+            user_repo.update(user)
+            flash('Profile and password updated successfully!', 'success')
+        else:
+            flash('Profile updated successfully!', 'success')
+            
     except Exception as e:
         flash(str(e), 'error')
     

@@ -18,6 +18,11 @@ class UserRepository:
         if row is None:
             return None
         # Correct column order: id, name, email, password_hash, role, is_active, created_at, updated_at
+        # Try to get bio (column may not exist in older schemas)
+        try:
+            bio_value = row[8]
+        except (IndexError, KeyError):
+            bio_value = None
         return User(
             id=row[0],           # id
             name=row[1],         # name
@@ -26,7 +31,8 @@ class UserRepository:
             role=row[4],         # role
             created_at=row[6],   # created_at
             updated_at=row[7],   # updated_at
-            is_active=row[5]     # is_active
+            is_active=row[5],    # is_active
+            bio=bio_value
         )
     
     def get_by_email(self, email: str):
@@ -38,6 +44,10 @@ class UserRepository:
         row = result.fetchone()
         if row is None:
             return None
+        try:
+            bio_value = row[8]
+        except (IndexError, KeyError):
+            bio_value = None
         return User(
             id=row[0],
             name=row[1],
@@ -46,7 +56,8 @@ class UserRepository:
             role=row[4],
             created_at=row[6],
             updated_at=row[7],
-            is_active=row[5]
+            is_active=row[5],
+            bio=bio_value
         )
     
     def create(self, user: User):
@@ -97,6 +108,10 @@ class UserRepository:
         result = self.db.execute(base_query, params)
         users = []
         for row in result.fetchall():
+            try:
+                bio_value = row[8]
+            except (IndexError, KeyError):
+                bio_value = None
             users.append(
                 User(
                     id=row[0],
@@ -106,7 +121,8 @@ class UserRepository:
                     role=row[4],
                     created_at=row[6],
                     updated_at=row[7],
-                    is_active=row[5]
+                    is_active=row[5],
+                    bio=bio_value
                 )
             )
         return users
@@ -121,6 +137,7 @@ class UserRepository:
                     password_hash = :password_hash,
                     role = :role,
                     is_active = :is_active,
+                    bio = :bio,
                     updated_at = CURRENT_TIMESTAMP
                 WHERE id = :id
             """
@@ -130,7 +147,8 @@ class UserRepository:
                 "email": user.email,
                 "password_hash": user.get_password_hash(),
                 "role": user.role,
-                "is_active": int(user.is_active)
+                "is_active": int(user.is_active),
+                "bio": user.bio
             })
             
             self.db.commit()
