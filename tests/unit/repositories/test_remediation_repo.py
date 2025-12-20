@@ -1,11 +1,17 @@
 import pytest
+import sqlite3
+from unittest.mock import Mock
 from datetime import datetime
 from core.entities.remediation import Remediation, StudentRemediation
+
 
 @pytest.mark.repo
 @pytest.mark.unit
 class TestRemediationRepo:
+    """Test suite for RemediationRepository"""
+    
     def test_create_and_get_remediation(self, remediation_repo):
+        """Test creating and retrieving remediation by ID"""
         rem = Remediation(
             id=None,
             failure_pattern="test_pattern",
@@ -25,7 +31,12 @@ class TestRemediationRepo:
         assert retrieved is not None
         assert retrieved.resource_title == "Test Resource"
 
+    def test_get_by_id_not_found(self, remediation_repo):
+        """Line 12: _row_to_remediation returns None for empty row"""
+        assert remediation_repo.get_by_id(9999) is None
+
     def test_find_by_pattern(self, remediation_repo):
+        """Test finding remediations by failure pattern"""
         rem = Remediation(
             id=None,
             failure_pattern="unique_pattern",
@@ -39,6 +50,7 @@ class TestRemediationRepo:
         assert any(r.resource_title == "Unique Resource" for r in results)
 
     def test_get_all(self, remediation_repo):
+        """Test retrieving all remediations"""
         initial_count = len(remediation_repo.get_all())
         
         rem = Remediation(
@@ -52,7 +64,18 @@ class TestRemediationRepo:
         all_rems = remediation_repo.get_all()
         assert len(all_rems) == initial_count + 1
 
+    def test_create_error(self, remediation_repo):
+        """Line 79-81: create handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        remediation_repo.db = mock_db
+        rem = Remediation(None, "p", "t")
+        with pytest.raises(sqlite3.Error):
+            remediation_repo.create(rem)
+        mock_db.rollback.assert_called_once()
+
     def test_student_remediation_ops(self, remediation_repo, sample_student, sample_submission):
+        """Test complete student remediation lifecycle"""
         # Create a remediation first
         rem = Remediation(
             id=None,
@@ -100,3 +123,27 @@ class TestRemediationRepo:
         
         pending_after = remediation_repo.list_student_remediations(sample_student.get_id(), only_pending=True)
         assert not any(p.get_id() == updated_sr.get_id() for p in pending_after)
+
+    def test_create_student_remediation_error(self, remediation_repo, sample_student):
+        """Line 124-126: create_student_remediation handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        remediation_repo.db = mock_db
+        sr = StudentRemediation(None, sample_student.get_id(), 1)
+        with pytest.raises(sqlite3.Error):
+            remediation_repo.create_student_remediation(sr)
+        mock_db.rollback.assert_called_once()
+
+    def test_update_student_remediation_error(self, remediation_repo, sample_student):
+        """Line 143-145: update_student_remediation handles sqlite3.Error"""
+        mock_db = Mock()
+        mock_db.execute.side_effect = sqlite3.Error("Mock error")
+        remediation_repo.db = mock_db
+        sr = StudentRemediation(1, sample_student.get_id(), 1)
+        with pytest.raises(sqlite3.Error):
+            remediation_repo.update_student_remediation(sr)
+        mock_db.rollback.assert_called_once()
+
+    def test_get_student_remediation_not_found(self, remediation_repo):
+        """Line 27: _row_to_student_remediation returns None for empty row"""
+        assert remediation_repo.get_student_remediation(999, 999) is None
