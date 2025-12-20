@@ -124,21 +124,22 @@ class SubmissionRepository:
         for row in rows:
             try:
                 submissions.append(Submission(
-                    id=row[0],
-                    assignment_id=row[1],
-                    student_id=row[2],
-                    version=row[3],
-                    language=row[4],
-                    status=row[5],
-                    score=row[6],
-                    is_late=row[7],
-                    created_at=row[8],
-                    updated_at=row[9],
-                    grade_at=row[10],
-                    content=row[11] if len(row) > 11 else None,
-                    file_id=row[12] if len(row) > 12 else None
+                    id=row.id,
+                    assignment_id=row.assignment_id,
+                    student_id=row.student_id,
+                    version=row.version,
+                    language=row.language,
+                    status=row.status,
+                    score=row.score,
+                    content=row.content,
+                    file_id=row.file_id,
+                    is_late=row.is_late,
+                    created_at=row.created_at,
+                    updated_at=row.updated_at,
+                    grade_at=row.grade_at
                 ))
-            except Exception:
+            except Exception as e:
+                # Log error if possible, or just continue
                 continue  # Skip invalid rows
         return submissions
 

@@ -12,6 +12,10 @@ class Assignment:
         self.late_submission_penalty = late_submission_penalty
         self.created_at = created_at
         self.updated_at = updated_at
+        # Template-required attributes
+        self.languages = ['python']
+        self.points = max_points or 100
+        self.submission_count = 0  # Will be populated by routes if needed
     def get_id(self):
         return self.__id
     def get_course_id(self):

@@ -30,7 +30,15 @@ def create_review(submission_id):
             rubric_score=rubric_score,
             comments=comments
         )
-        flash("Peer review created successfully", "success")
+        
+        if request.form.get("action") == "submit":
+            peer_review_service.submit_review(
+                reviewer_student=get_current_user(),
+                submission_id=submission_id
+            )
+            flash("Peer review submitted successfully", "success")
+        else:
+            flash("Peer review saved as draft", "success")
 
     except (AuthError, ValidationError, sqlite3.Error) as e:
         flash(str(e), "error")
@@ -54,7 +62,15 @@ def update_review(submission_id):
             rubric_score=rubric_score,
             comments=comments
         )
-        flash("Peer review updated successfully", "success")
+        
+        if request.form.get("action") == "submit":
+            peer_review_service.submit_review(
+                reviewer_student=get_current_user(),
+                submission_id=submission_id
+            )
+            flash("Peer review submitted successfully", "success")
+        else:
+            flash("Peer review updated successfully", "success")
 
     except (AuthError, ValidationError, sqlite3.Error) as e:
         flash(str(e), "error")

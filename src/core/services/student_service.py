@@ -3,6 +3,7 @@ from core.exceptions.auth_error import AuthError
 from core.exceptions.validation_error import ValidationError
 from core.entities.enrollment import Enrollment
 from core.entities.submission import Submission
+from core.entities.result import Result
 
 class StudentService:
     def __init__(self, student_repo, course_repo, enrollment_repo, assignment_repo, submission_repo, sandbox_service=None, test_case_repo=None, result_repo=None):
@@ -134,8 +135,20 @@ class StudentService:
                         # Save individual results via result_repo if available
                         if hasattr(self, 'result_repo') and self.result_repo:
                             for res in results.get('results', []):
-                                # In a real implementation, we'd save Result entities here
-                                pass
+                                r_entity = Result(
+                                    id=None,
+                                    submission_id=created.get_id(),
+                                    test_case_id=res.get('test_case_id'),
+                                    passed=res.get('passed'),
+                                    stdout=res.get('stdout'),
+                                    stderr=res.get('stderr'),
+                                    runtime_ms=res.get('runtime_ms'),
+                                    memory_kb=0, # Not currently tracked in results dict
+                                    exit_code=res.get('exit_code'),
+                                    error_message=None,
+                                    created_at=datetime.now()
+                                )
+                                self.result_repo.save_result(r_entity)
             except Exception as e:
                 created.status = "error"
                 self.submission_repo.update(created)

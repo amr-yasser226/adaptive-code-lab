@@ -220,11 +220,23 @@ def assignment_detail(assignment_id):
     # The template expects 'latest_submission'
     latest_submission = next((s for s in sorted(submissions, key=lambda x: x.version, reverse=True) if str(s.get_assignment_id()) == str(assignment_id)), None)
     
+    # Calculate stats for the sidebar (used in instructor view)
+    submission_repo = get_service('submission_repo')
+    all_subs = submission_repo.list_by_assignment(assignment_id)
+    # Filter for graded submissions for stats
+    scores = [s.score for s in all_subs if s.score is not None]
+    stats = {
+        'total_submissions': len(all_subs),
+        'average_score': sum(scores) / len(scores) if scores else 0,
+        'pass_rate': (len([s for s in scores if s >= 50]) / len(scores) * 100) if scores else 0
+    }
+    
     return render_template('assignment_detail.html',
         user=current_user,
         assignment=assignment,
         latest_submission=latest_submission,
-        current_user=current_user)
+        current_user=current_user,
+        stats=stats)
 
 @student_bp.route('/submit/<assignment_id>', methods=['GET', 'POST'])
 @login_required

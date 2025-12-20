@@ -249,9 +249,13 @@ def assignment_detail(assignment_id):
     
     # Get all submissions for this assignment
     all_submissions = submission_repo.get_all() if hasattr(submission_repo, 'get_all') else []
-    assignment_submissions = [s for s in all_submissions if str(s.assignment_id) == str(assignment_id)]
+    assignment_submissions = [s for s in all_submissions if str(s.get_assignment_id()) == str(assignment_id)]
     
-    # Calculate stats for template (FIX BUG #2)
+    # Get test cases for the template
+    test_case_repo = get_service('test_case_repo')
+    visible_test_cases = test_case_repo.list_by_assignment(assignment_id)
+    
+    # Calculate stats for template
     scores = [s.score for s in assignment_submissions if hasattr(s, 'score') and s.score is not None]
     stats = {
         'total_submissions': len(assignment_submissions),
@@ -260,11 +264,12 @@ def assignment_detail(assignment_id):
     }
     
     return render_template('assignment_detail.html',
-        user={'role': 'instructor'},
+        user=current_user,
         assignment=assignment,
         submissions=assignment_submissions,
         stats=stats,
-        current_user={'role': 'instructor'})
+        visible_test_cases=visible_test_cases,
+        current_user=current_user)
 
 @instructor_bp.route('/plagiarism')
 @login_required

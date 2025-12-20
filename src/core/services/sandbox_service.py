@@ -255,6 +255,7 @@ class SandboxService:
         )
         
         return {
+            'test_case_id': test_case.get_id() if hasattr(test_case, 'get_id') else getattr(test_case, 'id', None),
             'test_name': test_case.name,
             'passed': passed,
             'actual_output': actual_output,

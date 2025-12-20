@@ -128,7 +128,7 @@ class PeerReviewService:
         if review.is_submitted:
             raise ValidationError("Peer review already submitted")
 
-        if not review.rubric_score:
+        if review.rubric_score is None:
             raise ValidationError("Rubric score is required before submission")
 
         review.submit_review()
