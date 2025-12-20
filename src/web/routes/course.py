@@ -3,6 +3,7 @@ from web.utils import login_required, instructor_required, get_service, get_curr
 from core.exceptions.validation_error import ValidationError
 from core.exceptions.auth_error import AuthError
 from core.entities.course import Course
+import sqlite3
 from core.entities.enrollment import Enrollment
 from datetime import datetime
 
@@ -87,7 +88,7 @@ def create_course():
             )
             flash('Course created successfully', 'success')
             return redirect(url_for('course.course_detail', course_id=new_course.get_id()))
-        except (ValidationError, AuthError) as e:
+        except (ValidationError, AuthError, sqlite3.Error) as e:
             flash(str(e), 'error')
 
     return render_template('courses/create.html')
@@ -140,7 +141,7 @@ def edit_course(course_id):
 
         return render_template('courses/edit.html', course=course)
 
-    except (ValidationError, AuthError) as e:
+    except (ValidationError, AuthError, sqlite3.Error) as e:
         flash(str(e), 'error')
         return redirect(url_for('course.list_courses'))
 
@@ -163,7 +164,7 @@ def publish_course(course_id):
         flash('Course published', 'success')
         return redirect(url_for('course.course_detail', course_id=course_id))
 
-    except (ValidationError, AuthError) as e:
+    except (ValidationError, AuthError, sqlite3.Error) as e:
         flash(str(e), 'error')
         return redirect(url_for('course.list_courses'))
 
@@ -185,8 +186,7 @@ def archive_course(course_id):
         course_repo.archive(course_id)
         flash('Course archived', 'success')
         return redirect(url_for('course.list_courses'))
-
-    except (ValidationError, AuthError) as e:
+    except (ValidationError, AuthError, sqlite3.Error) as e:
         flash(str(e), 'error')
         return redirect(url_for('course.list_courses'))
 
@@ -217,6 +217,6 @@ def enroll(course_id):
         flash('Enrolled successfully', 'success')
         return redirect(url_for('course.course_detail', course_id=course_id))
 
-    except ValidationError as e:
+    except (ValidationError, AuthError, sqlite3.Error) as e:
         flash(str(e), 'error')
         return redirect(url_for('course.course_detail', course_id=course_id))
