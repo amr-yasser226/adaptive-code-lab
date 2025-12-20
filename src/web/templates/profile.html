@@ -59,7 +59,9 @@
                     </h5>
                 </div>
                 <div class="card-body p-4">
-                    <form method="POST" action="{{ url_for('student.update_profile') }}" novalidate>
+                    <form method="POST"
+                        action="{{ url_for('instructor.update_profile' if current_user.role == 'instructor' else 'student.update_profile') }}"
+                        novalidate>
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
                         <div class="row">
@@ -96,11 +98,13 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="new_password" class="form-label">New Password</label>
-                                {{ form.new_password(class_="form-control", id="new_password", placeholder="Leave blank to keep current") }}
+                                {{ form.new_password(class_="form-control", id="new_password", placeholder="Leave blank
+                                to keep current") }}
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="confirm_password" class="form-label">Confirm Password</label>
-                                {{ form.confirm_password(class_="form-control", id="confirm_password", placeholder="Confirm new password") }}
+                                {{ form.confirm_password(class_="form-control", id="confirm_password",
+                                placeholder="Confirm new password") }}
                             </div>
                         </div>
 

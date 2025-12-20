@@ -4,8 +4,21 @@ from web.utils import login_required, instructor_required, get_service
 from datetime import datetime
 import io
 import csv
+from web.routes.profile_shared import profile_view, profile_update_logic
 
 instructor_bp = Blueprint('instructor', __name__)
+
+@instructor_bp.route('/profile')
+@login_required
+@instructor_required
+def profile():
+    return profile_view()
+
+@instructor_bp.route('/profile/update', methods=['POST'])
+@login_required
+@instructor_required
+def update_profile():
+    return profile_update_logic('instructor')
 
 @instructor_bp.route('/dashboard')
 @login_required

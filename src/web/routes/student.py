@@ -3,8 +3,19 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from web.utils import login_required, get_service
 from core.exceptions.validation_error import ValidationError
 from datetime import datetime
+from web.routes.profile_shared import profile_view, profile_update_logic
 
 student_bp = Blueprint('student', __name__)
+
+@student_bp.route('/profile')
+@login_required
+def profile():
+    return profile_view()
+
+@student_bp.route('/profile/update', methods=['POST'])
+@login_required
+def update_profile():
+    return profile_update_logic('student')
 
 @student_bp.route('/dashboard')
 @login_required
@@ -161,118 +172,3 @@ def submission_results(submission_id):
         assignment=assignment,
         test_results=test_results,
         current_user={'role': 'student'})
-
-@student_bp.route('/profile')
-@login_required
-def profile():
-    user_id = session['user_id']
-    student_service = get_service('student_service')
-    user_repo = get_service('user_repo')
-    
-    # Get the actual user entity from database
-    user = user_repo.get_by_id(user_id)
-    
-    # Try to get submissions
-    try:
-        submissions = student_service.get_student_submissions(user_id)
-    except sqlite3.Error:
-        submissions = []
-    
-    # Calculate stats
-    avg_score = 0
-    if submissions:
-        scores = [s.score for s in submissions if hasattr(s, 'score') and s.score is not None]
-        avg_score = sum(scores) / len(scores) if scores else 0
-    
-    from markupsafe import Markup
-    
-    class StubField:
-        def __init__(self, name, type="text"):
-            self.name = name
-            self.type = type
-            self.errors = []
-            
-        def __call__(self, **kwargs):
-            attrs = [f'type="{self.type}"', f'name="{self.name}"']
-            for k, v in kwargs.items():
-                if k == "class_": k = "class"
-                attrs.append(f'{k}="{v}"')
-            return Markup(f'<input {" ".join(attrs)}>')
-    
-    class StubForm:
-        current_password = StubField("current_password", "password")
-        new_password = StubField("new_password", "password")
-        confirm_password = StubField("confirm_password", "password")
-        csrf_token = Markup('<input type="hidden" name="csrf_token" value="">')
-        email_on_grade = StubField("email_on_grade", "checkbox")
-        email_on_hint = StubField("email_on_hint", "checkbox")
-        email_on_deadline = StubField("email_on_deadline", "checkbox")
-    
-    stats = {
-        'average_score': avg_score,
-        'total_submissions': len(submissions) if submissions else 0,
-        'total_assignments': 10
-    }
-    
-    return render_template('profile.html',
-        user=user,
-        current_user=user,  # Pass actual user entity
-        form=StubForm(),
-        notification_form=StubForm(),
-        stats=stats,
-        submissions_count=len(submissions) if submissions else 0,
-        avg_score=avg_score)
-
-@student_bp.route('/profile/update', methods=['POST'])
-@login_required
-def update_profile():
-    user_id = session['user_id']
-    auth_service = get_service('auth_service')
-    user_repo = get_service('user_repo')
-    
-    # Get form data
-    name = request.form.get('name', '').strip()
-    email = request.form.get('email', '').strip()
-    bio = request.form.get('bio', '').strip()
-    new_password = request.form.get('new_password', '').strip()
-    confirm_password = request.form.get('confirm_password', '').strip()
-    
-    try:
-        # Get current user
-        user = user_repo.get_by_id(user_id)
-        if not user:
-            flash('User not found', 'error')
-            return redirect(url_for('student.profile'))
-        
-        # Update profile info if provided
-        if name:
-            user.name = name
-        if email:
-            user.email = email
-        if bio is not None:
-            user.bio = bio
-        
-        # Save profile changes
-        user_repo.update(user)
-        
-        # Handle password change only if new password provided
-        if new_password:
-            if new_password != confirm_password:
-                flash('New passwords do not match', 'error')
-                return redirect(url_for('student.profile'))
-            
-            if len(new_password) < 8:
-                flash('New password must be at least 8 characters', 'error')
-                return redirect(url_for('student.profile'))
-            
-            # Update password using the proper method
-            user.set_password(new_password)
-            user_repo.update(user)
-            flash('Profile and password updated successfully!', 'success')
-        else:
-            flash('Profile updated successfully!', 'success')
-            
-    except (sqlite3.Error, ValidationError) as e:
-        flash(str(e), 'error')
-    
-    return redirect(url_for('student.profile'))

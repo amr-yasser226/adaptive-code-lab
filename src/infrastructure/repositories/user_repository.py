@@ -29,10 +29,10 @@ class UserRepository:
             email=row[2],        # email
             password=row[3],     # password_hash
             role=row[4],         # role
-            created_at=row[6],   # created_at
-            updated_at=row[7],   # updated_at
             is_active=row[5],    # is_active
-            bio=bio_value
+            bio=row[6],          # bio
+            created_at=row[7],   # created_at
+            updated_at=row[8]    # updated_at
         )
     
     def get_by_email(self, email: str):
@@ -54,10 +54,10 @@ class UserRepository:
             email=row[2],
             password=row[3],
             role=row[4],
-            created_at=row[6],
-            updated_at=row[7],
             is_active=row[5],
-            bio=bio_value
+            bio=row[6],
+            created_at=row[7],
+            updated_at=row[8]
         )
     
     def create(self, user: User):
@@ -119,10 +119,10 @@ class UserRepository:
                     email=row[2],
                     password=row[3],
                     role=row[4],
-                    created_at=row[6],
-                    updated_at=row[7],
                     is_active=row[5],
-                    bio=bio_value
+                    bio=row[6],
+                    created_at=row[7],
+                    updated_at=row[8]
                 )
             )
         return users
