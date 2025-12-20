@@ -1,3 +1,4 @@
+import sqlite3
 from flask import (
     Blueprint,
     request,
@@ -31,7 +32,7 @@ def create_review(submission_id):
         )
         flash("Peer review created successfully", "success")
 
-    except (AuthError, ValidationError) as e:
+    except (AuthError, ValidationError, sqlite3.Error) as e:
         flash(str(e), "error")
 
     return redirect(request.referrer or url_for("index"))
@@ -55,7 +56,7 @@ def update_review(submission_id):
         )
         flash("Peer review updated successfully", "success")
 
-    except (AuthError, ValidationError) as e:
+    except (AuthError, ValidationError, sqlite3.Error) as e:
         flash(str(e), "error")
 
     return redirect(request.referrer or url_for("index"))
@@ -74,7 +75,7 @@ def submit_review(submission_id):
         )
         flash("Peer review submitted successfully", "success")
 
-    except (AuthError, ValidationError) as e:
+    except (AuthError, ValidationError, sqlite3.Error) as e:
         flash(str(e), "error")
 
     return redirect(request.referrer or url_for("index"))
@@ -98,6 +99,6 @@ def list_reviews_for_submission(submission_id):
             submission_id=submission_id
         )
 
-    except (AuthError, ValidationError) as e:
+    except (AuthError, ValidationError, sqlite3.Error) as e:
         flash(str(e), "error")
         return redirect(url_for("index"))
