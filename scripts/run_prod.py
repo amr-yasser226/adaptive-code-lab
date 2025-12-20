@@ -4,6 +4,44 @@ import subprocess
 from pathlib import Path
 from dotenv import load_dotenv
 
+def kill_port_process(port):
+    """Attempt to kill any process using the specified port."""
+    import platform
+    import subprocess
+    import signal
+    
+    system = platform.system().lower()
+    print(f"Checking for existing processes on port {port}...")
+    
+    try:
+        if "windows" in system:
+            # Find PID using port
+            cmd = f"netstat -ano | findstr :^{port}" # Standard port check
+            # For robustness, we check specifically for LISTENING
+            output = subprocess.check_output(f"netstat -ano | findstr LISTENING | findstr :{port}", shell=True, text=True)
+            for line in output.strip().split('\n'):
+                if str(port) in line:
+                    pid = line.strip().split()[-1]
+                    if pid and pid != "0":
+                        print(f"  → Found process {pid} on Windows. Terminating...")
+                        subprocess.run(["taskkill", "/F", "/PID", pid], capture_output=True)
+        else:
+            # Linux/macOS
+            try:
+                # Use fuser if available
+                subprocess.run(["fuser", "-k", f"{port}/tcp"], capture_output=True)
+                print(f"  → Port {port} cleared using fuser.")
+            except:
+                # Fallback to lsof
+                output = subprocess.check_output(["lsof", "-t", f"-i:{port}"], text=True)
+                for pid in output.strip().split('\n'):
+                    if pid:
+                        print(f"  → Found process {pid} on Linux. Terminating...")
+                        os.kill(int(pid), signal.SIGKILL)
+    except Exception:
+        # If port is free or command fails, just continue
+        pass
+
 def main():
     # Navigate to project root
     project_root = Path(__file__).parent.parent
@@ -12,6 +50,9 @@ def main():
     print("==========================================")
     print("STARTING ACCL PRODUCTION SERVER")
     print("==========================================")
+
+    # 0. Clear port 5000 if in use
+    kill_port_process(5000)
 
     # Check if .env exists
     env_path = project_root / '.env'
