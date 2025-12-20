@@ -54,6 +54,50 @@ def safe_insert(cursor, sql, params, description=""):
         return False
 
 
+def reset_demo_data(cursor):
+    """Clear existing demo data for fresh seeding"""
+    print("\n[0/15] Resetting demo data...")
+    
+    demo_emails = ['alice@accl.edu', 'bob@accl.edu', 'charlie@accl.edu', 'diana@accl.edu', 'admin@accl.edu']
+    
+    # Get demo user IDs
+    cursor.execute(f"SELECT id FROM users WHERE email IN ({','.join('?' * len(demo_emails))})", demo_emails)
+    user_ids = [row[0] for row in cursor.fetchall()]
+    
+    if user_ids:
+        placeholders = ','.join('?' * len(user_ids))
+        
+        # Clear related data in order (foreign key dependencies)
+        tables_to_clear = [
+            ('results', 'submission_id IN (SELECT id FROM submissions WHERE student_id IN ({}))'.format(placeholders)),
+            ('sandbox_jobs', 'submission_id IN (SELECT id FROM submissions WHERE student_id IN ({}))'.format(placeholders)),
+            ('hints', 'submission_id IN (SELECT id FROM submissions WHERE student_id IN ({}))'.format(placeholders)),
+            ('similarity_flags', 'submission_id IN (SELECT id FROM submissions WHERE student_id IN ({}))'.format(placeholders)),
+            ('peer_reviews', 'submission_id IN (SELECT id FROM submissions WHERE student_id IN ({}))'.format(placeholders)),
+            ('drafts', f'user_id IN ({placeholders})'),
+            ('submissions', f'student_id IN ({placeholders})'),
+            ('enrollments', f'student_id IN ({placeholders})'),
+            ('notifications', f'user_id IN ({placeholders})'),
+            ('audit_logs', f'actor_user_id IN ({placeholders})'),
+        ]
+        
+        for table, condition in tables_to_clear:
+            try:
+                cursor.execute(f"DELETE FROM {table} WHERE {condition}", user_ids)
+            except:
+                pass  # Table might not exist
+        
+        # Clear test cases and assignments for demo courses
+        cursor.execute("DELETE FROM test_cases WHERE assignment_id IN (SELECT id FROM assignments WHERE course_id IN (SELECT id FROM courses WHERE code IN ('CS101', 'CS201', 'CS301')))")
+        cursor.execute("DELETE FROM assignments WHERE course_id IN (SELECT id FROM courses WHERE code IN ('CS101', 'CS201', 'CS301'))")
+        cursor.execute("DELETE FROM courses WHERE code IN ('CS101', 'CS201', 'CS301')")
+        
+        # Clear demo users
+        cursor.execute(f"DELETE FROM users WHERE id IN ({placeholders})", user_ids)
+    
+    print("    ✓ Demo data cleared")
+
+
 def seed_users(cursor):
     """FR-01: Create users with all roles"""
     print("\n[1/12] Creating test users (FR-01)...")
@@ -286,18 +330,18 @@ def seed_hints(cursor, submission_ids):
     
     hints_data = [
         (submission_ids[0] if submission_ids else 1, 'llama-3.3-70b', 0.95, 
-         'Great job! Your Hello World program is correct.', 1, 'Very helpful hint', datetime.now()),
+         'Great job! Your Hello World program is correct.', 1, 'Very helpful hint'),
         (submission_ids[-1] if submission_ids else 2, 'llama-3.3-70b', 0.85,
          'Hint: Check your output formatting. Python print() adds spaces between arguments.', 
-         None, None, datetime.now()),
+         None, None),
     ]
     
     count = 0
-    for sub_id, model, conf, hint, helpful, feedback, created in hints_data:
+    for sub_id, model, conf, hint, helpful, feedback in hints_data:
         if sub_id and safe_insert(cursor, '''
             INSERT INTO hints (submission_id, model_used, confidence, hint_text, is_helpful, feedback_text, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ''', (sub_id, model, conf, hint, helpful, feedback, created), "Hint"):
+            VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+        ''', (sub_id, model, conf, hint, helpful, feedback), "Hint"):
             count += 1
     
     print(f"    ✓ Created {count} hints")
@@ -481,7 +525,7 @@ def seed_sandbox_jobs(cursor, submission_ids):
     for i, sub_id in enumerate(submission_ids[:5]):  # First 5 submissions
         cursor.execute('SELECT id FROM sandbox_jobs WHERE submission_id = ?', (sub_id,))
         if not cursor.fetchone():
-            status = 'completed' if i < 4 else 'pending'
+            status = 'completed' if i < 4 else 'queued'
             exit_code = 0 if i < 3 else (1 if i == 3 else None)
             if safe_insert(cursor, '''
                 INSERT INTO sandbox_jobs 
@@ -573,6 +617,7 @@ def main():
     cursor = conn.cursor()
     
     try:
+        reset_demo_data(cursor)
         user_ids = seed_users(cursor)
         course_id, course_ids = seed_courses(cursor, user_ids)
         assignment_ids = seed_assignments(cursor, course_id)
