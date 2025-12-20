@@ -128,3 +128,25 @@ class EnrollmentRepository:
             )
             for row in rows
         ]
+    
+
+    def list_all(self):
+        query = """
+            SELECT *
+            FROM enrollments
+            ORDER BY enrolled_at DESC
+        """
+        result = self.db.execute(query)
+        rows = result.fetchall()
+
+        return [
+            Enrollment(
+                student_id=row.student_id,
+                course_id=row.course_id,
+                status=row.status,
+                final_grade=row.final_grade,
+                enrolled_at=row.enrolled_at,
+                dropped_at=row.dropped_at
+            )
+            for row in rows
+        ]
