@@ -1,16 +1,148 @@
 {% extends 'base.html' %}
 {% block title %}{{ course.title }}{% endblock %}
 {% block content %}
-<div class="container">
-    <h1>{{ course.title }} ({{ course.code }})</h1>
-    <p>{{ course.description }}</p>
-    {% if is_enrolled %}
-    <p>You are enrolled.</p>
-    {% else %}
-    <form action="{{ url_for('course.enroll', course_id=course.get_id()) }}" method="POST">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-        <button type="submit">Enroll</button>
-    </form>
-    {% endif %}
+<div class="dashboard-header mb-5">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-9">
+                <div class="d-flex align-items-center gap-3 mb-2">
+                    <span class="badge bg-white text-primary px-3 py-2 rounded-pill font-weight-bold">
+                        {{ course.code }}
+                    </span>
+                    {% if is_enrolled %}
+                    <span class="badge bg-success px-3 py-2 rounded-pill">
+                        <i class="fas fa-check-circle"></i> Enrolled
+                    </span>
+                    {% endif %}
+                </div>
+                <h1 class="dashboard-title">{{ course.title }}</h1>
+                <p class="dashboard-subtitle">
+                    <i class="fas fa-calendar-alt"></i> {{ course.year }} {{ course.semester }} |
+                    <i class="fas fa-award"></i> {{ course.credits }} Credits |
+                    <i class="fas fa-users"></i> Max Students: {{ course.max_students }}
+                </p>
+            </div>
+            <div class="col-md-3 text-end">
+                <i class="fas fa-book" style="font-size: 5rem; opacity: 0.7; color: white;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5">
+    <div class="row g-4">
+        <!-- Main Info -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="mb-0 font-weight-bold">
+                        <i class="fas fa-info-circle text-primary me-2"></i> About this Course
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <p class="lead text-muted">{{ course.description or 'No description available for this course.' }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="mb-0 font-weight-bold">
+                        <i class="fas fa-tasks text-primary me-2"></i> Assignments
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if assignments %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">Title</th>
+                                    <th>Due Date</th>
+                                    <th class="text-end pe-4">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for assignment in assignments %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <strong>{{ assignment.title }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ (assignment.description or '')[:50] }}...</small>
+                                    </td>
+                                    <td class="align-middle text-muted small">
+                                        <i class="fas fa-calendar-clock"></i> {{ assignment.due_date|format_date }}
+                                    </td>
+                                    <td class="text-end pe-4 align-middle">
+                                        {% if current_user.role == 'student' %}
+                                        <a href="{{ url_for('student.assignment_detail', assignment_id=assignment.get_id()) }}"
+                                            class="btn btn-sm btn-outline-primary rounded-pill">
+                                            View
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="p-5 text-center">
+                        <i class="fas fa-clipboard-list fa-3x text-muted opacity-25 mb-3"></i>
+                        <p class="text-muted mb-0">No assignments listed yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Actions -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm bg-light mb-4">
+                <div class="card-body p-4">
+                    {% if not is_enrolled %}
+                    <h5 class="font-weight-bold mb-3">Interested?</h5>
+                    <p class="text-muted small mb-4">Enroll now to access assignments, submit your code, and receive
+                        AI-powered feedback.</p>
+                    <form action="{{ url_for('course.enroll', course_id=course.get_id()) }}" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill font-weight-bold">
+                            <i class="fas fa-user-plus me-2"></i> Enroll in Course
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-check-circle fa-3x text-success"></i>
+                        </div>
+                        <h5 class="font-weight-bold">You're Enrolled!</h5>
+                        <p class="text-muted small mb-0">You have full access to this course's materials and
+                            assignments.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if current_user.role == 'instructor' and course.get_instructor_id() == current_user.get_id() %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="mb-0 font-weight-bold text-dark">Management</h5>
+                </div>
+                <div class="card-body p-4 pt-0">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('course.edit_course', course_id=course.get_id()) }}"
+                            class="btn btn-outline-primary rounded-pill">
+                            <i class="fas fa-edit"></i> Edit Course
+                        </a>
+                        <a href="{{ url_for('assignment.create_assignment', course_id=course.get_id()) }}"
+                            class="btn btn-outline-success rounded-pill">
+                            <i class="fas fa-plus"></i> New Assignment
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% endblock %}

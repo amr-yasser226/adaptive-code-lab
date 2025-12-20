@@ -139,6 +139,26 @@
                 </h5>
             </div>
             <div class="card-body">
+                <!-- Enrollment CTA for new students -->
+                {% if not enrolled_courses %}
+                <div class="alert alert-warning border-0 shadow-sm p-4 mb-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-warning text-white rounded-circle p-3">
+                            <i class="fas fa-search-plus fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5 class="alert-heading font-weight-bold mb-1">Getting Started?</h5>
+                            <p class="mb-0 text-dark">You aren't enrolled in any courses yet. Explore our course catalog
+                                to find your first challenge!</p>
+                            <a href="{{ url_for('course.list_courses') }}"
+                                class="btn btn-warning btn-sm mt-3 px-4 rounded-pill font-weight-bold text-white shadow-sm">
+                                Explore Courses
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
                 {% if assignments_with_status %}
                 <div class="table-responsive">
                     <table class="table table-hover">
@@ -202,31 +222,64 @@
         </div>
     </div>
 
-    <!-- Recent Submissions -->
+    <!-- Recent Submissions & Community -->
     <div class="col-lg-4">
+        <!-- Pending Peer Reviews -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="fas fa-users"></i> Pending Peer Reviews
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                {% if pending_reviews %}
+                <div class="list-group list-group-flush">
+                    {% for review in pending_reviews %}
+                    <a href="{{ url_for('student.submission_results', submission_id=review.get_submission_id()) }}"
+                        class="list-group-item list-group-item-action p-3">
+                        <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                            <h6 class="mb-0 font-weight-bold">{{ review.submission.assignment.title if review.submission
+                                and review.submission.assignment else 'Assignment' }}</h6>
+                            <span class="badge bg-soft-warning text-warning small rounded-pill">Draft</span>
+                        </div>
+                        <p class="mb-0 small text-muted">Reviewing peer's submission #{{ review.get_submission_id() }}
+                        </p>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="p-4 text-center text-muted small">
+                    <i class="fas fa-check-double fa-2x opacity-25 mb-2"></i>
+                    <p class="mb-0">No pending peer reviews.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
         <div class="card">
             <div class="card-header bg-success text-white">
                 <h5 class="mb-0">
                     <i class="fas fa-history"></i> Recent Submissions
                 </h5>
             </div>
-            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+            <div class="card-body p-0" style="max-height: 400px; overflow-y: auto;">
                 {% if recent_submissions %}
                 <div class="list-group list-group-flush">
                     {% for submission in recent_submissions %}
                     <a href="{{ url_for('student.submission_results', submission_id=submission.get_id()) }}"
-                        class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">{{ submission.assignment.title }}</h6>
-                            <small>{{ submission.created_at|format_date('%m/%d') if submission.created_at else 'N/A'
+                        class="list-group-item list-group-item-action p-3">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                            <h6 class="mb-0 font-weight-bold">{{ submission.assignment.title }}</h6>
+                            <small class="text-muted">{{ submission.created_at|format_date('%m/%d') if
+                                submission.created_at else 'N/A'
                                 }}</small>
                         </div>
-                        <p class="mb-1 small text-muted">Version {{ submission.version }}</p>
+                        <p class="mb-0 small text-muted">Version {{ submission.version }}</p>
                     </a>
                     {% endfor %}
                 </div>
                 {% else %}
-                <p class="text-muted text-center">No recent submissions</p>
+                <p class="text-muted text-center p-4">No recent submissions</p>
                 {% endif %}
             </div>
         </div>

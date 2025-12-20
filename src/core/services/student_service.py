@@ -75,7 +75,17 @@ class StudentService:
         last_submission = self.submission_repo.get_last_submission(student_id, assignment_id)
         new_version = last_submission.version + 1 if last_submission else 1
 
-        is_late = datetime.now() > assignment.due_date
+        # Handle potential string from SQLite
+        due_date = assignment.due_date
+        if isinstance(due_date, str):
+            try:
+                # Remove Z if present and parse
+                due_date = datetime.fromisoformat(due_date.replace('Z', ''))
+            except (ValueError, AttributeError):
+                # Fallback to current time if unparseable (should not happen with valid DB)
+                due_date = datetime.now()
+        
+        is_late = datetime.now() > due_date
 
         new_submission = Submission(
             id=None,

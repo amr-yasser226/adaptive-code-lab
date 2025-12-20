@@ -1,105 +1,127 @@
 {% extends "base.html" %}
 
-{% block title %}
-Notifications
-{% endblock %}
+{% block title %}Notifications - ACCL{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+            <div>
+                <h2 class="mb-1 font-weight-bold"><i class="fas fa-bell me-2 text-primary"></i>Notifications</h2>
+                <p class="text-muted small mb-0">Stay updated with your course activities and feedback.</p>
+            </div>
+            <div class="btn-group shadow-sm">
+                <a href="{{ url_for('notification.list_notifications') }}"
+                    class="btn btn-sm {{ 'btn-primary' if not only_unread else 'btn-outline-primary' }}">
+                    All
+                </a>
+                <a href="{{ url_for('notification.list_notifications', unread=1) }}"
+                    class="btn btn-sm {{ 'btn-primary' if only_unread else 'btn-outline-primary' }}">
+                    Unread
+                </a>
+            </div>
+        </div>
 
-    <h2 class="mb-3">
-        Notifications
-        {% if only_unread %}
-            <small class="text-muted">(Unread)</small>
-        {% endif %}
-    </h2>
-
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-
-    <!-- Filter Links -->
-    <div class="mb-3">
-        <a href="{{ url_for('notification.list_notifications') }}"
-           class="btn btn-sm btn-outline-secondary">
-            All
-        </a>
-        <a href="{{ url_for('notification.list_notifications', unread=1) }}"
-           class="btn btn-sm btn-outline-primary">
-            Unread only
-        </a>
-    </div>
-
-    <!-- Notifications List -->
-    {% if notifications %}
-        <ul class="list-group">
+        <!-- Notifications Container -->
+        <div class="notification-list shadow-sm rounded-lg overflow-hidden bg-white">
+            {% if notifications %}
             {% for notification in notifications %}
-                <li class="list-group-item d-flex justify-content-between align-items-start
-                    {% if not notification.is_read %}list-group-item-warning{% endif %}">
-                    
-                    <div class="ms-2 me-auto">
-                        <div class="fw-bold">
-                            {{ notification.type|capitalize }}
-                        </div>
+            <div class="notification-item p-4 border-bottom d-flex align-items-start gap-3 {% if not notification.is_read %}unread-bg{% endif %}"
+                style="transition: background 0.2s ease;">
 
-                        <p class="mb-1">
-                            {{ notification.message }}
-                        </p>
+                <!-- Icon based on type -->
+                <div class="flex-shrink-0 mt-1">
+                    <div class="icon-circle shadow-sm d-flex align-items-center justify-content-center"
+                        style="width: 45px; height: 45px; border-radius: 50%; background: {{ 'rgba(13, 110, 253, 0.1)' if notification.type == 'info' else 'rgba(25, 135, 84, 0.1)' if notification.type == 'grade' else 'rgba(255, 193, 7, 0.1)' }};">
+                        <i
+                            class="fas {{ 'fa-info-circle text-primary' if notification.type == 'info' else 'fa-graduation-cap text-success' if notification.type == 'grade' else 'fa-comments text-warning' }}"></i>
+                    </div>
+                </div>
 
+                <!-- Content -->
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <h6 class="mb-0 font-weight-bold text-dark">{{ notification.type|capitalize }}</h6>
+                        <small class="text-muted">{{ notification.created_at | format_date('%b %d, %H:%M') }}</small>
+                    </div>
+                    <p class="text-secondary mb-2" style="font-size: 0.95rem; line-height: 1.5;">
+                        {{ notification.message }}
+                    </p>
+
+                    <div class="d-flex justify-content-between align-items-center">
                         {% if notification.link %}
-                            <a href="{{ notification.link }}" class="small">
-                                View related item
-                            </a>
+                        <a href="{{ notification.link }}"
+                            class="btn btn-link btn-sm p-0 text-decoration-none font-weight-bold">
+                            View Details <i class="fas fa-arrow-right ms-1" style="font-size: 0.75rem;"></i>
+                        </a>
+                        {% else %}
+                        <span></span>
                         {% endif %}
 
-                        <div class="text-muted small">
-                            {{ notification.created_at | format_date }}
-                        </div>
-                    </div>
-
-                    <!-- Actions -->
-                    <div class="btn-group btn-group-sm">
-                        {% if notification.is_read %}
+                        <div class="btn-group btn-group-sm">
+                            {% if notification.is_read %}
                             <form method="post"
-                                  action="{{ url_for('notification.mark_as_unread', notification_id=notification.id) }}">
-                                <button type="submit" class="btn btn-outline-secondary">
+                                action="{{ url_for('notification.mark_as_unread', notification_id=notification.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit"
+                                    class="btn btn-link text-muted p-0 me-3 text-decoration-none small">
                                     Mark unread
                                 </button>
                             </form>
-                        {% else %}
+                            {% else %}
                             <form method="post"
-                                  action="{{ url_for('notification.mark_as_read', notification_id=notification.id) }}">
-                                <button type="submit" class="btn btn-outline-success">
+                                action="{{ url_for('notification.mark_as_read', notification_id=notification.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit"
+                                    class="btn btn-link text-primary p-0 me-3 text-decoration-none small">
                                     Mark read
                                 </button>
                             </form>
-                        {% endif %}
+                            {% endif %}
 
-                        <form method="post"
-                              action="{{ url_for('notification.delete_notification', notification_id=notification.id) }}"
-                              onsubmit="return confirm('Delete this notification?');">
-                            <button type="submit" class="btn btn-outline-danger">
-                                Delete
-                            </button>
-                        </form>
+                            <form method="post"
+                                action="{{ url_for('notification.delete_notification', notification_id=notification.id) }}"
+                                onsubmit="return confirm('Delete this notification?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit" class="btn btn-link text-danger p-0 text-decoration-none small">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
                     </div>
-
-                </li>
+                </div>
+            </div>
             {% endfor %}
-        </ul>
-    {% else %}
-        <p class="text-muted mt-4">
-            No notifications found.
-        </p>
-    {% endif %}
-
+            {% else %}
+            <div class="text-center py-5 bg-white">
+                <div class="mb-3 opacity-25">
+                    <i class="fas fa-bell-slash fa-4x"></i>
+                </div>
+                <h5 class="text-muted">No notifications found</h5>
+                <p class="text-muted small">We'll let you know when something important happens.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
+
+<style>
+    .notification-item:hover {
+        background-color: #fcfcfc;
+    }
+
+    .unread-bg {
+        background-color: #f0f7ff !important;
+        border-left: 4px solid #0d6efd;
+    }
+
+    .rounded-lg {
+        border-radius: 1rem !important;
+    }
+
+    .btn-link:hover {
+        opacity: 0.8;
+    }
+</style>
 {% endblock %}

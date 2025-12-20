@@ -140,6 +140,20 @@ def create_app(test_config=None):
             settings = {}
         return dict(site_settings=settings)
 
+    @app.context_processor
+    def inject_notifications():
+        from web.utils import get_service, get_current_user
+        from flask import session
+        try:
+            if 'user_id' in session:
+                user = get_current_user()
+                notification_service = get_service('notification_service')
+                unread = notification_service.get_user_notifications(user, only_unread=True)
+                return dict(unread_notifications_count=len(unread))
+        except Exception:
+            pass
+        return dict(unread_notifications_count=0)
+
     # Initialize CSRF Protection
     csrf = CSRFProtect(app)
     

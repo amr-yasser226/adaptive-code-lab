@@ -25,8 +25,23 @@ def dashboard():
     assignment_repo = get_service('assignment_repo')
     user_repo = get_service('user_repo')
     result_repo = get_service('result_repo')
+    enrollment_repo = get_service('enrollment_repo')
+    peer_review_repo = get_service('peer_review_repo')
     
     current_user = user_repo.get_by_id(user_id)
+    
+    # Check enrollments
+    enrollments = enrollment_repo.list_by_student(user_id)
+    enrolled_courses = [e for e in enrollments if e.status == 'enrolled']
+    
+    # Get pending peer reviews
+    all_reviews = peer_review_repo.list_by_reviewer(user_id)
+    pending_reviews = [r for r in all_reviews if not r.is_submitted]
+    # Attach submission and assignment to each pending review for display
+    for r in pending_reviews:
+        r.submission = get_service('submission_repo').get_by_id(r.get_submission_id())
+        if r.submission:
+            r.submission.assignment = assignment_repo.get_by_id(r.submission.get_assignment_id())
     
     # Get parameters
     filter_type = request.args.get('filter', 'all')
@@ -113,6 +128,8 @@ def dashboard():
         assignments_with_status=assignments_data,
         submissions=submissions,
         recent_submissions=sorted(submissions, key=lambda s: s.created_at if s.created_at else datetime.min, reverse=True)[:5],
+        pending_reviews=pending_reviews,
+        enrolled_courses=enrolled_courses,
         current_user=current_user,
         stats=stats)
 

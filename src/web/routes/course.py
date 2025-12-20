@@ -24,10 +24,13 @@ def list_courses():
             instructor_service = get_service('instructor_service')
             courses = instructor_service.list_instructor_courses(user_id)
         elif role == 'student':
+            # Show all published courses that are available for enrollment
+            courses = course_repo.list_all()
+            courses = [c for c in courses if c.status == 'published']
+            # Also fetch enrollment status for each course to show "Enrolled" badge
             enrollments = enrollment_repo.list_by_student(user_id)
-            courses = [course_repo.get_by_id(e.get_course_id()) for e in enrollments if course_repo.get_by_id(e.get_course_id())]
-        else:
-            courses = []
+            enrolled_course_ids = {e.get_course_id() for e in enrollments if e.status == 'enrolled'}
+            return render_template('courses/list.html', courses=courses, enrolled_course_ids=enrolled_course_ids)
 
         return render_template('courses/list.html', courses=courses)
 

@@ -1,12 +1,81 @@
 {% extends 'base.html' %}
-{% block title %}Courses{% endblock %}
+{% block title %}Explore Courses{% endblock %}
 {% block content %}
-<div class="container">
-    <h1>Courses</h1>
-    <ul>
-        {% for course in courses %}
-        <li><a href="{{ url_for('course.course_detail', course_id=course.get_id()) }}">{{ course.title }}</a></li>
-        {% endfor %}
-    </ul>
+<div class="dashboard-header mb-5">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-9">
+                <h1 class="dashboard-title">
+                    <i class="fas fa-search-plus"></i> Explore Courses
+                </h1>
+                <p class="dashboard-subtitle">Discover and enroll in available engineering courses.</p>
+            </div>
+            <div class="col-md-3 text-end">
+                <i class="fas fa-university" style="font-size: 4rem; opacity: 0.7; color: white;"></i>
+            </div>
+        </div>
+    </div>
 </div>
+
+<div class="container-fluid px-lg-5">
+    {% if courses %}
+    <div class="row g-4">
+        {% for course in courses %}
+        <div class="col-md-4 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm hover-shadow transition-all">
+                <div class="card-body d-flex flex-column p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-soft-primary text-primary px-3 py-2 rounded-pill small font-weight-bold">
+                            {{ course.code }}
+                        </span>
+                        {% if enrolled_course_ids and course.get_id() in enrolled_course_ids %}
+                        <span class="badge bg-success rounded-pill small">
+                            <i class="fas fa-check"></i> Enrolled
+                        </span>
+                        {% endif %}
+                    </div>
+                    <h5 class="card-title font-weight-bold mb-2">{{ course.title }}</h5>
+                    <p class="card-text text-muted small mb-4 flex-grow-1">
+                        {{ (course.description or 'No description available.')[:100] }}{% if (course.description|length)
+                        > 100 %}...{% endif %}
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                        <div class="text-muted small">
+                            <i class="fas fa-calendar-alt me-1"></i> {{ course.year }} {{ course.semester }}
+                        </div>
+                        <a href="{{ url_for('course.course_detail', course_id=course.get_id()) }}"
+                            class="btn btn-primary btn-sm px-4 rounded-pill">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <div class="mb-4">
+            <i class="fas fa-book-open fa-5x text-muted opacity-25"></i>
+        </div>
+        <h3>No courses available yet</h3>
+        <p class="text-muted">New courses will appear here once they are published by instructors.</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .bg-soft-primary {
+        background-color: rgba(102, 126, 234, 0.1);
+    }
+
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175) !important;
+    }
+
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+</style>
 {% endblock %}
