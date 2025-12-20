@@ -499,17 +499,17 @@ def fibonacci(n):
     pass'''
     
     # Draft for student 1 on assignment 3 (Fibonacci)
-    if len(assignment_ids) >= 3:
+    if 'student1' in user_ids and len(assignment_ids) >= 3:
         cursor.execute('SELECT id FROM drafts WHERE user_id = ? AND assignment_id = ?',
                        (user_ids['student1'], assignment_ids[2]))
         if not cursor.fetchone():
             safe_insert(cursor, '''
                 INSERT INTO drafts (user_id, assignment_id, content, language, saved_at)
-                VALUES (?, ?, ?, ?, datetime('now'))
-            ''', (user_ids['student1'], assignment_ids[2], draft_code, 'python'), "Draft 1")
+                VALUES (?, ?, ?, 'python', datetime('now'))
+            ''', (user_ids['student1'], assignment_ids[2], draft_code), "Draft 1")
         
         # Draft for student 3 on BST assignment
-        if len(assignment_ids) >= 4:
+        if 'student3' in user_ids and len(assignment_ids) >= 4:
             bst_draft = '''# Binary Search Tree - work in progress
 class Node:
     def __init__(self, value):
@@ -519,12 +519,12 @@ class Node:
             
             safe_insert(cursor, '''
                 INSERT INTO drafts (user_id, assignment_id, content, language, saved_at)
-                VALUES (?, ?, ?, ?, datetime('now'))
-            ''', (user_ids['student3'], assignment_ids[3], bst_draft, 'python'), "Draft 2")
+                VALUES (?, ?, ?, 'python', datetime('now'))
+            ''', (user_ids['student3'], assignment_ids[3], bst_draft), "Draft 2")
         
         print("    ✓ Created drafts")
     else:
-        print("    ⚠ Not enough assignments for drafts")
+        print("    ⚠ Not enough assignments or users for drafts")
 
 
 def seed_sandbox_jobs(cursor, submission_ids):
