@@ -132,6 +132,10 @@ def create_app(test_config=None):
     # Initialize CSRF Protection
     csrf = CSRFProtect(app)
     
+    # Exempt API routes from CSRF for programmatic access
+    from web.routes.api import api_bp
+    csrf.exempt(api_bp)
+    
     # Initialize Rate Limiter
     limiter = Limiter(
         app=app,
