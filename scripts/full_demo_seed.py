@@ -552,34 +552,49 @@ def seed_sandbox_jobs(cursor, submission_ids):
 
 
 def seed_results(cursor, submission_ids, test_case_ids):
-    """FR-05: Create test results"""
+    """FR-05: Create test results for all submissions"""
     print("\n[15/15] Creating test results (FR-05)...")
     
     if not table_exists(cursor, 'results'):
         print("    ⚠ results table not found")
         return
     
+    # We'll map submissions to their assignments to find the right test cases
+    cursor.execute('SELECT id, assignment_id, score, status FROM submissions')
+    submissions = cursor.fetchall()
+    
     count = 0
-    # Create results for first submission (Hello World - should pass)
-    if submission_ids and test_case_ids:
-        for i, (sub_id, tc_id) in enumerate([(submission_ids[0], test_case_ids[0])]):
-            cursor.execute('SELECT id FROM results WHERE submission_id = ? AND test_case_id = ?', (sub_id, tc_id))
-            if not cursor.fetchone():
-                if safe_insert(cursor, '''
-                    INSERT INTO results 
-                    (submission_id, test_case_id, passed, stdout, stderr, runtime_ms, memory_kb, exit_code, created_at)
-                    VALUES (?, ?, 1, 'Hello, World!', '', 45, 8192, 0, datetime('now'))
-                ''', (sub_id, tc_id), f"Result {i+1}"):
-                    count += 1
+    for sub in submissions:
+        sub_id, assignment_id, score, status = sub
         
-        # Add some failing results for variety
-        if len(submission_ids) > 5 and len(test_case_ids) > 1:
-            safe_insert(cursor, '''
+        # Only seed results for graded submissions
+        if status != 'graded':
+            continue
+            
+        # Get test cases for this assignment
+        cursor.execute('SELECT id, expected_out FROM test_cases WHERE assignment_id = ?', (assignment_id,))
+        tcs = cursor.fetchall()
+        
+        for i, tc in enumerate(tcs):
+            tc_id, expected = tc
+            
+            # Check if result already exists
+            cursor.execute('SELECT id FROM results WHERE submission_id = ? AND test_case_id = ?', (sub_id, tc_id))
+            if cursor.fetchone():
+                continue
+            
+            # Simple logic: if score is 100, all pass. If 80, first 80% pass.
+            # This is just for demo data consistency.
+            passed = 1 if (score >= 100 or i < 2) else 0
+            stdout = expected if passed else "Error: Output mismatch"
+            stderr = "" if passed else "AssertionError: Expected " + expected
+            
+            if safe_insert(cursor, '''
                 INSERT INTO results 
                 (submission_id, test_case_id, passed, stdout, stderr, runtime_ms, memory_kb, exit_code, created_at)
-                VALUES (?, ?, 0, 'hello world', '', 42, 8000, 0, datetime('now'))
-            ''', (submission_ids[5], test_case_ids[0]), "Failing result")
-            count += 1
+                VALUES (?, ?, ?, ?, ?, ?, 8192, ?, datetime('now'))
+            ''', (sub_id, tc_id, passed, stdout, stderr, 40 + (i * 10), 0 if passed else 1), f"Result for Sub {sub_id} TC {tc_id}"):
+                count += 1
     
     print(f"    ✓ Created {count} test results")
 
