@@ -47,7 +47,7 @@
                         <td>{{ sub.score if sub.score else '-' }}</td>
                         <td>{{ sub.submitted_at | format_date if sub.submitted_at else '-' }}</td>
                         <td>
-                            <a href="{{ url_for('student.submission_results', submission_id=sub.get_id()) }}"
+                            <a href="{{ url_for('submission.view_submission', submission_id=sub.get_id()) }}"
                                 class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-eye"></i>
                             </a>

@@ -344,7 +344,8 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <a href="#" class="btn btn-sm btn-info">
+                                    <a href="{{ url_for('submission.view_submission', submission_id=submission.get_id()) }}"
+                                        class="btn btn-sm btn-info">
                                         Review
                                     </a>
                                 </td>
