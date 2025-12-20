@@ -35,7 +35,7 @@ def list_files(submission_id):
             submission_id=submission_id,
         )
 
-    except (AuthError, ValidationError) as e:
+    except (AuthError, ValidationError, sqlite3.Error) as e:
         flash(str(e), "error")
         return redirect(request.referrer or "/")
 
@@ -53,10 +53,7 @@ def upload_file(submission_id):
         data = uploaded_file.read()
         size_bytes = len(data)
         checksum = hashlib.sha256(data).hexdigest() if size_bytes > 0 else None
-        try:
-            uploaded_file.stream.seek(0)
-        except Exception:
-            pass
+        uploaded_file.seek(0)
     except Exception:
         flash("Failed to read uploaded file", "error")
         return redirect(request.referrer or "/")
@@ -77,7 +74,7 @@ def upload_file(submission_id):
 
         flash("File uploaded successfully", "success")
 
-    except (AuthError, ValidationError) as e:
+    except (AuthError, ValidationError, sqlite3.Error) as e:
         flash(str(e), "error")
 
     return redirect(request.referrer or "/")
@@ -122,7 +119,7 @@ def delete_file(file_id):
         file_service.delete_file(user=get_current_user(), file_id=file_id)
         flash("File deleted successfully", "success")
 
-    except (AuthError, ValidationError) as e:
+    except (AuthError, ValidationError, sqlite3.Error) as e:
         flash(str(e), "error")
 
     return redirect(request.referrer or "/")

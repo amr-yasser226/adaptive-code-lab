@@ -1,3 +1,4 @@
+import sqlite3
 from flask import (
     Blueprint,
     request,
@@ -31,7 +32,7 @@ def list_notifications():
             only_unread=only_unread
         )
 
-    except (AuthError, ValidationError) as e:
+    except (AuthError, ValidationError, sqlite3.Error) as e:
         flash(str(e), "error")
         return redirect(url_for("index"))
 
@@ -50,7 +51,7 @@ def mark_as_read(notification_id):
         )
         flash("Notification marked as read", "success")
 
-    except (AuthError, ValidationError) as e:
+    except (AuthError, ValidationError, sqlite3.Error) as e:
         flash(str(e), "error")
 
     return redirect(request.referrer or url_for("notification.list_notifications"))
@@ -71,7 +72,7 @@ def mark_as_unread(notification_id):
         )
         flash("Notification marked as unread", "success")
 
-    except (AuthError, ValidationError) as e:
+    except (AuthError, ValidationError, sqlite3.Error) as e:
         flash(str(e), "error")
 
     return redirect(request.referrer or url_for("notification.list_notifications"))
@@ -92,7 +93,7 @@ def delete_notification(notification_id):
         )
         flash("Notification deleted", "success")
 
-    except (AuthError, ValidationError) as e:
+    except (AuthError, ValidationError, sqlite3.Error) as e:
         flash(str(e), "error")
 
     return redirect(request.referrer or url_for("notification.list_notifications"))

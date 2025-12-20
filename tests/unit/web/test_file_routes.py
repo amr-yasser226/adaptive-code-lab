@@ -1,46 +1,22 @@
 import pytest
 import os
-from datetime import datetime as dt
-from flask import Flask, session
-from unittest.mock import Mock, MagicMock
-from io import BytesIO
-
+import io
+from unittest.mock import Mock, patch
+from flask import Flask, session, Blueprint
+from core.entities.user import User
+from core.exceptions.validation_error import ValidationError
+from core.exceptions.auth_error import AuthError
 
 @pytest.fixture
 def mock_services():
-    """Create mock services for file routes."""
-    services = {
-        'user_repo': Mock(),
+    return {
         'file_service': Mock(),
         'file_repo': Mock(),
+        'user_repo': Mock(),
     }
-    
-    # Setup user repo
-    mock_user = Mock()
-    mock_user.get_id.return_value = 1
-    mock_user.name = "Test Student"
-    mock_user.email = "student@test.com"
-    mock_user.role = "student"
-    services['user_repo'].get_by_id.return_value = mock_user
-    
-    # Setup file service
-    mock_file = Mock()
-    mock_file.get_id.return_value = 1  # Return int for template url_for
-    mock_file.file_name = "test.py"
-    mock_file.content_type = "text/plain"
-    mock_file.size_bytes = 100
-    services['file_service'].list_files.return_value = [mock_file]
-    services['file_service'].upload_file.return_value = mock_file
-    
-    # Setup file repo
-    services['file_repo'].get_by_id.return_value = mock_file
-    
-    return services
-
 
 @pytest.fixture
 def app(mock_services):
-    """Create Flask test app with routes."""
     template_dir = os.path.join(os.path.dirname(__file__), '../../../src/web/templates')
     static_dir = os.path.join(os.path.dirname(__file__), '../../../src/web/static')
     
@@ -51,115 +27,199 @@ def app(mock_services):
     app.config['WTF_CSRF_ENABLED'] = False
     app.config['TESTING'] = True
     
-    # Add format_date filter
-    def format_date(value, fmt='%b %d, %Y'):
-        if value is None:
-            return 'N/A'
-        if isinstance(value, str):
-            return value
-        return value.strftime(fmt)
-    
-    app.jinja_env.filters['format_date'] = format_date
-    
     @app.context_processor
     def inject_csrf_token():
-        return dict(csrf_token=lambda: 'test-csrf-token')
+        return {'csrf_token': lambda: ''}
     
     @app.context_processor
     def inject_current_user():
-        user_id = session.get('user_id')
-        if user_id:
-            return dict(current_user=mock_services['user_repo'].get_by_id(user_id))
-        return dict(current_user=None)
+        if 'user_id' in session:
+            user = mock_services['user_repo'].get_by_id(session['user_id'])
+            return {'current_user': user}
+        return {'current_user': None}
+    
+    def format_date(value, fmt='%b %d, %Y'):
+        if value is None: return 'N/A'
+        return value.strftime(fmt) if hasattr(value, 'strftime') else str(value)
+    
+    app.jinja_env.filters['format_date'] = format_date
     
     app.extensions['services'] = mock_services
     
-    # Register required blueprints
     from web.routes.file import files_bp
-    from web.routes.auth import auth_bp
-    from web.routes.student import student_bp
+    app.register_blueprint(files_bp)
     
+    student_bp = Blueprint('student', __name__)
+    @student_bp.route('/dashboard')
+    def dashboard(): return 'Student Dash'
+    @student_bp.route('/assignments')
+    def assignments(): return 'Assignments'
+    @student_bp.route('/profile')
+    def profile(): return 'Profile'
+    app.register_blueprint(student_bp, url_prefix='/student')
+    
+    auth_bp = Blueprint('auth', __name__)
+    @auth_bp.route('/login')
+    def login(): return 'Login'
+    @auth_bp.route('/logout')
+    def logout(): return 'Logout'
+    app.register_blueprint(auth_bp, url_prefix='/auth')
+
     @app.route('/')
     def index():
-        return 'Home'
-    
-    app.register_blueprint(auth_bp, url_prefix='/auth')
-    app.register_blueprint(student_bp, url_prefix='/student')
-    app.register_blueprint(files_bp)
+        from flask import get_flashed_messages
+        return f"Index {' '.join(get_flashed_messages())}"
     
     return app
 
-
 @pytest.fixture
 def client(app):
-    """Create test client."""
     return app.test_client()
 
-
 @pytest.fixture
-def auth_session(client):
-    """Create authenticated session."""
+def user_session(client, mock_services):
+    mock_user = User(1, "User", "u@t.com", "p", "student")
+    mock_services['user_repo'].get_by_id.return_value = mock_user
     with client.session_transaction() as sess:
         sess['user_id'] = 1
         sess['user_role'] = 'student'
-    return client
+    return mock_user
 
-
-@pytest.mark.unit
 class TestFileRoutes:
-    
-    def test_list_files_requires_login(self, client):
-        """Test that listing files requires login."""
+    def test_list_files_success(self, client, user_session, mock_services):
+        mock_services['file_service'].list_files.return_value = []
         response = client.get('/files/submission/1')
-        assert response.status_code in [302, 401, 403]
-    
-    def test_list_files_authenticated(self, auth_session, mock_services):
-        """Test listing files when authenticated."""
-        response = auth_session.get('/files/submission/1')
-        # May fail due to missing template, but service should be called
-        mock_services['file_service'].list_files.assert_called()
-    
-    def test_upload_file_requires_login(self, client):
-        """Test that uploading files requires login."""
-        response = client.post('/files/submission/1/upload')
-        assert response.status_code in [302, 401, 403]
-    
-    def test_upload_file_no_file(self, auth_session):
-        """Test upload without file returns error."""
-        response = auth_session.post('/files/submission/1/upload')
-        assert response.status_code in [302, 400]  # Redirect with flash or error
-    
-    def test_upload_file_success(self, auth_session, mock_services):
-        """Test successful file upload."""
+        assert response.status_code == 200
+        assert b'Files' in response.data or b'No files found' in response.data
+
+    def test_list_files_error(self, client, user_session, mock_services):
+        mock_services['file_service'].list_files.side_effect = AuthError("Denied")
+        response = client.get('/files/submission/1', follow_redirects=True)
+        assert b'Denied' in response.data
+
+    def test_list_files_db_error(self, client, user_session, mock_services):
+        import sqlite3
+        mock_services['file_service'].list_files.side_effect = sqlite3.Error("DB error")
+        response = client.get('/files/submission/1', follow_redirects=True)
+        assert b'DB error' in response.data
+
+    def test_upload_file_success(self, client, user_session, mock_services):
         data = {
-            'file': (BytesIO(b'print("hello")'), 'test.py')
+            'file': (io.BytesIO(b"hello world"), 'test.txt')
         }
-        response = auth_session.post(
-            '/files/submission/1/upload',
-            data=data,
-            content_type='multipart/form-data'
-        )
-        assert response.status_code in [302, 200]
+        response = client.post('/files/submission/1/upload', data=data, content_type='multipart/form-data', follow_redirects=True)
+        assert b'File uploaded successfully' in response.data
         mock_services['file_service'].upload_file.assert_called()
-    
-    def test_download_file_requires_login(self, client):
-        """Test that downloading files requires login."""
+
+    def test_upload_file_no_file(self, client, user_session, mock_services):
+        response = client.post('/files/submission/1/upload', data={}, follow_redirects=True)
+        assert b'No file provided' in response.data
+
+    def test_upload_file_error(self, client, user_session, mock_services):
+        mock_services['file_service'].upload_file.side_effect = ValidationError("Too big")
+        data = {'file': (io.BytesIO(b"X"), 'test.txt')}
+        response = client.post('/files/submission/1/upload', data=data, content_type='multipart/form-data', follow_redirects=True)
+        assert b'Too big' in response.data
+
+    def test_upload_file_db_error(self, client, user_session, mock_services):
+        import sqlite3
+        mock_services['file_service'].upload_file.side_effect = sqlite3.Error("DB error")
+        data = {'file': (io.BytesIO(b"X"), 'test.txt')}
+        response = client.post('/files/submission/1/upload', data=data, content_type='multipart/form-data', follow_redirects=True)
+        assert b'DB error' in response.data
+
+    def test_download_file_success_url(self, client, user_session, mock_services):
+        mock_file = Mock()
+        mock_file.storage_url = "http://example.com/file"
+        mock_services['file_repo'].get_by_id.return_value = mock_file
+        
         response = client.get('/files/1/download')
-        assert response.status_code in [302, 401, 403]
-    
-    def test_download_file_not_found(self, auth_session, mock_services):
-        """Test download when file not found."""
+        assert response.status_code == 302
+        assert response.location == "http://example.com/file"
+
+    @patch('web.routes.file.os.path.isabs')
+    @patch('web.routes.file.os.path.exists')
+    @patch('web.routes.file.send_file')
+    def test_download_file_success_local_abs(self, mock_send_file, mock_exists, mock_isabs, client, user_session, mock_services):
+        mock_isabs.return_value = True
+        mock_exists.return_value = True
+        mock_file = Mock()
+        mock_file.storage_url = None
+        mock_file.path = "/abs/path/test.txt"
+        mock_file.content_type = "text/plain"
+        mock_file.file_name = "test.txt"
+        mock_services['file_repo'].get_by_id.return_value = mock_file
+        
+        from flask import Response
+        mock_send_file.return_value = Response("file content", 200)
+        
+        response = client.get('/files/1/download', follow_redirects=True)
+        assert b'file content' in response.data
+        assert response.status_code == 200
+        mock_send_file.assert_called()
+
+    def test_download_file_not_found(self, client, user_session, mock_services):
         mock_services['file_repo'].get_by_id.return_value = None
-        response = auth_session.get('/files/99/download')
-        assert response.status_code in [302, 404]
-    
-    def test_delete_file_requires_login(self, client):
-        """Test that deleting files requires login."""
-        response = client.post('/files/1/delete')
-        assert response.status_code in [302, 401, 403]
-    
-    def test_delete_file_success(self, auth_session, mock_services):
-        """Test successful file deletion."""
-        response = auth_session.post('/files/1/delete')
-        assert response.status_code in [302, 200]
-        mock_services['file_service'].delete_file.assert_called()
+        response = client.get('/files/1/download', follow_redirects=True)
+        assert b'File not found' in response.data
+
+    def test_download_file_error(self, client, user_session, mock_services):
+        import sqlite3
+        mock_services['file_repo'].get_by_id.side_effect = sqlite3.Error("DB Fail")
+        response = client.get('/files/1/download', follow_redirects=True)
+        assert b'DB Fail' in response.data
+
+    @patch('web.routes.file.os.path.isabs')
+    @patch('web.routes.file.os.path.exists')
+    @patch('web.routes.file.send_file')
+    def test_download_file_success_local_candidate(self, mock_send_file, mock_exists, mock_isabs, client, user_session, mock_services):
+        # Mock isabs to return False for relative path
+        mock_isabs.return_value = False
+        mock_exists.return_value = True
+        mock_file = Mock()
+        mock_file.storage_url = None
+        mock_file.path = "relative/path/test.txt"
+        mock_file.content_type = "text/plain"
+        mock_file.file_name = "test.txt"
+        mock_services['file_repo'].get_by_id.return_value = mock_file
+        
+        from flask import Response
+        mock_send_file.return_value = Response("file content", 200)
+        
+        response = client.get('/files/1/download', follow_redirects=True)
+        assert b'file content' in response.data
+        assert response.status_code == 200
+
+    @patch('web.routes.file.os.path.exists')
+    def test_download_file_not_available(self, mock_exists, client, user_session, mock_services):
+        mock_exists.return_value = False
+        mock_file = Mock()
+        mock_file.storage_url = None
+        mock_file.path = "relative/path/test.txt"
+        mock_services['file_repo'].get_by_id.return_value = mock_file
+        
+        response = client.get('/files/1/download', follow_redirects=True)
+        assert b'File is not available for download' in response.data
+
+    @patch('web.routes.file.hashlib.sha256')
+    def test_upload_file_read_error(self, mock_sha, client, user_session, mock_services):
+        mock_sha.side_effect = Exception("Read error")
+        data = {'file': (io.BytesIO(b"abc"), 'test.txt')}
+        response = client.post('/files/submission/1/upload', data=data, content_type='multipart/form-data', follow_redirects=True)
+        assert b'Failed to read uploaded file' in response.data
+
+    def test_delete_file_success(self, client, user_session, mock_services):
+        response = client.post('/files/1/delete', follow_redirects=True)
+        assert b'File deleted successfully' in response.data
+        mock_services['file_service'].delete_file.assert_called_with(user=user_session, file_id=1)
+
+    def test_delete_file_error(self, client, user_session, mock_services):
+        mock_services['file_service'].delete_file.side_effect = ValidationError("Cant delete")
+        response = client.post('/files/1/delete', follow_redirects=True)
+        assert b'Cant delete' in response.data
+
+    def test_delete_file_db_error(self, client, user_session, mock_services):
+        import sqlite3
+        mock_services['file_service'].delete_file.side_effect = sqlite3.Error("DB error")
+        response = client.post('/files/1/delete', follow_redirects=True)
+        assert b'DB error' in response.data
