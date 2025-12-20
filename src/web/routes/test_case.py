@@ -26,7 +26,7 @@ def create_test_case(assignment_id):
             )
             flash('Test case created', 'success')
             return redirect(request.referrer or url_for('assignment.view_submissions', assignment_id=assignment_id))
-        except (ValidationError, AuthError) as e:
+        except (ValidationError, AuthError, sqlite3.Error) as e:
             flash(str(e), 'error')
 
     return render_template('test_case/create.html', assignment_id=assignment_id)
@@ -51,13 +51,17 @@ def edit_test_case(testcase_id):
             )
             flash('Test case updated', 'success')
             return redirect(request.referrer or url_for('instructor.dashboard'))
-        except (ValidationError, AuthError) as e:
+        except (ValidationError, AuthError, sqlite3.Error) as e:
             flash(str(e), 'error')
 
     # GET: load testcase
-    testcase = get_service('test_case_repo').get_by_id(testcase_id)
-    if not testcase:
-        flash('Test case not found', 'error')
+    try:
+        testcase = get_service('test_case_repo').get_by_id(testcase_id)
+        if not testcase:
+            flash('Test case not found', 'error')
+            return redirect(request.referrer or url_for('instructor.dashboard'))
+    except sqlite3.Error as e:
+        flash(str(e), 'error')
         return redirect(request.referrer or url_for('instructor.dashboard'))
 
     return render_template('test_case/edit.html', testcase=testcase)

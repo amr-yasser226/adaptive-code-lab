@@ -252,3 +252,41 @@ class TestApiRoutes:
     def test_save_draft_no_id(self, client, user_session, mock_services):
         response = client.post('/api/drafts', data=json.dumps({}), content_type='application/json')
         assert response.status_code == 400
+
+    def test_test_code_malformed_json(self, client, user_session, mock_services):
+        response = client.post('/api/test-code', 
+                               data="not a json",
+                               content_type='application/json')
+        assert response.status_code == 400 # Flask handles bad JSON
+
+    def test_test_code_missing_id(self, client, user_session, mock_services):
+        mock_services['assignment_repo'].get_by_id.return_value = None
+        response = client.post('/api/test-code', 
+                               data=json.dumps({'code': 'print(1)'}),
+                               content_type='application/json')
+        # Line 27 in api.py: if not assignment -> 404
+        assert response.status_code == 404
+
+    def test_get_hint_empty_payload(self, client, user_session, mock_services):
+        # api.py line 136-138 handles missing keys via data.get('', '')
+        response = client.post('/api/hint', 
+                               data=json.dumps({}),
+                               content_type='application/json')
+        # If groq is not mocked as None, it tries to proceed
+        mock_services['sandbox_service'].groq_client = Mock()
+        mock_services['sandbox_service'].get_ai_feedback.return_value = "Hint"
+        response = client.post('/api/hint', 
+                               data=json.dumps({}),
+                               content_type='application/json')
+        assert response.status_code == 200
+        assert json.loads(response.data)['hint'] == "Hint"
+
+    def test_save_draft_malformed_types(self, client, user_session, mock_services):
+        # Passing string instead of int for assignment_id
+        response = client.post('/api/drafts', 
+                               data=json.dumps({'assignment_id': 'abc'}),
+                               content_type='application/json')
+        # api.py line 204: int(assignment_id) -> raises ValueError
+        # caught by Exception block line 208 -> returns 500
+        assert response.status_code == 500
+        assert b'invalid literal for int()' in response.data.lower()

@@ -4,16 +4,14 @@
 
 {% block content %}
 <!-- Educational Blue/Purple Gradient Header -->
-<div class="dashboard-header mb-5"
-    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 2rem; color: white;">
+<div class="dashboard-header mb-5">
     <div class="container-fluid">
         <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="dashboard-title" style="color: white;">
-                    <i class="fas fa-chart-pie"></i> Assignment Dashboard
+            <div class="col-md-9">
+                <h1 class="dashboard-title">
+                    <i class="fas fa-rocket"></i> Learning Progress
                 </h1>
-                <p class="dashboard-subtitle" style="color: rgba(255,255,255,0.9);">Track your progress and manage
-                    submissions</p>
+                <p class="dashboard-subtitle">Track your assignments, grades, and academic growth.</p>
             </div>
             <div class="col-md-4 text-end">
                 {% if user and user.role == 'instructor' %}

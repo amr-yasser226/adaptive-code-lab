@@ -15,13 +15,17 @@ def list_remediations():
     remediation_service = get_service('remediation_service')
     
     only_pending = request.args.get('pending', 'false').lower() == 'true'
-    remediations = remediation_service.get_student_remediations(user_id, only_pending)
-    
-    return render_template(
-        'student/remediations.html',
-        remediations=remediations,
-        only_pending=only_pending
-    )
+    try:
+        remediations = remediation_service.get_student_remediations(user_id, only_pending)
+        
+        return render_template(
+            'student/remediations.html',
+            remediations=remediations,
+            only_pending=only_pending
+        )
+    except (sqlite3.Error, Exception) as e:
+        flash(str(e), 'error')
+        return redirect(url_for('index'))
 
 
 @remediation_bp.route('/remediations/<int:remediation_id>')
@@ -79,13 +83,16 @@ def api_list_remediations():
     remediation_service = get_service('remediation_service')
     
     only_pending = request.args.get('pending', 'false').lower() == 'true'
-    remediations = remediation_service.get_student_remediations(user_id, only_pending)
-    
-    return jsonify({
-        'success': True,
-        'remediations': remediations,
-        'count': len(remediations)
-    })
+    try:
+        remediations = remediation_service.get_student_remediations(user_id, only_pending)
+        
+        return jsonify({
+            'success': True,
+            'remediations': remediations,
+            'count': len(remediations)
+        })
+    except (sqlite3.Error, Exception) as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 @remediation_bp.route('/api/remediations/<int:remediation_id>/view', methods=['POST'])

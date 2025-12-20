@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Create Test Case{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Create Test Case for Assignment {{ assignment_id }}</h2>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="text" name="name" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Stdin</label>
+            <textarea name="stdin" class="form-control"></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Expected Output</label>
+            <textarea name="expected_out" class="form-control" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Points</label>
+            <input type="number" name="points" class="form-control" value="0">
+        </div>
+        <div class="mb-3 form-check">
+            <input type="checkbox" name="is_visible" class="form-check-input" id="isVisible" checked>
+            <label class="form-check-label" for="isVisible">Visible to Students</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Test Case</button>
+    </form>
+</div>
+{% endblock %}
