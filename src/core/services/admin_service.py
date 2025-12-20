@@ -93,17 +93,25 @@ class AdminService:
 
 
     def export_db_dump(self, admin_user, output_path):
+        import sqlite3
         self._ensure_admin(admin_user)
 
         if not self.db_path:
             raise ValidationError("Database path not configured")
 
         try:
-            shutil.copy(self.db_path, output_path)
+            # Use SQLite's native VACUUM INTO for a safe, live backup
+            conn = sqlite3.connect(self.db_path)
+            # Ensure output_path is safe for the query
+            conn.execute(f"VACUUM INTO '{output_path}'")
+            conn.close()
+            
             return {
                 "status": "success",
                 "output_path": output_path,
                 "exported_at": datetime.utcnow()
             }
+        except sqlite3.Error as e:
+            raise ValidationError(f"Database export failed (SQL): {str(e)}")
         except Exception as e:
-            raise ValidationError(f"Database export failed: {e}")
+            raise ValidationError(f"Database export failed: {str(e)}")
