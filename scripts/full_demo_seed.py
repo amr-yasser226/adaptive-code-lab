@@ -128,7 +128,10 @@ def seed_users(cursor):
             print(f"    - Exists: {name}")
         
         key = role if role in ('instructor', 'admin') else f"student{len([k for k in user_ids if 'student' in k])+1}"
-        user_ids[key] = row[0]
+        if row:
+            user_ids[key] = row[0]
+        else:
+            print(f"      ⚠ Failed to get ID for {name}")
     
     return user_ids
 
