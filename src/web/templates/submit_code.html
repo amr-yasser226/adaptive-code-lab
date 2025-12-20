@@ -10,7 +10,8 @@
         <li class="breadcrumb-item"><a href="{{ url_for('student.assignments') }}"><i class="fas fa-list"></i>
                 Assignments</a>
         </li>
-        <li class="breadcrumb-item"><a href="{{ url_for('student.assignment_detail', assignment_id=assignment.id) }}">{{
+        <li class="breadcrumb-item"><a
+                href="{{ url_for('student.assignment_detail', assignment_id=assignment.get_id()) }}">{{
                 assignment.title }}</a></li>
         <li class="breadcrumb-item active" aria-current="page">Submit Code</li>
     </ol>
@@ -56,7 +57,7 @@
             </div>
 
             <div class="editor-body">
-                <form method="POST" action="{{ url_for('student.submit_code', assignment_id=assignment.id) }}"
+                <form method="POST" action="{{ url_for('student.submit_code', assignment_id=assignment.get_id()) }}"
                     novalidate id="codeForm">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
@@ -121,11 +122,12 @@
                         <button type="submit" class="btn btn-primary btn-lg">
                             <i class="fas fa-paper-plane"></i> Submit Code
                         </button>
-                        <a href="{{ url_for('student.assignment_detail', assignment_id=assignment.id) }}"
+                        <a href="{{ url_for('student.assignment_detail', assignment_id=assignment.get_id()) }}"
                             class="btn btn-outline-secondary btn-lg">
                             Cancel
                         </a>
-                        <button type="button" id="saveDraftBtn" class="btn btn-outline-success btn-lg" onclick="saveDraftManual()">
+                        <button type="button" id="saveDraftBtn" class="btn btn-outline-success btn-lg"
+                            onclick="saveDraftManual()">
                             <i class="fas fa-save"></i> Save Draft
                         </button>
                         <span id="autosaveStatus" class="autosave-status"></span>
@@ -369,18 +371,20 @@
                 {% for prev in previous_submissions %}
                 <div class="submission-item">
                     <div class="submission-header">
-                        <strong>Version {{ prev.version_number }}</strong>
-                        <small class="text-muted">{{ prev.submitted_at|format_date('%m/%d %H:%M') }}</small>
+                        <strong>Version {{ prev.version }}</strong>
+                        <small class="text-muted">{{ prev.created_at|format_date('%m/%d %H:%M') if prev.created_at else
+                            'N/A' }}</small>
                     </div>
                     <div class="submission-details">
                         <span class="badge bg-secondary">{{ prev.language }}</span>
-                        {% if prev.score %}
+                        {% if prev.score is not none %}
                         <span class="score-badge">
                             {{ prev.score }}/100
                         </span>
                         {% endif %}
                     </div>
-                    <a href="{{ url_for('student.submission_results', submission_id=prev.id) }}" class="view-link">
+                    <a href="{{ url_for('student.submission_results', submission_id=prev.get_id()) }}"
+                        class="view-link">
                         <i class="fas fa-eye"></i> View
                     </a>
                 </div>
@@ -505,7 +509,7 @@ if __name__ == "__main__":
         const input = document.getElementById('codeInput').value;
         const language = document.getElementById('language').value;
         const output = document.getElementById('codeOutput');
-        const assignmentId = '{{ assignment.id }}'; // Injected by Jinja
+        const assignmentId = '{{ assignment.get_id() }}'; // Injected by Jinja
 
         if (!code.trim()) {
             showError(output, 'Please enter some code first');
@@ -669,15 +673,28 @@ if __name__ == "__main__":
 <script src="{{ url_for('static', filename='js/submission_autosave.js') }}"></script>
 <script>
     window.AUTOSAVE_CONFIG = {
-        assignmentId: {{ assignment.id }},
-        csrfToken: '{{ csrf_token() if csrf_token else "" }}',
+        assignmentId: {{ assignment.get_id() }},
+    csrfToken: '{{ csrf_token() if csrf_token else "" }}',
         intervalMs: 10000
     };
 </script>
 <style>
-    .autosave-status { display:inline-block; margin-left:8px; font-size:0.95rem; }
-    .autosave-status.ok { color: #198754; }
-    .autosave-status.saving { color: #0d6efd; }
-    .autosave-status.error { color: #dc3545; }
+    .autosave-status {
+        display: inline-block;
+        margin-left: 8px;
+        font-size: 0.95rem;
+    }
+
+    .autosave-status.ok {
+        color: #198754;
+    }
+
+    .autosave-status.saving {
+        color: #0d6efd;
+    }
+
+    .autosave-status.error {
+        color: #dc3545;
+    }
 </style>
 {% endblock %}

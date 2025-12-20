@@ -6,44 +6,42 @@
     <h2>Assignments</h2>
 
     {% if assignments %}
-        <ul class="list-group">
-            {% for a in assignments %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>{{ a.title }}</strong><br>
-                        <small class="text-muted">
-                            Due: {{ a.due_date | format_date }}
-                        </small>
-                    </div>
+    <ul class="list-group">
+        {% for a in assignments %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ a.title }}</strong><br>
+                <small class="text-muted">
+                    Due: {{ a.due_date | format_date }}
+                </small>
+            </div>
 
-                    <div class="btn-group btn-group-sm">
-                        {% if session.user_role == "instructor" %}
-                            {% if not a.is_published %}
-                                <form method="post"
-                                      action="{{ url_for('assignment.publish_assignment', assignment_id=a.id) }}">
-                                    <button class="btn btn-success">Publish</button>
-                                </form>
-                            {% else %}
-                                <form method="post"
-                                      action="{{ url_for('assignment.unpublish_assignment', assignment_id=a.id) }}">
-                                    <button class="btn btn-warning">Unpublish</button>
-                                </form>
-                            {% endif %}
-                            <a href="{{ url_for('assignment.view_submissions', assignment_id=a.id) }}"
-                               class="btn btn-secondary">
-                                Submissions
-                            </a>
-                            <a href="{{ url_for('assignment.assignment_statistics', assignment_id=a.id) }}"
-                               class="btn btn-info">
-                                Stats
-                            </a>
-                        {% endif %}
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
+            <div class="btn-group btn-group-sm">
+                {% if session.user_role == "instructor" %}
+                {% if not a.is_published %}
+                <form method="post" action="{{ url_for('assignment.publish_assignment', assignment_id=a.get_id()) }}">
+                    <button class="btn btn-success">Publish</button>
+                </form>
+                {% else %}
+                <form method="post" action="{{ url_for('assignment.unpublish_assignment', assignment_id=a.get_id()) }}">
+                    <button class="btn btn-warning">Unpublish</button>
+                </form>
+                {% endif %}
+                <a href="{{ url_for('assignment.view_submissions', assignment_id=a.get_id()) }}"
+                    class="btn btn-secondary">
+                    Submissions
+                </a>
+                <a href="{{ url_for('assignment.assignment_statistics', assignment_id=a.get_id()) }}"
+                    class="btn btn-info">
+                    Stats
+                </a>
+                {% endif %}
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
     {% else %}
-        <p class="text-muted">No assignments available.</p>
+    <p class="text-muted">No assignments available.</p>
     {% endif %}
 </div>
 {% endblock %}

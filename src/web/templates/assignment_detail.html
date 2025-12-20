@@ -137,7 +137,7 @@
                         <span class="info-label">Status</span>
                         <span class="badge bg-info">{{ latest_submission.status }}</span>
                     </div>
-                    {% if latest_submission.score %}
+                    {% if latest_submission.score is not none %}
                     <div class="info-row">
                         <span class="info-label">Score</span>
                         <span class="info-value">{{ latest_submission.score }}/100</span>
@@ -145,20 +145,26 @@
                     {% endif %}
                     <div class="info-row">
                         <span class="info-label">Submitted</span>
-                        <span class="info-value small">{{ latest_submission.submitted_at|format_date('%b %d, %Y')
-                            }}</span>
+                        <span class="info-value small">
+                            {{ latest_submission.created_at|format_date('%b %d, %Y') if latest_submission.created_at
+                            else 'N/A' }}
+                        </span>
                     </div>
-                    <a href="{{ url_for('student.submission_results', submission_id=latest_submission.id) }}"
+                    <a href="{{ url_for('student.submission_results', submission_id=latest_submission.get_id()) }}"
                         class="btn btn-info w-100 mb-2">
                         <i class="fas fa-eye"></i> View Submission
                     </a>
-                    <a href="{{ url_for('student.submit_code', assignment_id=assignment.id) }}"
-                        class="btn btn-primary w-100">
-                        <i class="fas fa-upload"></i> {% if latest_submission %}Re-submit{% else %}Submit Code{% endif
-                        %}
-                    </a>
+                </div>
+                {% else %}
+                <div class="alert alert-light border mb-3">
+                    <small class="text-muted"><i class="fas fa-info-circle"></i> No submissions yet.</small>
                 </div>
                 {% endif %}
+
+                <a href="{{ url_for('student.submit_code', assignment_id=assignment.get_id()) }}"
+                    class="btn btn-primary w-100">
+                    <i class="fas fa-upload"></i> {% if latest_submission %}Re-submit{% else %}Submit Code{% endif %}
+                </a>
             </div>
         </div>
         {% endif %}

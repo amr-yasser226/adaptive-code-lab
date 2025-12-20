@@ -28,43 +28,91 @@ def dashboard():
     
     current_user = user_repo.get_by_id(user_id)
     
+    # Get parameters
+    filter_type = request.args.get('filter', 'all')
+    search_query = request.args.get('search', '').lower()
+    sort_by = request.args.get('sort', 'due_date')
+
     submissions = student_service.get_student_submissions(user_id)
+    user_submissions = {s.get_assignment_id(): s for s in submissions}
+    
     for s in submissions:
         s.assignment = assignment_repo.get_by_id(s.get_assignment_id())
     
     all_assignments = assignment_repo.get_all()
-    active_assignments = [a for a in all_assignments if a.is_published]
+    # Student only sees published assignments
+    visible_assignments = [a for a in all_assignments if a.is_published]
+    
+    now = datetime.now()
+    
+    assignments_data = []
+    for a in visible_assignments:
+        sub = user_submissions.get(a.get_id())
+        
+        # Determine status
+        if sub:
+            status = 'completed' if sub.status in ['graded', 'submitted'] else 'in_progress'
+        else:
+            # Handle string or datetime due_date
+            due_date = a.due_date
+            if isinstance(due_date, str):
+                try:
+                    due_date = datetime.fromisoformat(due_date.replace('Z', ''))
+                except ValueError:
+                    due_date = now # Fallback
+            
+            if due_date < now:
+                status = 'overdue'
+            else:
+                status = 'pending' # Or in_progress if explicitly started
 
-    total_submissions = len(submissions)
-    passed_tests = 0 
-    total_tests = 0
-    total_score = 0
-    
-    for s in submissions:
-        total_score += s.score if s.score else 0
-        if result_repo:
-            res = result_repo.find_by_submission(s.get_id())
-            total_tests += len(res)
-            passed_tests += len([r for r in res if getattr(r, 'passed', False)])
-    
-    avg_score = round(total_score / total_submissions, 1) if total_submissions > 0 else 0
-    
+        # Apply search
+        if search_query and search_query not in a.title.lower() and search_query not in (a.description or '').lower():
+            continue
+            
+        # Apply filter
+        if filter_type != 'all' and status != filter_type:
+            # Note: 'in_progress' in tabs might mean pending/incomplete
+            if filter_type == 'in_progress' and status not in ['pending', 'in_progress']:
+                continue
+            elif filter_type == 'completed' and status != 'completed':
+                continue
+            elif filter_type == 'overdue' and status != 'overdue':
+                continue
+            elif filter_type not in ['in_progress', 'completed', 'overdue']:
+                pass
+
+        assignments_data.append({
+            'entity': a,
+            'status': status,
+            'score': sub.score if sub else None,
+            'submission': sub
+        })
+
+    # Apply sorting
+    if sort_by == 'title':
+        assignments_data.sort(key=lambda x: x['entity'].title)
+    elif sort_by == 'due_date':
+        assignments_data.sort(key=lambda x: x['entity'].due_date)
+    else:
+        assignments_data.sort(key=lambda x: x['entity'].due_date)
+
+    # Simplified stats for display
     stats = {
-        'active_assignments': len(active_assignments),
-        'total_submissions': total_submissions,
-        'passed_tests': passed_tests,
-        'total_tests': total_tests,
-        'average_score': avg_score,
-        'total_assignments': len(all_assignments),
-        'pending_submissions': len([s for s in submissions if getattr(s, 'status', '') == 'pending']),
-        'class_average': 75.0, # Peer avg placeholder
-        'plagiarism_flags': 0
+        'total_assignments': len(visible_assignments),
+        'active_assignments': len([a for a in assignments_data if a['status'] in ['pending', 'in_progress']]),
+        'passed_tests': len([a for a in assignments_data if a['status'] == 'completed']),
+        'pending_submissions': len([a for a in assignments_data if a['status'] == 'overdue']),
+        'average_score': round(sum(a['score'] for a in assignments_data if a['score']) / len([a for a in assignments_data if a['score']]), 1) if [a for a in assignments_data if a['score']] else 0,
+        'total_submissions': len(submissions)
     }
     
     return render_template('dashboard.html',
         user=current_user,
-        assignments=active_assignments,
+        assignments=[a['entity'] for a in assignments_data],
+        assignments_with_status=assignments_data,
         submissions=submissions,
+        recent_submissions=sorted(submissions, key=lambda s: s.created_at if s.created_at else datetime.min, reverse=True)[:5],
         current_user=current_user,
         stats=stats)
 
@@ -74,12 +122,56 @@ def assignments():
     user_id = session['user_id']
     assignment_repo = get_service('assignment_repo')
     student_service = get_service('student_service')
+    user_repo = get_service('user_repo')
+    
+    current_user = user_repo.get_by_id(user_id)
+    
+    # Get parameters
+    search_query = request.args.get('search', '').lower()
+    status_filter = request.args.get('status', '') # active, closed
+    sort_by = request.args.get('sort', 'due_date')
     
     all_assignments = assignment_repo.get_all()
     published_assignments = [a for a in all_assignments if a.is_published]
     submissions = student_service.get_student_submissions(user_id)
-    
     user_submissions = {s.get_assignment_id(): s for s in submissions}
+    
+    now = datetime.now()
+    filtered_assignments = []
+    for a in published_assignments:
+        # Resolve due_date if string
+        due_date = a.due_date
+        if isinstance(due_date, str):
+            try:
+                due_date = datetime.fromisoformat(due_date.replace('Z', ''))
+            except (ValueError, AttributeError):
+                due_date = now
+        
+        is_overdue = due_date < now
+        
+        # Apply search
+        if search_query and search_query not in a.title.lower() and search_query not in (a.description or '').lower():
+            continue
+            
+        # Apply status filter
+        if status_filter == 'active' and is_overdue:
+            continue
+        if status_filter == 'closed' and not is_overdue:
+            continue
+            
+        # Inject submission status for template
+        a.student_submission = user_submissions.get(a.get_id())
+        a.is_overdue = is_overdue
+        
+        filtered_assignments.append(a)
+        
+    # Apply sorting
+    if sort_by == 'name':
+        filtered_assignments.sort(key=lambda x: x.title)
+    elif sort_by == 'recent':
+        filtered_assignments.sort(key=lambda x: x.created_at if x.created_at else datetime.min, reverse=True)
+    else: # due_date
+        filtered_assignments.sort(key=lambda x: x.due_date)
     
     pagination = type('Pagination', (), {
         'pages': 1, 'page': 1, 'has_prev': False, 'has_next': False,
@@ -87,10 +179,10 @@ def assignments():
     })()
     
     return render_template('assignments.html',
-        user={'role': 'student'}, # Placeholder
-        assignments=published_assignments,
+        user=current_user,
+        assignments=filtered_assignments,
         user_submissions=user_submissions,
-        current_user={'role': 'student'},
+        current_user=current_user,
         pagination=pagination)
 
 @student_bp.route('/assignment/<assignment_id>')
@@ -99,20 +191,23 @@ def assignment_detail(assignment_id):
     user_id = session['user_id']
     assignment_repo = get_service('assignment_repo')
     student_service = get_service('student_service')
+    user_repo = get_service('user_repo')
     
+    current_user = user_repo.get_by_id(user_id)
     assignment = assignment_repo.get_by_id(assignment_id)
     if not assignment:
         flash('Assignment not found', 'error')
         return redirect(url_for('student.assignments'))
         
     submissions = student_service.get_student_submissions(user_id)
-    user_submission = next((s for s in submissions if str(s.get_assignment_id()) == str(assignment_id)), None)
+    # The template expects 'latest_submission'
+    latest_submission = next((s for s in sorted(submissions, key=lambda x: x.version, reverse=True) if str(s.get_assignment_id()) == str(assignment_id)), None)
     
     return render_template('assignment_detail.html',
-        user={'role': 'student'},
+        user=current_user,
         assignment=assignment,
-        user_submission=user_submission,
-        current_user={'role': 'student'})
+        latest_submission=latest_submission,
+        current_user=current_user)
 
 @student_bp.route('/submit/<assignment_id>', methods=['GET', 'POST'])
 @login_required
@@ -120,7 +215,9 @@ def submit_code(assignment_id):
     user_id = session['user_id']
     assignment_repo = get_service('assignment_repo')
     student_service = get_service('student_service')
+    user_repo = get_service('user_repo')
     
+    current_user = user_repo.get_by_id(user_id)
     assignment = assignment_repo.get_by_id(assignment_id)
     if not assignment:
         flash('Assignment not found', 'error')
@@ -137,10 +234,18 @@ def submit_code(assignment_id):
         except (sqlite3.Error, ValidationError, Exception) as e:
             flash(str(e), 'error')
             
+    submissions = student_service.get_student_submissions(user_id)
+    previous_submissions = sorted(
+        [s for s in submissions if str(s.get_assignment_id()) == str(assignment_id)],
+        key=lambda x: x.version,
+        reverse=True
+    )
+            
     return render_template('submit_code.html',
-        user={'role': 'student'},
+        user=current_user,
         assignment=assignment,
-        current_user={'role': 'student'})
+        previous_submissions=previous_submissions,
+        current_user=current_user)
 
 @student_bp.route('/results/<submission_id>')
 @login_required
@@ -149,6 +254,9 @@ def submission_results(submission_id):
     submission_repo = get_service('submission_repo')
     assignment_repo = get_service('assignment_repo')
     result_repo = get_service('result_repo')
+    
+    user_repo = get_service('user_repo')
+    current_user = user_repo.get_by_id(user_id)
     
     # Actually fetch the submission from repository
     submission = submission_repo.get_by_id(submission_id)
@@ -167,8 +275,8 @@ def submission_results(submission_id):
     test_results = result_repo.find_by_submission(submission_id) if result_repo else []
     
     return render_template('submission_results.html',
-        user={'role': 'student'},
+        user=current_user,
         submission=submission,
         assignment=assignment,
         test_results=test_results,
-        current_user={'role': 'student'})
+        current_user=current_user)
