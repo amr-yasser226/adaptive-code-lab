@@ -31,7 +31,8 @@ def create_assignment():
                 due_date=request.form.get("due_date"),
                 max_points=request.form.get("max_points", type=int),
                 allow_late_submissions=bool(request.form.get("allow_late")),
-                late_submission_penalty=request.form.get("late_penalty")
+                late_submission_penalty=request.form.get("late_penalty"),
+                is_published=bool(request.form.get("is_published"))
             )
             flash("Assignment created successfully", "success")
             return redirect(url_for("instructor.dashboard"))
