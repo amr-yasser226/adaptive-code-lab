@@ -100,7 +100,7 @@
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm bg-light mb-4">
                 <div class="card-body p-4">
-                    {% if not is_enrolled %}
+                    {% if current_user.role == 'student' and not is_enrolled %}
                     <h5 class="font-weight-bold mb-3">Interested?</h5>
                     <p class="text-muted small mb-4">Enroll now to access assignments, submit your code, and receive
                         AI-powered feedback.</p>

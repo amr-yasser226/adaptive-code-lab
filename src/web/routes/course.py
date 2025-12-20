@@ -228,10 +228,14 @@ def enroll(course_id):
             final_grade=None
         )
 
-        enrollment_repo.enroll(new_enrollment)
-        flash('Enrolled successfully', 'success')
+        result = enrollment_repo.enroll(new_enrollment)
+        if result:
+            flash('Enrolled successfully', 'success')
+        else:
+            flash('Enrollment failed. You might already be enrolled or there was a database error.', 'error')
+        
         return redirect(url_for('course.course_detail', course_id=course_id))
 
-    except (ValidationError, AuthError, sqlite3.Error) as e:
+    except (ValidationError, AuthError, sqlite3.Error, Exception) as e:
         flash(str(e), 'error')
         return redirect(url_for('course.course_detail', course_id=course_id))
