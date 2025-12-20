@@ -57,6 +57,10 @@
                         <a class="nav-link" href="{{ url_for('instructor.dashboard') }}">
                             <i class="fas fa-chart-line"></i> Dashboard
                         </a>
+                        {% elif current_user.role == 'admin' %}
+                        <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+                            <i class="fas fa-th-large"></i> Dashboard
+                        </a>
                         {% else %}
                         <a class="nav-link" href="{{ url_for('student.dashboard') }}">
                             <i class="fas fa-th-large"></i> Dashboard
@@ -66,7 +70,8 @@
 
                     {% if current_user.role == 'instructor' or current_user.role == 'admin' %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('instructor.analytics') }}"
+                        <a class="nav-link"
+                            href="{{ url_for('admin.admin_analytics' if current_user.role == 'admin' else 'instructor.analytics') }}"
                             style="color: #374151; font-weight: 500;">
                             <i class="fas fa-chart-bar" style="color: #667eea;"></i> Analytics
                         </a>
@@ -91,6 +96,8 @@
                             <li>
                                 {% if current_user.role == 'instructor' %}
                                 <a class="dropdown-item" href="{{ url_for('instructor.profile') }}">Profile</a>
+                                {% elif current_user.role == 'admin' %}
+                                <a class="dropdown-item" href="{{ url_for('admin.profile') }}">Profile</a>
                                 {% else %}
                                 <a class="dropdown-item" href="{{ url_for('student.profile') }}">Profile</a>
                                 {% endif %}

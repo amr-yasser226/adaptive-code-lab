@@ -24,7 +24,7 @@ def instructor_required(f):
             flash('Please log in first', 'warning')
             return redirect(url_for('auth.login'))
         # Then check role
-        if session.get('user_role') != 'instructor':
+        if session.get('user_role') not in ['instructor', 'admin']:
             flash('Instructor access required', 'error')
             return redirect(url_for('index'))
         return f(*args, **kwargs)
@@ -40,7 +40,7 @@ def student_required(f):
             flash('Please log in first', 'warning')
             return redirect(url_for('auth.login'))
         # Then check role
-        if session.get('user_role') != 'student':
+        if session.get('user_role') not in ['student', 'admin']:
             flash('Student access required', 'error')
             return redirect(url_for('index'))
         return f(*args, **kwargs)

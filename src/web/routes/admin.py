@@ -4,6 +4,7 @@ from flask import Blueprint, request, redirect, url_for, flash, render_template
 from web.utils import login_required, admin_required, get_service ,get_current_user
 from core.exceptions.auth_error import AuthError
 from core.exceptions.validation_error import ValidationError
+from web.routes.instructor import analytics
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -12,6 +13,18 @@ admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 @admin_required
 def dashboard():
     return render_template("admin/dashboard.html")
+
+@admin_bp.route("/analytics")
+@login_required
+@admin_required
+def admin_analytics():
+    return analytics()
+
+@admin_bp.route("/analytics")
+@login_required
+@admin_required
+def admin_analytics():
+    return analytics()
 
 
 @admin_bp.route("/users/manage", methods=["POST"])
@@ -67,27 +80,41 @@ def generate_report(report_type):
 
 
 
-# @admin_bp.route("/settings", methods=["POST"])
-# @login_required
-# @admin_required
-# def configure_system_setting():
-#     key = request.form.get("key")
-#     value = request.form.get("value")
+@admin_bp.route("/settings", methods=["POST"])
+@login_required
+@admin_required
+def configure_system_setting():
+    key = request.form.get("key")
+    value = request.form.get("value")
 
-#     admin_service = get_service("admin_service")
+    admin_service = get_service("admin_service")
 
-#     try:
-#         admin_service.configure_system_setting(
-#             admin_user=get_current_user(),
-#             key=key,
-#             value=value
-#         )
-#         flash("System setting updated successfully", "success")
+    try:
+        admin_service.configure_system_setting(
+            admin_user=get_current_user(),
+            key=key,
+            value=value
+        )
+        flash("System setting updated successfully", "success")
 
-#     except (ValidationError, sqlite3.Error) as e:
-#         flash(str(e), "error")
+    except (ValidationError, sqlite3.Error) as e:
+        flash(str(e), "error")
 
-#     return redirect(url_for("admin.dashboard"))
+    return redirect(url_for("admin.dashboard"))
+
+from web.routes.profile_shared import profile_view, profile_update_logic
+
+@admin_bp.route('/profile')
+@login_required
+@admin_required
+def profile():
+    return profile_view()
+
+@admin_bp.route('/profile/update', methods=['POST'])
+@login_required
+@admin_required
+def update_profile():
+    return profile_update_logic('admin')
 
 
 
@@ -108,6 +135,7 @@ def export_db_dump():
             output_path=output_path
         )
         flash("Database exported successfully", "success")
+        return redirect(url_for("admin.dashboard", download_path=output_path))
 
     except (ValidationError, sqlite3.Error) as e:
         flash(str(e), "error")
