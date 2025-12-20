@@ -70,7 +70,7 @@ class AdminService:
             return self.enrollment_repo.list_all()
 
         if report_type == "submissions" and self.submission_repo:
-            return self.submission_repo.list_all()
+            return self.submission_repo.get_all()
 
         raise ValidationError("Invalid or unsupported report type")
 
