@@ -104,6 +104,11 @@ def seed_users(cursor):
     password_hash = generate_password_hash('testpassword123')
     admin_hash = generate_password_hash('adminpassword123')
     
+    # Check if bio column exists
+    cursor.execute("PRAGMA table_info(users)")
+    columns = [col[1] for col in cursor.fetchall()]
+    has_bio = 'bio' in columns
+    
     users = [
         ('Alice Instructor', 'alice@accl.edu', password_hash, 'instructor', 'Hello, I am the main instructor.'),
         ('Bob Student', 'bob@accl.edu', password_hash, 'student', 'CS major, junior year'),
@@ -117,10 +122,16 @@ def seed_users(cursor):
         cursor.execute('SELECT id FROM users WHERE email = ?', (email,))
         row = cursor.fetchone()
         if not row:
-            safe_insert(cursor, '''
-                INSERT INTO users (name, email, password_hash, role, is_active, bio, created_at)
-                VALUES (?, ?, ?, ?, 1, ?, datetime('now'))
-            ''', (name, email, pwd, role, bio), f"Insert {name}")
+            if has_bio:
+                safe_insert(cursor, '''
+                    INSERT INTO users (name, email, password_hash, role, is_active, bio, created_at)
+                    VALUES (?, ?, ?, ?, 1, ?, datetime('now'))
+                ''', (name, email, pwd, role, bio), f"Insert {name}")
+            else:
+                safe_insert(cursor, '''
+                    INSERT INTO users (name, email, password_hash, role, is_active, created_at)
+                    VALUES (?, ?, ?, ?, 1, datetime('now'))
+                ''', (name, email, pwd, role), f"Insert {name}")
             cursor.execute('SELECT id FROM users WHERE email = ?', (email,))
             row = cursor.fetchone()
             print(f"    ✓ Created: {name} ({role})")
