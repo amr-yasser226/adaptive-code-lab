@@ -297,18 +297,20 @@ print(' '.join(map(str, fib[:n])))'''
     code_wrong = 'print("hello world")'  # Wrong output
     
     submissions = [
-        # Student 1 - good submissions
+        # Student 1 (Bob) - good submissions
         (user_ids['student1'], assignment_ids[0], code_hello, 'graded', 100, 'python'),
         (user_ids['student1'], assignment_ids[1], code_sum, 'graded', 100, 'python'),
         (user_ids['student1'], assignment_ids[2], code_fib, 'graded', 100, 'python'),
         
-        # Student 2 - similar code (for plagiarism detection)
-        (user_ids['student2'], assignment_ids[0], code_similar, 'graded', 100, 'python'),
-        (user_ids['student2'], assignment_ids[1], code_sum, 'graded', 80, 'python'),
+        # Student 2 (Charlie) - similar code (plagiarism cases)
+        (user_ids['student2'], assignment_ids[0], code_similar, 'graded', 100, 'python'), # Similar to HW-S1
+        (user_ids['student2'], assignment_ids[1], code_sum, 'graded', 100, 'python'),    # Identical to Sum-S1
+        (user_ids['student2'], assignment_ids[2], code_fib.replace('fib', 'sequence'), 'graded', 90, 'python'), # Similar to Fib-S1
         
-        # Student 3 - partial/wrong submissions
+        # Student 3 (Diana) - partial/wrong or common patterns
         (user_ids['student3'], assignment_ids[0], code_wrong, 'graded', 50, 'python'),
-        (user_ids['student3'], assignment_ids[1], 'print("testing")', 'submitted', 0, 'python'),
+        (user_ids['student3'], assignment_ids[1], 'n = int(input()); print(n*(n+1)//2)', 'graded', 100, 'python'), # Different logic for Sum
+        (user_ids['student3'], assignment_ids[2], code_fib, 'submitted', 0, 'python'), # Plagiarism: copied Bob's exactly
     ]
     
     submission_ids = []
@@ -362,30 +364,70 @@ def seed_hints(cursor, submission_ids):
 
 
 def seed_similarity_flags(cursor, submission_ids):
-    """FR-07: Create similarity/plagiarism flags"""
-    print("\n[8/12] Creating similarity flags (FR-07)...")
+    """FR-07: Create similarity/plagiarism flags and detailed comparisons"""
+    print("\n[8/12] Creating similarity flags and comparisons (FR-07)...")
     
-    if len(submission_ids) >= 2:
-        # High similarity between student 1 and student 2 on Hello World
+    if len(submission_ids) >= 9:
+        # Case 1: Hello World (Sub 0 vs Sub 3) - 95% similarity
         cursor.execute('SELECT id FROM similarity_flags WHERE submission_id = ?', (submission_ids[0],))
-        if not cursor.fetchone():
+        flag_row = cursor.fetchone()
+        if not flag_row:
             safe_insert(cursor, '''
-                INSERT INTO similarity_flags 
-                (submission_id, similarity_score, is_reviewed, created_at)
+                INSERT INTO similarity_flags (submission_id, similarity_score, is_reviewed, created_at)
                 VALUES (?, ?, 0, datetime('now'))
-            ''', (submission_ids[0], 0.95), "Flag 1")
-        
-        # Medium similarity
-        if len(submission_ids) > 4:
+            ''', (submission_ids[0], 0.95), "Flag HW-S1")
+            cursor.execute('SELECT last_insert_rowid()')
+            flag_id = cursor.fetchone()[0]
+        else:
+            flag_id = flag_row[0]
+            
+        if table_exists(cursor, 'similarity_comparisons'):
             safe_insert(cursor, '''
-                INSERT INTO similarity_flags 
-                (submission_id, similarity_score, is_reviewed, created_at)
+                INSERT INTO similarity_comparisons (similarity_id, compared_submission_id, match_score, note, matched_segments)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (flag_id, submission_ids[3], 0.95, "Identical logic detected in Hello World", '[{"start": 0, "end": 20, "type": "exact"}]'), "Comparison HW-S1-S2")
+            
+        # Case 2: Sum Calculator (Sub 1 vs Sub 4) - 100% similarity (identical)
+        cursor.execute('SELECT id FROM similarity_flags WHERE submission_id = ?', (submission_ids[1],))
+        flag_row_2 = cursor.fetchone()
+        if not flag_row_2:
+            safe_insert(cursor, '''
+                INSERT INTO similarity_flags (submission_id, similarity_score, is_reviewed, created_at)
                 VALUES (?, ?, 0, datetime('now'))
-            ''', (submission_ids[4], 0.65), "Flag 2")
-        
-        print("    ✓ Created similarity flags")
+            ''', (submission_ids[1], 1.0), "Flag Sum-S1")
+            cursor.execute('SELECT last_insert_rowid()')
+            flag_id_2 = cursor.fetchone()[0]
+        else:
+            flag_id_2 = flag_row_2[0]
+            
+        if table_exists(cursor, 'similarity_comparisons'):
+            safe_insert(cursor, '''
+                INSERT INTO similarity_comparisons (similarity_id, compared_submission_id, match_score, note, matched_segments)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (flag_id_2, submission_ids[4], 1.0, "Submissions are identical byte-for-byte", '[{"start": 0, "end": 60, "type": "identical"}]'), "Comparison Sum-S1-S2")
+            
+        # Case 3: Fibonacci Sequence (Sub 2 vs Sub 8) - 100% similarity (Cross-student copying)
+        cursor.execute('SELECT id FROM similarity_flags WHERE submission_id = ?', (submission_ids[2],))
+        flag_row_3 = cursor.fetchone()
+        if not flag_row_3:
+            safe_insert(cursor, '''
+                INSERT INTO similarity_flags (submission_id, similarity_score, is_reviewed, created_at)
+                VALUES (?, ?, 0, datetime('now'))
+            ''', (submission_ids[2], 1.0), "Flag Fib-S1")
+            cursor.execute('SELECT last_insert_rowid()')
+            flag_id_3 = cursor.fetchone()[0]
+        else:
+            flag_id_3 = flag_row_3[0]
+            
+        if table_exists(cursor, 'similarity_comparisons'):
+            safe_insert(cursor, '''
+                INSERT INTO similarity_comparisons (similarity_id, compared_submission_id, match_score, note, matched_segments)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (flag_id_3, submission_ids[8], 1.0, "Diana copied Bob's Fibonacci code exactly", '[{"start": 0, "end": 100, "type": "identical"}]'), "Comparison Fib-S1-S3")
+            
+        print("    ✓ Created detailed similarity flags and comparisons across 3 assignments")
     else:
-        print("    ⚠ Not enough submissions for flags")
+        print(f"    ⚠ Not enough submissions for flags (need 9, have {len(submission_ids)})")
 
 
 def seed_notifications(cursor, user_ids):
@@ -445,23 +487,32 @@ def seed_peer_reviews(cursor, submission_ids, user_ids):
         print("    ⚠ peer_reviews table not found")
         return
     
-    if len(submission_ids) >= 3:
+    if len(submission_ids) >= 5:
         # peer_reviews schema: submission_id, reviewer_student_id, rubric_scores, comments, is_submitted
         reviews = [
+            # Submitted reviews
             (submission_ids[0], user_ids['student2'], '{"code_quality": 4, "correctness": 5}', 'Good code structure and clear output', 1),
             (submission_ids[0], user_ids['student3'], '{"code_quality": 5, "correctness": 5}', 'Perfect solution!', 1),
             (submission_ids[1], user_ids['student3'], '{"code_quality": 4, "correctness": 4}', 'Works correctly, could add comments', 1),
+            
+            # Pending reviews (is_submitted=0)
+            (submission_ids[2], user_ids['student2'], '{}', '', 0),  # Student 2 (Charlie) to review Student 1 (Bob)
+            (submission_ids[3], user_ids['student1'], '{}', '', 0),  # Student 1 (Bob) to review Student 2 (Charlie)
         ]
         
         count = 0
         for sub_id, reviewer_id, scores, comment, is_submitted in reviews:
-            if safe_insert(cursor, '''
-                INSERT INTO peer_reviews (submission_id, reviewer_student_id, rubric_scores, comments, is_submitted, created_at)
-                VALUES (?, ?, ?, ?, ?, datetime('now'))
-            ''', (sub_id, reviewer_id, scores, comment, is_submitted), "Peer review"):
-                count += 1
+            # Check if exists
+            cursor.execute('SELECT submission_id FROM peer_reviews WHERE submission_id = ? AND reviewer_student_id = ?',
+                           (sub_id, reviewer_id))
+            if not cursor.fetchone():
+                if safe_insert(cursor, '''
+                    INSERT INTO peer_reviews (submission_id, reviewer_student_id, rubric_scores, comments, is_submitted, created_at)
+                    VALUES (?, ?, ?, ?, ?, datetime('now'))
+                ''', (sub_id, reviewer_id, scores, comment, is_submitted), "Peer review"):
+                    count += 1
         
-        print(f"    ✓ Created {count} peer reviews")
+        print(f"    ✓ Created {count} peer reviews (including pending)")
     else:
         print("    ⚠ Not enough submissions for peer reviews")
 
