@@ -31,7 +31,7 @@ Admin Dashboard
 
         <div class="card-body">
             <form method="post" action="{{ url_for('admin.manage_user_account') }}">
-                
+
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="row g-2 align-items-center">
@@ -101,7 +101,7 @@ Admin Dashboard
     <!-- ===================== -->
     <!-- System Settings -->
     <!-- ===================== -->
-    <section class="card mb-4">
+    <!-- <section class="card mb-4">
         <div class="card-header">
             <h5>System Settings</h5>
         </div>
@@ -134,7 +134,7 @@ Admin Dashboard
                 </div>
             </form>
         </div>
-    </section>
+    </section> -->
 
     <!-- ===================== -->
     <!-- Database Export -->
